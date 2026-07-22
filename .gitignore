@@ -46,3 +46,6 @@ tmp/
 
 # Ollama or downloaded model data
 models/
+
+# Generated experimental runs
+generated-apps/runs/

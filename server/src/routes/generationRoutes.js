@@ -1,27 +1,78 @@
 import express from "express";
+import { buildPrompt } from "../prompts/buildPrompt.js";
 import { generateWithOllama } from "../services/ollamaService.js";
+import { saveGeneratedRun } from "../services/runStorageService.js";
+import { getSpecificationById } from "../specifications/index.js";
+import { parseGeneratedApplication } from "../utils/responseParser.js";
 
 const router = express.Router();
 
+const supportedWorkflows = ["one-shot", "quality-focused"];
+
 router.post("/", async (request, response) => {
   try {
-    const { prompt, model, temperature } = request.body;
+    const {
+      specificationId,
+      workflow,
+      temperature = 0,
+    } = request.body;
 
-    if (typeof prompt !== "string" || prompt.trim().length === 0) {
+    if (
+      typeof specificationId !== "string" ||
+      specificationId.trim() === ""
+    ) {
       return response.status(400).json({
-        error: "A non-empty prompt is required.",
+        error: "A specificationId is required.",
       });
     }
 
-    const result = await generateWithOllama({
-      prompt: prompt.trim(),
-      model,
+    if (!supportedWorkflows.includes(workflow)) {
+      return response.status(400).json({
+        error: `Workflow must be one of: ${supportedWorkflows.join(", ")}.`,
+      });
+    }
+
+    const specification = getSpecificationById(
+      specificationId.trim(),
+    );
+
+    if (!specification) {
+      return response.status(404).json({
+        error: `No specification exists with ID "${specificationId}".`,
+      });
+    }
+
+    const prompt = buildPrompt({
+      workflow,
+      specification,
+    });
+
+    const ollamaResult = await generateWithOllama({
+      prompt,
       temperature,
     });
 
-    return response.json(result);
+    const application = parseGeneratedApplication(
+      ollamaResult.rawResponse,
+    );
+
+    const runMetadata = await saveGeneratedRun({
+      application,
+      specification,
+      workflow,
+      model: ollamaResult.model,
+      temperature: Number(temperature),
+      prompt,
+      rawResponse: ollamaResult.rawResponse,
+      generationMetrics: ollamaResult.generationMetrics,
+    });
+
+    return response.status(201).json({
+      run: runMetadata,
+      application,
+    });
   } catch (error) {
-    console.error(error);
+    console.error("Generation failed:", error);
 
     return response.status(500).json({
       error: "Application generation failed.",

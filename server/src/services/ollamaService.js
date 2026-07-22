@@ -1,47 +1,113 @@
-const ollamaBaseUrl =
-  process.env.OLLAMA_BASE_URL || "http://localhost:11434";
+function getOllamaBaseUrl() {
+  return (
+    process.env.OLLAMA_BASE_URL ||
+    "http://localhost:11434"
+  );
+}
 
-const defaultModel = process.env.OLLAMA_MODEL;
+function getDefaultModel() {
+  return process.env.OLLAMA_MODEL;
+}
+
+function normaliseTemperature(value) {
+  if (value === undefined || value === null || value === "") {
+    return 0;
+  }
+
+  const parsedValue = Number(value);
+
+  if (
+    !Number.isFinite(parsedValue) ||
+    parsedValue < 0 ||
+    parsedValue > 2
+  ) {
+    throw new Error(
+      "Temperature must be a number between 0 and 2.",
+    );
+  }
+
+  return parsedValue;
+}
 
 export async function generateWithOllama({
   prompt,
-  model = defaultModel,
+  model,
   temperature = 0,
 }) {
-  if (!model) {
-    throw new Error("OLLAMA_MODEL is not configured.");
+  const ollamaBaseUrl = getOllamaBaseUrl();
+  const selectedModel = model || getDefaultModel();
+
+  if (!selectedModel) {
+    throw new Error(
+      "OLLAMA_MODEL is not configured in server/.env.",
+    );
   }
 
-  const response = await fetch(`${ollamaBaseUrl}/api/generate`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model,
-      prompt,
-      stream: false,
-      options: {
-        temperature,
+  const parsedTemperature =
+    normaliseTemperature(temperature);
+
+  const startedAt = Date.now();
+
+  let response;
+
+  try {
+    response = await fetch(
+      `${ollamaBaseUrl}/api/generate`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: selectedModel,
+          prompt,
+          stream: false,
+          format: "json",
+          options: {
+            temperature: parsedTemperature,
+          },
+        }),
       },
-    }),
-  });
+    );
+  } catch (error) {
+    throw new Error(
+      `Could not connect to Ollama at ${ollamaBaseUrl}: ${error.message}`,
+    );
+  }
 
   if (!response.ok) {
-    const body = await response.text();
+    const responseBody = await response.text();
 
     throw new Error(
-      `Ollama request failed with status ${response.status}: ${body}`,
+      `Ollama returned ${response.status}: ${responseBody}`,
     );
   }
 
   const data = await response.json();
 
+  if (
+    typeof data.response !== "string" ||
+    data.response.trim() === ""
+  ) {
+    throw new Error(
+      "Ollama returned an empty generation response.",
+    );
+  }
+
   return {
-    model: data.model,
-    response: data.response,
-    totalDuration: data.total_duration,
-    promptTokens: data.prompt_eval_count,
-    outputTokens: data.eval_count,
+    model: data.model || selectedModel,
+    rawResponse: data.response,
+    generationMetrics: {
+      requestDurationMilliseconds:
+        Date.now() - startedAt,
+      totalDurationNanoseconds:
+        data.total_duration ?? null,
+      loadDurationNanoseconds:
+        data.load_duration ?? null,
+      promptTokenCount:
+        data.prompt_eval_count ?? null,
+      outputTokenCount:
+        data.eval_count ?? null,
+    },
   };
 }
