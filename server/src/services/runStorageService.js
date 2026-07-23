@@ -47,6 +47,7 @@ export async function saveGeneratedRun({
   prompt,
   rawResponse,
   generationMetrics,
+  qualityReport,
 }) {
   const runId = createRunId();
   const runDirectory = path.join(getRunsDirectory(), runId);
@@ -66,6 +67,7 @@ export async function saveGeneratedRun({
     promptVersion: "1.0.0",
     generationMetrics,
     generatedApplication: application.metadata,
+    qualitySummary: qualityReport.summary,
   };
 
   await Promise.all([
@@ -94,7 +96,13 @@ export async function saveGeneratedRun({
       rawResponse,
       "utf8",
     ),
-    writeJson(path.join(runDirectory, "metadata.json"), metadata),
+    writeJson(
+      path.join(runDirectory, "metadata.json"), metadata
+    ),
+    writeJson(
+      path.join(runDirectory, "quality-report.json"),
+      qualityReport,
+    ),
   ]);
 
   return metadata;

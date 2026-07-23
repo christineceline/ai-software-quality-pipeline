@@ -4,6 +4,7 @@ import { generateWithOllama } from "../services/ollamaService.js";
 import { saveGeneratedRun } from "../services/runStorageService.js";
 import { getSpecificationById } from "../specifications/index.js";
 import { parseGeneratedApplication } from "../utils/responseParser.js";
+import { analyseApplication } from "../quality/qualityAnalyzer.js";
 
 const router = express.Router();
 
@@ -56,6 +57,8 @@ router.post("/", async (request, response) => {
       ollamaResult.rawResponse,
     );
 
+    const qualityReport = await analyseApplication(application);
+
     const runMetadata = await saveGeneratedRun({
       application,
       specification,
@@ -65,11 +68,13 @@ router.post("/", async (request, response) => {
       prompt,
       rawResponse: ollamaResult.rawResponse,
       generationMetrics: ollamaResult.generationMetrics,
+      qualityReport,
     });
 
     return response.status(201).json({
       run: runMetadata,
       application,
+      qualityReport,
     });
   } catch (error) {
     console.error("Generation failed:", error);
