@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import ApplicationPreview from "./components/ApplicationPreview";
 import CodeViewer from "./components/CodeViewer";
+import QualityReport from "./components/QualityReport";
 
 const workflows = [
   {
@@ -36,6 +37,7 @@ function App() {
     useState("preview");
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState("");
+  const [qualityReport, setQualityReport] = useState(null);
 
   useEffect(() => {
     async function initialiseApplication() {
@@ -91,6 +93,7 @@ function App() {
     setApplication(null);
     setRun(null);
     setIsGenerating(true);
+    setQualityReport(null);
 
     try {
       const response = await fetch("/api/generate", {
@@ -115,6 +118,7 @@ function App() {
 
       setApplication(data.application);
       setRun(data.run);
+      setQualityReport(data.qualityReport);
       setActiveResultView("preview");
     } catch (generationError) {
       setError(generationError.message);
@@ -280,13 +284,31 @@ function App() {
               >
                 Source code
               </button>
+
+              <button
+                type="button"
+                className={
+                  activeResultView === "quality"
+                    ? "view-button view-button--active"
+                    : "view-button"
+                }
+                onClick={() => setActiveResultView("quality")}
+              >
+                Quality report
+              </button>
             </div>
           </div>
 
-          {activeResultView === "preview" ? (
+          {activeResultView === "preview" && (
             <ApplicationPreview application={application} />
-          ) : (
+          )}
+
+          {activeResultView === "code" && (
             <CodeViewer application={application} />
+          )}
+
+          {activeResultView === "quality" && (
+            <QualityReport report={qualityReport} />
           )}
         </section>
       </main>
