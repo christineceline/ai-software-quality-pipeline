@@ -56,6 +56,7 @@ Create the complete frontend web application described below using:
 - CSS
 - Vanilla JavaScript
 
+Make it visually appealing.
 Do not use external frameworks, external libraries, external APIs, cookies,
 analytics, user accounts or server-side code.
 
@@ -77,6 +78,7 @@ Create the complete frontend web application described below using:
 Functional correctness and software quality are equally important.
 
 Quality requirements:
+- Make it visually appealing.
 - Use semantic HTML5 elements.
 - Provide associated labels for every form control.
 - Ensure the application is usable using a keyboard.

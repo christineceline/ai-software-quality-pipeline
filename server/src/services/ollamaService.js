@@ -51,24 +51,23 @@ export async function generateWithOllama({
   let response;
 
   try {
-    response = await fetch(
-      `${ollamaBaseUrl}/api/generate`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: selectedModel,
-          prompt,
-          stream: false,
-          format: "json",
-          options: {
-            temperature: parsedTemperature,
-          },
-        }),
+      response = await fetch(`${ollamaBaseUrl}/api/generate`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify({
+        model: selectedModel,
+        prompt,
+        stream: false,
+        format: "json",
+        keep_alive: "60m",
+        options: {
+          temperature: 0.4,
+          num_predict: 4096,
+        },
+      }),
+    });
   } catch (error) {
     throw new Error(
       `Could not connect to Ollama at ${ollamaBaseUrl}: ${error.message}`,
