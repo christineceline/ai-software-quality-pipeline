@@ -3,6 +3,7 @@ import "./App.css";
 import ApplicationPreview from "./components/ApplicationPreview";
 import CodeViewer from "./components/CodeViewer";
 import QualityReport from "./components/QualityReport";
+import RuntimeReport from "./components/RuntimeReport";
 
 const workflows = [
   {
@@ -38,6 +39,7 @@ function App() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState("");
   const [qualityReport, setQualityReport] = useState(null);
+  const [runtimeReport, setRuntimeReport] = useState(null);
 
   useEffect(() => {
     async function initialiseApplication() {
@@ -94,6 +96,7 @@ function App() {
     setRun(null);
     setIsGenerating(true);
     setQualityReport(null);
+    setRuntimeReport(null);
 
     try {
       const response = await fetch("/api/generate", {
@@ -119,6 +122,7 @@ function App() {
       setApplication(data.application);
       setRun(data.run);
       setQualityReport(data.qualityReport);
+      setRuntimeReport(data.runtimeReport);
       setActiveResultView("preview");
     } catch (generationError) {
       setError(generationError.message);
@@ -307,8 +311,11 @@ function App() {
             <CodeViewer application={application} />
           )}
 
-          {activeResultView === "quality" && (
+          {activeResultView === "quality" && ( 
+            <>
             <QualityReport report={qualityReport} />
+            <RuntimeReport report={runtimeReport} />
+            </>
           )}
         </section>
       </main>

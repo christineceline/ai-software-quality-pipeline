@@ -418,3 +418,81 @@ input:focus-visible {
     flex-direction: column;
   }
 }
+
+.quality-report {
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  border: 1px solid #d7d7d7;
+  border-radius: 0.5rem;
+  background: #fff;
+}
+
+.quality-report__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.report-summary {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(160px, 1fr)
+  );
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.report-summary div {
+  padding: 0.75rem;
+  border: 1px solid #e5e5e5;
+  border-radius: 0.35rem;
+}
+
+.report-summary dt {
+  font-weight: 600;
+}
+
+.report-summary dd {
+  margin: 0.4rem 0 0;
+}
+
+.report-status {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.report-status--pass {
+  background: #dff5e5;
+  color: #145c2d;
+}
+
+.report-status--fail {
+  background: #fbe2e2;
+  color: #8a1c1c;
+}
+
+.report-list {
+  padding-left: 1.25rem;
+}
+
+.report-list li {
+  margin-bottom: 0.5rem;
+}
+
+.report-list--errors code {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.report-error,
+.report-warning {
+  padding: 0.75rem;
+  border: 1px solid #d9a0a0;
+  background: #fff0f0;
+  border-radius: 0.35rem;
+}
