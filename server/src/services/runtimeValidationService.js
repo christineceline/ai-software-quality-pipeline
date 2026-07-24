@@ -1,26 +1,34 @@
 import path from "node:path";
 import { writeFile } from "node:fs/promises";
 import { chromium } from "playwright";
+import AxeBuilder from "@axe-core/playwright";
 
 import { getRuntimeRequirements } from "../config/runtimeRequirements.js";
 
 const DEFAULT_TIMEOUT_MS = 15_000;
 const POST_LOAD_WAIT_MS = 500;
 
+const AXE_TAGS = [
+  "wcag2a",
+  "wcag2aa",
+  "wcag21a",
+  "wcag21aa",
+];
+
 async function candidateExists(page, candidate) {
   if (candidate.type === "css") {
-    return page.locator(candidate.selector).count().then(
-      (count) => count > 0,
-    );
+    const count = await page.locator(candidate.selector).count();
+    return count > 0;
   }
 
   if (candidate.type === "role") {
-    return page
+    const count = await page
       .getByRole(candidate.role, {
         name: candidate.name,
       })
-      .count()
-      .then((count) => count > 0);
+      .count();
+
+    return count > 0;
   }
 
   throw new Error(
@@ -54,6 +62,19 @@ async function evaluateRequiredControl(page, requirement) {
     } catch (error) {
       candidateResults.push({
         type: candidate.type,
+        selector:
+          candidate.type === "css"
+            ? candidate.selector
+            : undefined,
+        role:
+          candidate.type === "role"
+            ? candidate.role
+            : undefined,
+        name:
+          candidate.type === "role" &&
+          candidate.name instanceof RegExp
+            ? candidate.name.source
+            : undefined,
         found: false,
         error: error.message,
       });
@@ -76,6 +97,110 @@ function normalisePageError(error) {
   };
 }
 
+function simplifyAxeNode(node) {
+  return {
+    html: node.html,
+    target: node.target,
+    failureSummary: node.failureSummary || null,
+    impact: node.impact || null,
+  };
+}
+
+function simplifyAxeViolation(violation) {
+  return {
+    id: violation.id,
+    impact: violation.impact || null,
+    tags: violation.tags,
+    description: violation.description,
+    help: violation.help,
+    helpUrl: violation.helpUrl,
+    nodeCount: violation.nodes.length,
+    nodes: violation.nodes.map(simplifyAxeNode),
+  };
+}
+
+function countViolationsByImpact(violations) {
+  const counts = {
+    critical: 0,
+    serious: 0,
+    moderate: 0,
+    minor: 0,
+    unknown: 0,
+  };
+
+  for (const violation of violations) {
+    const impact = violation.impact;
+
+    if (impact && Object.hasOwn(counts, impact)) {
+      counts[impact] += 1;
+    } else {
+      counts.unknown += 1;
+    }
+  }
+
+  return counts;
+}
+
+function createFailedAccessibilityReport(error) {
+  return {
+    successful: false,
+    standard: "WCAG 2.0 and 2.1 Level A and AA",
+    tags: AXE_TAGS,
+    violationCount: null,
+    violatingNodeCount: null,
+    violationsByImpact: null,
+    violations: [],
+    incompleteCount: null,
+    inapplicableCount: null,
+    passCount: null,
+    error: {
+      name: error.name || "Error",
+      message: error.message || String(error),
+    },
+  };
+}
+
+async function runAccessibilityAnalysis(page) {
+  try {
+    const axeResults = await new AxeBuilder({ page })
+      .withTags(AXE_TAGS)
+      .analyze();
+
+    const violations = axeResults.violations.map(
+      simplifyAxeViolation,
+    );
+
+    return {
+      successful: true,
+      standard: "WCAG 2.0 and 2.1 Level A and AA",
+      tags: AXE_TAGS,
+      violationCount: violations.length,
+      violatingNodeCount: violations.reduce(
+        (total, violation) =>
+          total + violation.nodeCount,
+        0,
+      ),
+      violationsByImpact:
+        countViolationsByImpact(violations),
+      violations,
+      incompleteCount: axeResults.incomplete.length,
+      inapplicableCount: axeResults.inapplicable.length,
+      passCount: axeResults.passes.length,
+      error: null,
+    };
+  } catch (error) {
+    return createFailedAccessibilityReport(error);
+  }
+}
+
+async function writeJsonReport(filePath, report) {
+  await writeFile(
+    filePath,
+    JSON.stringify(report, null, 2),
+    "utf8",
+  );
+}
+
 export async function runRuntimeValidation({
   applicationUrl,
   runDirectory,
@@ -85,7 +210,10 @@ export async function runRuntimeValidation({
   const startedAt = new Date();
   const consoleErrors = [];
   const uncaughtExceptions = [];
+
   let browser;
+  let context;
+
   let navigation = {
     successful: false,
     status: null,
@@ -98,7 +226,7 @@ export async function runRuntimeValidation({
       headless: true,
     });
 
-    const context = await browser.newContext({
+    context = await browser.newContext({
       viewport: {
         width: 1280,
         height: 720,
@@ -138,18 +266,25 @@ export async function runRuntimeValidation({
       uncaughtExceptions.push(normalisePageError(error));
     });
 
-    const response = await page.goto(applicationUrl, {
-      waitUntil: "load",
-    });
+    const navigationResponse = await page.goto(
+      applicationUrl,
+      {
+        waitUntil: "load",
+      },
+    );
+
+    const status = navigationResponse?.status() ?? null;
 
     navigation = {
-      successful: true,
-      status: response?.status() ?? null,
+      successful:
+        navigationResponse === null ||
+        (status >= 200 && status < 400),
+      status,
       finalUrl: page.url(),
       error: null,
     };
 
-    // Allows short asynchronous startup errors to be captured.
+    // Capture errors produced shortly after initial page loading.
     await page.waitForTimeout(POST_LOAD_WAIT_MS);
 
     const body = await page.evaluate(() => {
@@ -189,9 +324,12 @@ export async function runRuntimeValidation({
     const requiredControls = [];
 
     for (const requirement of requiredDefinitions) {
-      requiredControls.push(
-        await evaluateRequiredControl(page, requirement),
+      const result = await evaluateRequiredControl(
+        page,
+        requirement,
       );
+
+      requiredControls.push(result);
     }
 
     const requiredControlSummary = {
@@ -205,20 +343,29 @@ export async function runRuntimeValidation({
       controls: requiredControls,
     };
 
-    const visibleBodyContent =
-      body.exists && body.visible && body.textLength > 0;
+    const accessibilityReport =
+      await runAccessibilityAnalysis(page);
 
-    const passed =
+    const visibleBodyContent =
+      body.exists &&
+      body.visible &&
+      body.textLength > 0;
+
+    const runtimePassed =
       navigation.successful &&
       visibleBodyContent &&
       consoleErrors.length === 0 &&
       uncaughtExceptions.length === 0 &&
       requiredControlSummary.allPresent;
 
+    const accessibilityPassed =
+      accessibilityReport.successful &&
+      accessibilityReport.violationCount === 0;
+
     const completedAt = new Date();
 
     const report = {
-      reportVersion: "1.0",
+      reportVersion: "1.1",
       runId,
       specificationId,
       applicationUrl,
@@ -242,33 +389,55 @@ export async function runRuntimeValidation({
       consoleErrors,
       uncaughtExceptions,
       requiredControls: requiredControlSummary,
+      accessibility: accessibilityReport,
       summary: {
-        passed,
+        runtimePassed,
+        accessibilityPassed,
         navigationSuccessful: navigation.successful,
         hasVisibleBodyContent: visibleBodyContent,
         consoleErrorCount: consoleErrors.length,
-        uncaughtExceptionCount: uncaughtExceptions.length,
+        uncaughtExceptionCount:
+          uncaughtExceptions.length,
         requiredControlsPresent:
           requiredControlSummary.present,
         requiredControlsExpected:
           requiredControlSummary.expected,
+        accessibilityAnalysisSuccessful:
+          accessibilityReport.successful,
+        accessibilityViolationCount:
+          accessibilityReport.violationCount,
+        accessibilityViolatingNodeCount:
+          accessibilityReport.violatingNodeCount,
       },
     };
 
-    await writeFile(
-      path.join(runDirectory, "runtime-report.json"),
-      JSON.stringify(report, null, 2),
-      "utf8",
-    );
-
-    await context.close();
+    await Promise.all([
+      writeJsonReport(
+        path.join(runDirectory, "runtime-report.json"),
+        report,
+      ),
+      writeJsonReport(
+        path.join(
+          runDirectory,
+          "accessibility-report.json",
+        ),
+        accessibilityReport,
+      ),
+    ]);
 
     return report;
   } catch (error) {
     const completedAt = new Date();
 
+    const accessibilityReport =
+      createFailedAccessibilityReport(
+        new Error(
+          "Accessibility analysis was not completed because runtime validation failed.",
+        ),
+      );
+
     const report = {
-      reportVersion: "1.0",
+      reportVersion: "1.1",
       runId,
       specificationId,
       applicationUrl,
@@ -295,32 +464,50 @@ export async function runRuntimeValidation({
         allPresent: false,
         controls: [],
       },
+      accessibility: accessibilityReport,
       summary: {
-        passed: false,
+        runtimePassed: false,
+        accessibilityPassed: false,
         navigationSuccessful: false,
         hasVisibleBodyContent: false,
         consoleErrorCount: consoleErrors.length,
-        uncaughtExceptionCount: uncaughtExceptions.length,
+        uncaughtExceptionCount:
+          uncaughtExceptions.length,
         requiredControlsPresent: 0,
         requiredControlsExpected: 0,
+        accessibilityAnalysisSuccessful: false,
+        accessibilityViolationCount: null,
+        accessibilityViolatingNodeCount: null,
       },
       analysisError: {
-        name: error.name,
-        message: error.message,
+        name: error.name || "Error",
+        message: error.message || String(error),
         stack: error.stack || null,
       },
     };
 
-    await writeFile(
-      path.join(runDirectory, "runtime-report.json"),
-      JSON.stringify(report, null, 2),
-      "utf8",
-    );
+    await Promise.all([
+      writeJsonReport(
+        path.join(runDirectory, "runtime-report.json"),
+        report,
+      ),
+      writeJsonReport(
+        path.join(
+          runDirectory,
+          "accessibility-report.json",
+        ),
+        accessibilityReport,
+      ),
+    ]);
 
     return report;
   } finally {
+    if (context) {
+      await context.close().catch(() => {});
+    }
+
     if (browser) {
-      await browser.close();
+      await browser.close().catch(() => {});
     }
   }
 }

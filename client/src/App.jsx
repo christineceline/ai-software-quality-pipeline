@@ -4,6 +4,7 @@ import ApplicationPreview from "./components/ApplicationPreview";
 import CodeViewer from "./components/CodeViewer";
 import QualityReport from "./components/QualityReport";
 import RuntimeReport from "./components/RuntimeReport";
+import AccessibilityReport from "./components/AccessibilityReport";
 
 const workflows = [
   {
@@ -40,6 +41,7 @@ function App() {
   const [error, setError] = useState("");
   const [qualityReport, setQualityReport] = useState(null);
   const [runtimeReport, setRuntimeReport] = useState(null);
+  const [accessibilityReport, setAccessibilityReport] = useState(null);
 
   useEffect(() => {
     async function initialiseApplication() {
@@ -97,6 +99,7 @@ function App() {
     setIsGenerating(true);
     setQualityReport(null);
     setRuntimeReport(null);
+    setAccessibilityReport(null);
 
     try {
       const response = await fetch("/api/generate", {
@@ -123,6 +126,11 @@ function App() {
       setRun(data.run);
       setQualityReport(data.qualityReport);
       setRuntimeReport(data.runtimeReport);
+      setAccessibilityReport(
+          data.accessibilityReport ??
+            data.runtimeReport?.accessibility ??
+            null,
+        );
       setActiveResultView("preview");
     } catch (generationError) {
       setError(generationError.message);
@@ -315,6 +323,9 @@ function App() {
             <>
             <QualityReport report={qualityReport} />
             <RuntimeReport report={runtimeReport} />
+            <AccessibilityReport
+              report={accessibilityReport}
+            />
             </>
           )}
         </section>

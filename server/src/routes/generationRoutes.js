@@ -98,6 +98,8 @@ return response.status(201).json({
   application,
   qualityReport,
   runtimeReport,
+  accessibilityReport:
+    runtimeReport.accessibility,
 });
   } catch (error) {
     console.error("Generation failed:", error);
