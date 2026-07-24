@@ -105,5 +105,8 @@ export async function saveGeneratedRun({
     ),
   ]);
 
-  return metadata;
+  return {
+    ...metadata,
+    runDirectory,
+  };
 }
