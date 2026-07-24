@@ -1,6 +1,8 @@
 import "dotenv/config";
 import cors from "cors";
 import express from "express";
+import path from "node:path";
+import { generatedAppsDirectory } from "./config/paths.js";
 import generationRoutes from "./routes/generationRoutes.js";
 import specificationRoutes from "./routes/specificationRoutes.js";
 
@@ -23,6 +25,11 @@ app.use(
 );
 
 app.use(express.json({ limit: "10mb" }));
+
+app.use(
+  "/generated-apps",
+  express.static(generatedAppsDirectory),
+);
 
 app.get("/api/health", (request, response) => {
   response.json({
