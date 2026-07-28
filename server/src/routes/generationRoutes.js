@@ -1,15 +1,27 @@
 import express from "express";
 import { buildPrompt } from "../prompts/buildPrompt.js";
 import { generateWithOllama } from "../services/ollamaService.js";
-import { saveGeneratedRun } from "../services/runStorageService.js";
+import {
+  saveGeneratedRun,
+  saveRefinementRun,
+  completeRefinementRun,
+} from "../services/runStorageService.js";
 import { getSpecificationById } from "../specifications/index.js";
 import { parseGeneratedApplication } from "../utils/responseParser.js";
 import { analyseApplication } from "../quality/qualityAnalyzer.js";
 import { runRuntimeValidation } from "../services/runtimeValidationService.js";
+import {
+  MAX_REFINEMENT_ITERATIONS,
+  runRefinementLoop,
+} from "../services/refinementService.js";
 
 const router = express.Router();
 
-const supportedWorkflows = ["one-shot", "quality-focused"];
+const supportedWorkflows = [
+  "one-shot",
+  "quality-focused",
+  "automated-refinement",
+];
 
 router.post("/", async (request, response) => {
   try {
@@ -44,8 +56,13 @@ router.post("/", async (request, response) => {
       });
     }
 
+    const initialPromptWorkflow =
+      workflow === "automated-refinement"
+        ? "quality-focused"
+        : workflow;
+
     const prompt = buildPrompt({
-      workflow,
+      workflow: initialPromptWorkflow,
       specification,
     });
 
@@ -59,6 +76,85 @@ router.post("/", async (request, response) => {
     );
 
     const qualityReport = await analyseApplication(application);
+
+if (workflow === "automated-refinement") {
+  const runMetadata = await saveRefinementRun({
+    application,
+    specification,
+    workflow,
+    model: ollamaResult.model,
+    temperature: Number(temperature),
+    prompt,
+    rawResponse: ollamaResult.rawResponse,
+    generationMetrics: ollamaResult.generationMetrics,
+    qualityReport,
+    maxRefinementIterations:
+      MAX_REFINEMENT_ITERATIONS,
+  });
+
+  const {
+    runId,
+    runDirectory,
+    iterationDirectory,
+  } = runMetadata;
+
+  const encodedRunId =
+    encodeURIComponent(runId);
+
+  const initialApplicationUrl =
+    `http://localhost:${process.env.PORT || 3001}` +
+    `/generated-apps/runs/${encodedRunId}` +
+    `/iterations/0/index.html`;
+
+  const initialRuntimeReport =
+    await runRuntimeValidation({
+      applicationUrl: initialApplicationUrl,
+      runDirectory: iterationDirectory,
+      runId,
+      specificationId: specification.id,
+    });
+
+  const refinementResult =
+    await runRefinementLoop({
+      runId,
+      runDirectory,
+      specification,
+      initialApplication:
+        application,
+      initialQualityReport:
+        qualityReport,
+      initialRuntimeReport:
+        initialRuntimeReport,
+      initialAccessibilityReport:
+        initialRuntimeReport.accessibility,
+      temperature:
+        Number(temperature),
+    });
+
+    const completedRunMetadata =
+      await completeRefinementRun({
+        runDirectory,
+        refinementResult,
+      });
+
+  return response.status(201).json({
+    run: {
+      ...completedRunMetadata,
+      runDirectory,
+},
+
+    initial: {
+      iteration: 0,
+      application,
+      qualityReport,
+      runtimeReport: initialRuntimeReport,
+      accessibilityReport:
+        initialRuntimeReport.accessibility,
+    },
+
+    refinement: refinementResult,
+  });
+}
 
 const runMetadata = await saveGeneratedRun({
   application,
@@ -80,18 +176,20 @@ if (!runId || !runDirectory) {
   );
 }
 
-const encodedRunId = encodeURIComponent(runId);
+const encodedRunId =
+  encodeURIComponent(runId);
 
 const applicationUrl =
   `http://localhost:${process.env.PORT || 3001}` +
   `/generated-apps/runs/${encodedRunId}/index.html`;
 
-const runtimeReport = await runRuntimeValidation({
-  applicationUrl,
-  runDirectory,
-  runId,
-  specificationId: specification.id,
-});
+const runtimeReport =
+  await runRuntimeValidation({
+    applicationUrl,
+    runDirectory,
+    runId,
+    specificationId: specification.id,
+  });
 
 return response.status(201).json({
   run: runMetadata,
@@ -101,6 +199,7 @@ return response.status(201).json({
   accessibilityReport:
     runtimeReport.accessibility,
 });
+
   } catch (error) {
     console.error("Generation failed:", error);
 

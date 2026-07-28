@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -36,6 +36,11 @@ async function writeJson(filePath, value) {
     JSON.stringify(value, null, 2),
     "utf8",
   );
+}
+
+async function readJson(filePath) {
+  const contents = await readFile(filePath, "utf8");
+  return JSON.parse(contents);
 }
 
 export async function saveGeneratedRun({
@@ -310,4 +315,51 @@ export async function saveRefinementIteration({
     ...iterationMetadata,
     iterationDirectory,
   };
+}
+
+export async function completeRefinementRun({
+  runDirectory,
+  refinementResult,
+}) {
+  const metadataPath = path.join(
+    runDirectory,
+    "metadata.json",
+  );
+
+  const metadata = await readJson(metadataPath);
+
+  const completedIterations =
+    refinementResult.iterations.map((result) => ({
+      iteration: result.iteration,
+      type: "refinement",
+      completedAt: new Date().toISOString(),
+      qualitySummary:
+        result.qualityReport?.summary ?? null,
+      runtimePassed:
+        result.runtimeReport?.summary
+          ?.runtimePassed ?? false,
+      accessibilityPassed:
+        result.runtimeReport?.summary
+          ?.accessibilityPassed ?? false,
+    }));
+
+  metadata.iterations = [
+    ...(metadata.iterations || []),
+    ...completedIterations,
+  ];
+
+  metadata.refinement = {
+    completedIterations:
+      refinementResult.completedIterations,
+    stoppedEarly:
+      refinementResult.stoppedEarly,
+    stopReason:
+      refinementResult.stopReason,
+    completedAt:
+      new Date().toISOString(),
+  };
+
+  await writeJson(metadataPath, metadata);
+
+  return metadata;
 }
