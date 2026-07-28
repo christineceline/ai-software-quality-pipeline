@@ -110,3 +110,204 @@ export async function saveGeneratedRun({
     runDirectory,
   };
 }
+
+export async function saveRefinementRun({
+  application,
+  specification,
+  workflow,
+  model,
+  temperature,
+  prompt,
+  rawResponse,
+  generationMetrics,
+  qualityReport,
+  maxRefinementIterations,
+}) {
+  const runId = createRunId();
+
+  const runDirectory = path.join(
+    getRunsDirectory(),
+    runId,
+  );
+
+  const iterationsDirectory = path.join(
+    runDirectory,
+    "iterations",
+  );
+
+  const iterationDirectory = path.join(
+    iterationsDirectory,
+    "0",
+  );
+
+  await mkdir(iterationDirectory, {
+    recursive: true,
+  });
+
+  const createdAt = new Date().toISOString();
+
+  const iterationMetadata = {
+    iteration: 0,
+    type: "initial-generation",
+    createdAt,
+    generationMetrics,
+    qualitySummary: qualityReport.summary,
+  };
+
+  const metadata = {
+    runId,
+    createdAt,
+    specification: {
+      id: specification.id,
+      name: specification.name,
+    },
+    workflow,
+    model,
+    temperature,
+    promptVersion: "1.0.0",
+    maxRefinementIterations,
+    generatedApplication: application.metadata,
+    iterations: [
+      iterationMetadata,
+    ],
+  };
+
+  await Promise.all([
+    writeFile(
+      path.join(iterationDirectory, "index.html"),
+      application.html,
+      "utf8",
+    ),
+    writeFile(
+      path.join(iterationDirectory, "styles.css"),
+      application.css,
+      "utf8",
+    ),
+    writeFile(
+      path.join(iterationDirectory, "script.js"),
+      application.javascript,
+      "utf8",
+    ),
+    writeFile(
+      path.join(iterationDirectory, "prompt.txt"),
+      prompt,
+      "utf8",
+    ),
+    writeFile(
+      path.join(
+        iterationDirectory,
+        "raw-response.txt",
+      ),
+      rawResponse,
+      "utf8",
+    ),
+    writeJson(
+      path.join(
+        iterationDirectory,
+        "metadata.json",
+      ),
+      iterationMetadata,
+    ),
+    writeJson(
+      path.join(
+        iterationDirectory,
+        "quality-report.json",
+      ),
+      qualityReport,
+    ),
+    writeJson(
+      path.join(runDirectory, "metadata.json"),
+      metadata,
+    ),
+  ]);
+
+  return {
+    ...metadata,
+    runDirectory,
+    iterationDirectory,
+  };
+}
+
+export async function saveRefinementIteration({
+  runDirectory,
+  iteration,
+  application,
+  prompt,
+  rawResponse,
+  generationMetrics,
+  qualityReport,
+}) {
+  if (!Number.isInteger(iteration) || iteration < 1) {
+    throw new Error(
+      "Refinement iteration must be an integer greater than or equal to 1.",
+    );
+  }
+
+  const iterationDirectory = path.join(
+    runDirectory,
+    "iterations",
+    String(iteration),
+  );
+
+  await mkdir(iterationDirectory, {
+    recursive: false,
+  });
+
+  const iterationMetadata = {
+    iteration,
+    type: "refinement",
+    createdAt: new Date().toISOString(),
+    generationMetrics,
+    qualitySummary: qualityReport.summary,
+  };
+
+  await Promise.all([
+    writeFile(
+      path.join(iterationDirectory, "index.html"),
+      application.html,
+      "utf8",
+    ),
+    writeFile(
+      path.join(iterationDirectory, "styles.css"),
+      application.css,
+      "utf8",
+    ),
+    writeFile(
+      path.join(iterationDirectory, "script.js"),
+      application.javascript,
+      "utf8",
+    ),
+    writeFile(
+      path.join(iterationDirectory, "prompt.txt"),
+      prompt,
+      "utf8",
+    ),
+    writeFile(
+      path.join(
+        iterationDirectory,
+        "raw-response.txt",
+      ),
+      rawResponse,
+      "utf8",
+    ),
+    writeJson(
+      path.join(
+        iterationDirectory,
+        "metadata.json",
+      ),
+      iterationMetadata,
+    ),
+    writeJson(
+      path.join(
+        iterationDirectory,
+        "quality-report.json",
+      ),
+      qualityReport,
+    ),
+  ]);
+
+  return {
+    ...iterationMetadata,
+    iterationDirectory,
+  };
+}
