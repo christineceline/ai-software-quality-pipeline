@@ -147,3 +147,85 @@ export async function refineAndEvaluateOnce({
       savedIteration.iterationDirectory,
   };
 }
+
+export async function runRefinementLoop({
+  runId,
+  runDirectory,
+  specification,
+  initialApplication,
+  initialQualityReport,
+  initialRuntimeReport,
+  initialAccessibilityReport,
+  temperature = 0,
+}) {
+  const iterations = [];
+
+  let currentApplication =
+    initialApplication;
+
+  let currentQualityReport =
+    initialQualityReport;
+
+  let currentRuntimeReport =
+    initialRuntimeReport;
+
+  let currentAccessibilityReport =
+    initialAccessibilityReport;
+
+  for (
+    let iteration = 1;
+    iteration <= MAX_REFINEMENT_ITERATIONS;
+    iteration += 1
+  ) {
+    const result =
+      await refineAndEvaluateOnce({
+        runId,
+        runDirectory,
+        specification,
+        application:
+          currentApplication,
+        qualityReport:
+          currentQualityReport,
+        runtimeReport:
+          currentRuntimeReport,
+        accessibilityReport:
+          currentAccessibilityReport,
+        temperature,
+        iteration,
+      });
+
+    if (!result.refined) {
+      return {
+        iterations,
+        stoppedEarly: true,
+        stopReason:
+          result.reason,
+        completedIterations:
+          iterations.length,
+      };
+    }
+
+    iterations.push(result);
+
+    currentApplication =
+      result.application;
+
+    currentQualityReport =
+      result.qualityReport;
+
+    currentRuntimeReport =
+      result.runtimeReport;
+
+    currentAccessibilityReport =
+      result.accessibilityReport;
+  }
+
+  return {
+    iterations,
+    stoppedEarly: false,
+    stopReason:
+      "maximum-iterations-reached",
+    completedIterations:
+      iterations.length,
+  };
+}

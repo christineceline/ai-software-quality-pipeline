@@ -24,7 +24,6 @@ const workflows = [
     name: "Automated quality-guided refinement",
     description:
       "Will use automated quality reports to improve the generated application.",
-    disabled: true,
   },
 ];
 
@@ -42,6 +41,8 @@ function App() {
   const [qualityReport, setQualityReport] = useState(null);
   const [runtimeReport, setRuntimeReport] = useState(null);
   const [accessibilityReport, setAccessibilityReport] = useState(null);
+  const [refinementIterations, setRefinementIterations] = useState([]);
+  const [selectedIteration, setSelectedIteration] = useState(null);
 
   useEffect(() => {
     async function initialiseApplication() {
@@ -100,6 +101,8 @@ function App() {
     setQualityReport(null);
     setRuntimeReport(null);
     setAccessibilityReport(null);
+    setRefinementIterations([]);
+    setSelectedIteration(null);
 
     try {
       const response = await fetch("/api/generate", {
@@ -122,15 +125,46 @@ function App() {
         );
       }
 
-      setApplication(data.application);
-      setRun(data.run);
-      setQualityReport(data.qualityReport);
-      setRuntimeReport(data.runtimeReport);
-      setAccessibilityReport(
+          setRun(data.run);
+
+      if (workflow === "automated-refinement") {
+        const completedRefinements =
+          data.refinement?.iterations ?? [];
+
+        const allIterations = [
+          data.initial,
+          ...completedRefinements,
+        ];
+
+        setRefinementIterations(allIterations);
+
+        const finalIteration =
+          allIterations[allIterations.length - 1];
+
+        setSelectedIteration(finalIteration.iteration);
+
+        setApplication(finalIteration.application);
+        setQualityReport(finalIteration.qualityReport);
+        setRuntimeReport(finalIteration.runtimeReport);
+        setAccessibilityReport(
+          finalIteration.accessibilityReport ??
+            finalIteration.runtimeReport?.accessibility ??
+            null,
+        );
+      } else {
+        setRefinementIterations([]);
+        setSelectedIteration(null);
+
+        setApplication(data.application);
+        setQualityReport(data.qualityReport);
+        setRuntimeReport(data.runtimeReport);
+        setAccessibilityReport(
           data.accessibilityReport ??
             data.runtimeReport?.accessibility ??
             null,
         );
+      }
+      
       setActiveResultView("preview");
     } catch (generationError) {
       setError(generationError.message);
@@ -229,8 +263,7 @@ function App() {
               type="submit"
               disabled={
                 isGenerating ||
-                !specificationId ||
-                workflow === "automated-refinement"
+                !specificationId
               }
             >
               {isGenerating
@@ -264,6 +297,54 @@ function App() {
                   {run.specification.name} · {run.workflow} ·{" "}
                   {run.model}
                 </p>
+              )}
+
+              {refinementIterations.length > 0 && (
+                <div className="iteration-selector">
+                  <label htmlFor="iteration">
+                    Refinement iteration
+                  </label>
+
+                  <select
+                    id="iteration"
+                    value={selectedIteration ?? ""}
+                    onChange={(event) => {
+                      const iterationNumber =
+                        Number(event.target.value);
+
+                      const selected =
+                        refinementIterations.find(
+                          (item) =>
+                            item.iteration === iterationNumber,
+                        );
+
+                      if (!selected) {
+                        return;
+                      }
+
+                      setSelectedIteration(iterationNumber);
+                      setApplication(selected.application);
+                      setQualityReport(selected.qualityReport);
+                      setRuntimeReport(selected.runtimeReport);
+                      setAccessibilityReport(
+                        selected.accessibilityReport ??
+                          selected.runtimeReport?.accessibility ??
+                          null,
+                      );
+                    }}
+                  >
+                    {refinementIterations.map((item) => (
+                      <option
+                        key={item.iteration}
+                        value={item.iteration}
+                      >
+                        {item.iteration === 0
+                          ? "Iteration 0 — Initial generation"
+                          : `Iteration ${item.iteration} — Refinement`}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               )}
             </div>
 

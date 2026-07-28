@@ -2,6 +2,7 @@ const MAX_STATIC_MESSAGES_PER_ANALYZER = 5;
 const MAX_CONSOLE_ERRORS = 5;
 const MAX_UNCAUGHT_EXCEPTIONS = 5;
 const MAX_ACCESSIBILITY_VIOLATIONS = 5;
+const MAX_NODES_PER_ACCESSIBILITY_VIOLATION = 3;
 
 function summariseStaticAnalyzer(analyzer) {
   if (!analyzer) {
@@ -113,17 +114,27 @@ function summariseAccessibility(accessibilityReport) {
       accessibilityReport.violationsByImpact || {},
 
     violations: (
-      accessibilityReport.violations || []
+    accessibilityReport.violations || []
     )
-      .slice(0, MAX_ACCESSIBILITY_VIOLATIONS)
-      .map((violation) => ({
+    .slice(0, MAX_ACCESSIBILITY_VIOLATIONS)
+    .map((violation) => ({
         id: violation.id,
         impact: violation.impact,
         description: violation.description,
         help: violation.help,
         affectedNodeCount:
-          violation.nodes?.length ?? 0,
-      })),
+        violation.nodes?.length ?? 0,
+
+        nodes: (violation.nodes || [])
+        .slice(
+            0,
+            MAX_NODES_PER_ACCESSIBILITY_VIOLATION,
+        )
+        .map((node) => ({
+            target: node.target,
+            failureSummary: node.failureSummary,
+        })),
+    })),
   };
 }
 

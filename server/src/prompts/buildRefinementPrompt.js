@@ -33,7 +33,11 @@ Your task is to improve the application using only the automated quality feedbac
 
 Important requirements:
 - Preserve the original application specification and required functionality.
-- Fix the reported quality issues where possible.
+- Fix every reported quality issue where possible.
+- For accessibility violations, use the reported target and failure summary to identify and correct the affected elements.
+- Do not consider a reported issue resolved unless the underlying HTML, CSS or JavaScript has been changed to address it.
+- For accessibility violations, use each node's target and failure summary to identify the affected element and make a concrete code change.
+- When a contrast violation provides foreground and background colours, adjust the relevant CSS colours so the required contrast ratio is met.
 - Do not remove working functionality.
 - Do not add unrelated features.
 - Do not redesign the application unnecessarily.
