@@ -11,6 +11,9 @@ const quizSpecification = {
     "Display the final score when the quiz is completed and submitted.",
     "Store data only in browser memory for the current page session.",
   ],
+  qualityRequirements: [
+    "Apply CSS to provide a clear, consistent and usable visual presentation.",
+],
 };
 
 export default quizSpecification;

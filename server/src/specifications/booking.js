@@ -13,7 +13,11 @@ const bookingSpecification = {
     "Display submitted bookings in a visible list.",
     "Allow a submitted booking to be cancelled.",
     "Do not send data to an external service.",
+    "Use CSS to make the application visually appealing"
   ],
+  qualityRequirements: [
+    "Apply CSS to provide a clear, consistent and usable visual presentation.",
+],
 };
 
 export default bookingSpecification;

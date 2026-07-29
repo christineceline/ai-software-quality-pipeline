@@ -10,8 +10,11 @@ const todoSpecification = {
     "Allow each task to be marked as completed.",
     "Allow each task to be deleted.",
     "Display the number of incomplete tasks.",
-    "Store data only in browser memory for the current page session.",
+    "Tasks must not persist after the application is opened in a fresh browser context.",
   ],
+  qualityRequirements: [
+    "Apply CSS to provide a clear, consistent and usable visual presentation.",
+],
 };
 
 export default todoSpecification;
