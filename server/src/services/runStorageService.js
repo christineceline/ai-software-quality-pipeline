@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -36,6 +36,11 @@ async function writeJson(filePath, value) {
     JSON.stringify(value, null, 2),
     "utf8",
   );
+}
+
+async function readJson(filePath) {
+  const contents = await readFile(filePath, "utf8");
+  return JSON.parse(contents);
 }
 
 export async function saveGeneratedRun({
@@ -109,4 +114,252 @@ export async function saveGeneratedRun({
     ...metadata,
     runDirectory,
   };
+}
+
+export async function saveRefinementRun({
+  application,
+  specification,
+  workflow,
+  model,
+  temperature,
+  prompt,
+  rawResponse,
+  generationMetrics,
+  qualityReport,
+  maxRefinementIterations,
+}) {
+  const runId = createRunId();
+
+  const runDirectory = path.join(
+    getRunsDirectory(),
+    runId,
+  );
+
+  const iterationsDirectory = path.join(
+    runDirectory,
+    "iterations",
+  );
+
+  const iterationDirectory = path.join(
+    iterationsDirectory,
+    "0",
+  );
+
+  await mkdir(iterationDirectory, {
+    recursive: true,
+  });
+
+  const createdAt = new Date().toISOString();
+
+  const iterationMetadata = {
+    iteration: 0,
+    type: "initial-generation",
+    createdAt,
+    generationMetrics,
+    qualitySummary: qualityReport.summary,
+  };
+
+  const metadata = {
+    runId,
+    createdAt,
+    specification: {
+      id: specification.id,
+      name: specification.name,
+    },
+    workflow,
+    model,
+    temperature,
+    promptVersion: "1.0.0",
+    maxRefinementIterations,
+    generatedApplication: application.metadata,
+    iterations: [
+      iterationMetadata,
+    ],
+  };
+
+  await Promise.all([
+    writeFile(
+      path.join(iterationDirectory, "index.html"),
+      application.html,
+      "utf8",
+    ),
+    writeFile(
+      path.join(iterationDirectory, "styles.css"),
+      application.css,
+      "utf8",
+    ),
+    writeFile(
+      path.join(iterationDirectory, "script.js"),
+      application.javascript,
+      "utf8",
+    ),
+    writeFile(
+      path.join(iterationDirectory, "prompt.txt"),
+      prompt,
+      "utf8",
+    ),
+    writeFile(
+      path.join(
+        iterationDirectory,
+        "raw-response.txt",
+      ),
+      rawResponse,
+      "utf8",
+    ),
+    writeJson(
+      path.join(
+        iterationDirectory,
+        "metadata.json",
+      ),
+      iterationMetadata,
+    ),
+    writeJson(
+      path.join(
+        iterationDirectory,
+        "quality-report.json",
+      ),
+      qualityReport,
+    ),
+    writeJson(
+      path.join(runDirectory, "metadata.json"),
+      metadata,
+    ),
+  ]);
+
+  return {
+    ...metadata,
+    runDirectory,
+    iterationDirectory,
+  };
+}
+
+export async function saveRefinementIteration({
+  runDirectory,
+  iteration,
+  application,
+  prompt,
+  rawResponse,
+  generationMetrics,
+  qualityReport,
+}) {
+  if (!Number.isInteger(iteration) || iteration < 1) {
+    throw new Error(
+      "Refinement iteration must be an integer greater than or equal to 1.",
+    );
+  }
+
+  const iterationDirectory = path.join(
+    runDirectory,
+    "iterations",
+    String(iteration),
+  );
+
+  await mkdir(iterationDirectory, {
+    recursive: false,
+  });
+
+  const iterationMetadata = {
+    iteration,
+    type: "refinement",
+    createdAt: new Date().toISOString(),
+    generationMetrics,
+    qualitySummary: qualityReport.summary,
+  };
+
+  await Promise.all([
+    writeFile(
+      path.join(iterationDirectory, "index.html"),
+      application.html,
+      "utf8",
+    ),
+    writeFile(
+      path.join(iterationDirectory, "styles.css"),
+      application.css,
+      "utf8",
+    ),
+    writeFile(
+      path.join(iterationDirectory, "script.js"),
+      application.javascript,
+      "utf8",
+    ),
+    writeFile(
+      path.join(iterationDirectory, "prompt.txt"),
+      prompt,
+      "utf8",
+    ),
+    writeFile(
+      path.join(
+        iterationDirectory,
+        "raw-response.txt",
+      ),
+      rawResponse,
+      "utf8",
+    ),
+    writeJson(
+      path.join(
+        iterationDirectory,
+        "metadata.json",
+      ),
+      iterationMetadata,
+    ),
+    writeJson(
+      path.join(
+        iterationDirectory,
+        "quality-report.json",
+      ),
+      qualityReport,
+    ),
+  ]);
+
+  return {
+    ...iterationMetadata,
+    iterationDirectory,
+  };
+}
+
+export async function completeRefinementRun({
+  runDirectory,
+  refinementResult,
+}) {
+  const metadataPath = path.join(
+    runDirectory,
+    "metadata.json",
+  );
+
+  const metadata = await readJson(metadataPath);
+
+  const completedIterations =
+    refinementResult.iterations.map((result) => ({
+      iteration: result.iteration,
+      type: "refinement",
+      completedAt: new Date().toISOString(),
+      qualitySummary:
+        result.qualityReport?.summary ?? null,
+      runtimePassed:
+        result.runtimeReport?.summary
+          ?.runtimePassed ?? false,
+      accessibilityPassed:
+        result.runtimeReport?.summary
+          ?.accessibilityPassed ?? false,
+    }));
+
+  metadata.iterations = [
+    ...(metadata.iterations || []),
+    ...completedIterations,
+  ];
+
+  metadata.refinement = {
+    completedIterations:
+      refinementResult.completedIterations,
+    stoppedEarly:
+      refinementResult.stoppedEarly,
+    stopReason:
+      refinementResult.stopReason,
+    completedAt:
+      new Date().toISOString(),
+  };
+
+  await writeJson(metadataPath, metadata);
+
+  return metadata;
 }

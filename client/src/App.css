@@ -496,3 +496,65 @@ input:focus-visible {
   background: #fff0f0;
   border-radius: 0.35rem;
 }
+
+.report-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(130px, 1fr)
+  );
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.metric-card {
+  padding: 1rem;
+  border: 1px solid #d8d8d8;
+  border-radius: 0.5rem;
+}
+
+.metric-card strong,
+.metric-card span {
+  display: block;
+}
+
+.metric-card strong {
+  font-size: 1.5rem;
+}
+
+.report-details {
+  padding: 0.75rem 0;
+  border-top: 1px solid #d8d8d8;
+}
+
+.report-details summary {
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.violation-node {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f5f5f5;
+  border-radius: 0.5rem;
+}
+
+.violation-node pre {
+  overflow-x: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.quality-section {
+  padding: 1.5rem;
+}

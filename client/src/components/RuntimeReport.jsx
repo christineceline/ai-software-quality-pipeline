@@ -30,7 +30,7 @@ function RuntimeReport({ report }) {
       <div className="quality-report__heading">
         <h2>Runtime validation</h2>
         <StatusBadge
-          passed={summary.passed}
+          passed={summary.runtimePassed}
           passText="Passed"
           failText="Issues detected"
         />
