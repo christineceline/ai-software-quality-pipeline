@@ -1,7 +1,9 @@
+import { todoFunctionalTests } from "./todoFunctionalTests.js";
+
 export function getFunctionalTests(specificationId) {
   switch (specificationId) {
     case "todo":
-      return [];
+      return todoFunctionalTests;
 
     default:
       return [];
