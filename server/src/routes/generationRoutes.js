@@ -10,7 +10,8 @@ import { getSpecificationById } from "../specifications/index.js";
 import { parseGeneratedApplication } from "../utils/responseParser.js";
 import { analyseApplication } from "../quality/qualityAnalyzer.js";
 import { runRuntimeValidation } from "../services/runtimeValidationService.js";
-import {
+import { runFunctionalValidation } from "../services/functionalValidationService.js";
+import {  
   MAX_REFINEMENT_ITERATIONS,
   runRefinementLoop,
 } from "../services/refinementService.js";
@@ -191,6 +192,14 @@ const runtimeReport =
     specificationId: specification.id,
   });
 
+  const functionalReport =
+  await runFunctionalValidation({
+    applicationUrl,
+    runDirectory,
+    runId,
+    specificationId: specification.id,
+  });
+
 return response.status(201).json({
   run: runMetadata,
   application,
@@ -198,6 +207,7 @@ return response.status(201).json({
   runtimeReport,
   accessibilityReport:
     runtimeReport.accessibility,
+  functionalReport,
 });
 
   } catch (error) {
