@@ -5,6 +5,7 @@ import CodeViewer from "./components/CodeViewer";
 import QualityReport from "./components/QualityReport";
 import RuntimeReport from "./components/RuntimeReport";
 import AccessibilityReport from "./components/AccessibilityReport";
+import FunctionalReport from "./components/FunctionalReport";
 
 const workflows = [
   {
@@ -41,6 +42,7 @@ function App() {
   const [qualityReport, setQualityReport] = useState(null);
   const [runtimeReport, setRuntimeReport] = useState(null);
   const [accessibilityReport, setAccessibilityReport] = useState(null);
+  const [functionalReport, setFunctionalReport] = useState(null);
   const [refinementIterations, setRefinementIterations] = useState([]);
   const [selectedIteration, setSelectedIteration] = useState(null);
 
@@ -101,6 +103,7 @@ function App() {
     setQualityReport(null);
     setRuntimeReport(null);
     setAccessibilityReport(null);
+    setFunctionalReport(null);
     setRefinementIterations([]);
     setSelectedIteration(null);
 
@@ -151,6 +154,9 @@ function App() {
             finalIteration.runtimeReport?.accessibility ??
             null,
         );
+        setFunctionalReport(
+          finalIteration.functionalReport ?? null,
+        );
       } else {
         setRefinementIterations([]);
         setSelectedIteration(null);
@@ -163,6 +169,7 @@ function App() {
             data.runtimeReport?.accessibility ??
             null,
         );
+        setFunctionalReport(data.functionalReport ?? null);
       }
       
       setActiveResultView("preview");
@@ -331,6 +338,9 @@ function App() {
                           selected.runtimeReport?.accessibility ??
                           null,
                       );
+                      setFunctionalReport(
+                        selected.functionalReport ?? null,
+                      );
                     }}
                   >
                     {refinementIterations.map((item) => (
@@ -406,6 +416,9 @@ function App() {
             <RuntimeReport report={runtimeReport} />
             <AccessibilityReport
               report={accessibilityReport}
+            />
+            <FunctionalReport
+              report={functionalReport}
             />
             </>
           )}

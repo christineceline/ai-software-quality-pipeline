@@ -8,7 +8,7 @@ const quizSpecification = {
     "Display all questions on a single page.",
     "Allow the user to select one answer for each question.",
     "Provide a button to submit the answers.",
-    "Display the final score when the quiz is completed and submitted.",
+    "Display the final score on the page when the quiz is completed and submitted.",
     "Store data only in browser memory for the current page session.",
   ],
   qualityRequirements: [

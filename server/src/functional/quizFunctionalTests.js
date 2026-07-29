@@ -161,10 +161,16 @@ export const quizFunctionalTests = [
         )
         .first();
 
-      await score.waitFor({
-        state: "visible",
-        timeout: 3000,
-      });
+        try {
+        await score.waitFor({
+            state: "visible",
+            timeout: 3000,
+        });
+        } catch {
+        throw new Error(
+            "The final score was not displayed on the page after the completed quiz was submitted.",
+        );
+        }
     },
   },
 

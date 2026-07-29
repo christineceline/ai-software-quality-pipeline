@@ -78,7 +78,6 @@ Create the complete frontend web application described below using:
 Functional correctness and software quality are equally important.
 
 Quality requirements:
-- Make it visually appealing.
 - Use semantic HTML5 elements.
 - Provide associated labels for every form control.
 - Ensure the application is usable using a keyboard.

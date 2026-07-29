@@ -175,10 +175,16 @@ export const bookingFunctionalTests = [
         /confirmed|confirmation|success|booked successfully|booking created/i,
       );
 
-      await confirmation.first().waitFor({
-        state: "visible",
-        timeout: 3000,
-      });
+      try {
+        await booking.waitFor({
+            state: "visible",
+            timeout: 3000,
+        });
+        } catch {
+        throw new Error(
+            "The created booking was not displayed on the page.",
+        );
+        }
     },
   },
 
@@ -201,10 +207,16 @@ export const bookingFunctionalTests = [
         })
         .first();
 
-      await booking.waitFor({
-        state: "visible",
-        timeout: 3000,
-      });
+      try {
+            await booking.waitFor({
+                state: "visible",
+                timeout: 3000,
+            });
+            } catch {
+            throw new Error(
+                "The created booking could not be cancelled.",
+            );
+            }
 
       const cancelButton = booking
         .getByRole("button", {
