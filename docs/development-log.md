@@ -28,3 +28,22 @@
 - Add Stylelint analysis
 - Store quality results with each run
 - Display the quality report in the interface
+
+## Static quality analysis
+
+### Implemented
+
+- HTMLHint analysis of generated HTML
+- ESLint analysis of generated JavaScript
+- Stylelint analysis of generated CSS
+- Combined machine-readable quality report
+- Quality report display in the React interface
+
+### Limitations
+
+Static analysis does not establish that an application is functionally
+correct. A generated application may pass linting but still fail at runtime,
+render a blank interface or implement the functional requirements
+incorrectly.
+
+Runtime and functional testing will therefore be implemented separately.

@@ -4,6 +4,8 @@ import { generateWithOllama } from "../services/ollamaService.js";
 import { saveGeneratedRun } from "../services/runStorageService.js";
 import { getSpecificationById } from "../specifications/index.js";
 import { parseGeneratedApplication } from "../utils/responseParser.js";
+import { analyseApplication } from "../quality/qualityAnalyzer.js";
+import { runRuntimeValidation } from "../services/runtimeValidationService.js";
 
 const router = express.Router();
 
@@ -56,21 +58,47 @@ router.post("/", async (request, response) => {
       ollamaResult.rawResponse,
     );
 
-    const runMetadata = await saveGeneratedRun({
-      application,
-      specification,
-      workflow,
-      model: ollamaResult.model,
-      temperature: Number(temperature),
-      prompt,
-      rawResponse: ollamaResult.rawResponse,
-      generationMetrics: ollamaResult.generationMetrics,
-    });
+    const qualityReport = await analyseApplication(application);
 
-    return response.status(201).json({
-      run: runMetadata,
-      application,
-    });
+const runMetadata = await saveGeneratedRun({
+  application,
+  specification,
+  workflow,
+  model: ollamaResult.model,
+  temperature: Number(temperature),
+  prompt,
+  rawResponse: ollamaResult.rawResponse,
+  generationMetrics: ollamaResult.generationMetrics,
+  qualityReport,
+});
+
+const { runId, runDirectory } = runMetadata;
+
+if (!runId || !runDirectory) {
+  throw new Error(
+    "saveGeneratedRun did not return runId and runDirectory.",
+  );
+}
+
+const encodedRunId = encodeURIComponent(runId);
+
+const applicationUrl =
+  `http://localhost:${process.env.PORT || 3001}` +
+  `/generated-apps/runs/${encodedRunId}/index.html`;
+
+const runtimeReport = await runRuntimeValidation({
+  applicationUrl,
+  runDirectory,
+  runId,
+  specificationId: specification.id,
+});
+
+return response.status(201).json({
+  run: runMetadata,
+  application,
+  qualityReport,
+  runtimeReport,
+});
   } catch (error) {
     console.error("Generation failed:", error);
 
