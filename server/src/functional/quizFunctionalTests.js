@@ -1,126 +1,170 @@
-async function selectAnswer(page) {
-  const radio = page
-    .getByRole("radio")
-    .first();
+async function getQuestionGroups(page) {
+  const radios = page.locator('input[type="radio"]');
 
-  if ((await radio.count()) > 0) {
-    await radio.check();
-    return;
-  }
+  const names = await radios.evaluateAll((elements) => [
+    ...new Set(
+      elements
+        .map((element) => element.name)
+        .filter(Boolean),
+    ),
+  ]);
 
-  const answerButton = page
-    .getByRole("button")
-    .filter({
-      hasNotText: /next|submit|restart|start again/i,
-    })
-    .first();
-
-  if ((await answerButton.count()) === 0) {
-    throw new Error("No selectable answer found.");
-  }
-
-  await answerButton.click();
+  return names;
 }
 
-async function getNextButton(page) {
+async function answerAllQuestions(page) {
+  const questionNames = await getQuestionGroups(page);
+
+  for (const name of questionNames) {
+    await page
+      .locator(`input[type="radio"][name="${name}"]`)
+      .first()
+      .check();
+  }
+}
+
+function getSubmitButton(page) {
   return page
     .getByRole("button", {
-      name: /next|submit|continue/i,
+      name: /submit|finish|complete|check answers/i,
     })
     .first();
 }
 
 export const quizFunctionalTests = [
   {
-    id: "quiz-answer-question",
+    id: "quiz-question-count",
+    requirement:
+      "Include three multiple-choice questions.",
+
+    async run(page) {
+      const questionNames = await getQuestionGroups(page);
+
+      if (questionNames.length !== 3) {
+        throw new Error(
+          `Expected 3 questions but found ${questionNames.length}.`,
+        );
+      }
+
+      for (const name of questionNames) {
+        const options = page.locator(
+          `input[type="radio"][name="${name}"]`,
+        );
+
+        if ((await options.count()) < 2) {
+          throw new Error(
+            `Question "${name}" does not contain multiple answer choices.`,
+          );
+        }
+      }
+    },
+  },
+
+  {
+    id: "quiz-single-page",
+    requirement:
+      "Display all questions on a single page.",
+
+    async run(page) {
+      const questionNames = await getQuestionGroups(page);
+
+      if (questionNames.length !== 3) {
+        throw new Error(
+          `Expected all 3 questions to be present, but found ${questionNames.length}.`,
+        );
+      }
+
+      for (const name of questionNames) {
+        const firstOption = page
+          .locator(`input[type="radio"][name="${name}"]`)
+          .first();
+
+        if (!(await firstOption.isVisible())) {
+          throw new Error(
+            `Question "${name}" is not visible on the page.`,
+          );
+        }
+      }
+    },
+  },
+
+  {
+    id: "quiz-select-answers",
     requirement:
       "Allow the user to select one answer for each question.",
 
     async run(page) {
-      await selectAnswer(page);
-    },
-  },
+      const questionNames = await getQuestionGroups(page);
 
-  {
-    id: "quiz-complete-and-score",
-    requirement:
-      "Display the final score after all questions have been answered.",
-
-    async run(page) {
-      for (let question = 0; question < 10; question += 1) {
-        const score = page.getByText(
-          /score|result|you scored/i,
+      if (questionNames.length !== 3) {
+        throw new Error(
+          `Expected 3 questions but found ${questionNames.length}.`,
         );
-
-        if ((await score.count()) > 0) {
-          return;
-        }
-
-        await selectAnswer(page);
-
-        const nextButton = await getNextButton(page);
-
-        if ((await nextButton.count()) === 0) {
-          throw new Error(
-            "Quiz could not progress to completion.",
-          );
-        }
-
-        await nextButton.click();
-        await page.waitForTimeout(100);
       }
 
-      throw new Error(
-        "Final score was not displayed after completing the quiz.",
-      );
+      for (const name of questionNames) {
+        const option = page
+          .locator(`input[type="radio"][name="${name}"]`)
+          .first();
+
+        await option.check();
+
+        if (!(await option.isChecked())) {
+          throw new Error(
+            `Unable to select an answer for question "${name}".`,
+          );
+        }
+      }
     },
   },
 
   {
-    id: "quiz-restart",
+    id: "quiz-submit",
     requirement:
-      "Allow the user to restart the quiz after completion.",
+      "Provide a button to submit the answers.",
 
     async run(page) {
-      for (let question = 0; question < 10; question += 1) {
-        const restartButton = page.getByRole("button", {
-          name: /restart|start again|try again/i,
-        });
+      const submitButton = getSubmitButton(page);
 
-        if ((await restartButton.count()) > 0) {
-          await restartButton.click();
+      if (
+        (await submitButton.count()) === 0 ||
+        !(await submitButton.isVisible())
+      ) {
+        throw new Error(
+          "Visible quiz submission button was not found.",
+        );
+      }
+    },
+  },
 
-          const score = page.getByText(
-            /score|result|you scored/i,
-          );
+  {
+    id: "quiz-final-score",
+    requirement:
+      "Display the final score on the page when the quiz is completed and submitted.",
 
-          if (
-            (await score.count()) > 0 &&
-            await score.first().isVisible()
-          ) {
-            throw new Error(
-              "Quiz remained on the result screen after restart.",
-            );
-          }
+    async run(page) {
+      await answerAllQuestions(page);
 
-          return;
-        }
+      const submitButton = getSubmitButton(page);
 
-        await selectAnswer(page);
-
-        const nextButton = await getNextButton(page);
-
-        if ((await nextButton.count()) === 0) {
-          throw new Error(
-            "Quiz could not reach the restart state.",
-          );
-        }
-
-        await nextButton.click();
-        await page.waitForTimeout(100);
+      if ((await submitButton.count()) === 0) {
+        throw new Error(
+          "Quiz submission button was not found.",
+        );
       }
 
-      throw new Error("Restart control was not found.");
+      await submitButton.click();
+
+      const score = page
+        .getByText(
+          /(?:score|result|correct).*(?:\d+)|(?:\d+).*(?:score|correct)|\d+\s*(?:\/|out of)\s*3/i,
+        )
+        .first();
+
+      await score.waitFor({
+        state: "visible",
+        timeout: 3000,
+      });
     },
   },
 
@@ -130,18 +174,28 @@ export const quizFunctionalTests = [
       "Store data only in browser memory for the current page session.",
 
     async run(page) {
-      await selectAnswer(page);
+      const questionNames = await getQuestionGroups(page);
 
-      const nextButton = await getNextButton(page);
-
-      if ((await nextButton.count()) > 0) {
-        await nextButton.click();
+      if (questionNames.length === 0) {
+        throw new Error(
+          "No quiz questions were found.",
+        );
       }
+
+      const firstOption = page
+        .locator(
+          `input[type="radio"][name="${questionNames[0]}"]`,
+        )
+        .first();
+
+      await firstOption.check();
 
       const browser = page.context().browser();
 
       if (!browser) {
-        throw new Error("Unable to access browser.");
+        throw new Error(
+          "Unable to access browser for session-memory test.",
+        );
       }
 
       const freshContext = await browser.newContext();
@@ -153,16 +207,13 @@ export const quizFunctionalTests = [
           waitUntil: "load",
         });
 
-        const result = freshPage.getByText(
-          /score|result|you scored/i,
+        const checkedAnswers = freshPage.locator(
+          'input[type="radio"]:checked',
         );
 
-        if (
-          (await result.count()) > 0 &&
-          await result.first().isVisible()
-        ) {
+        if ((await checkedAnswers.count()) > 0) {
           throw new Error(
-            "Quiz state persisted into a fresh browser context.",
+            "Quiz answer state persisted into a fresh browser context.",
           );
         }
       } finally {
