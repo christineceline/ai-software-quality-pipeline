@@ -1,0 +1,615 @@
+[1mdiff --git a/client/src/App.jsx b/client/src/App.jsx[m
+[1mindex 249cf10..2f9130d 100644[m
+[1m--- a/client/src/App.jsx[m
+[1m+++ b/client/src/App.jsx[m
+[36m@@ -24,7 +24,6 @@[m [mconst workflows = [[m
+     name: "Automated quality-guided refinement",[m
+     description:[m
+       "Will use automated quality reports to improve the generated application.",[m
+[31m-    disabled: true,[m
+   },[m
+ ];[m
+ [m
+[36m@@ -42,6 +41,8 @@[m [mfunction App() {[m
+   const [qualityReport, setQualityReport] = useState(null);[m
+   const [runtimeReport, setRuntimeReport] = useState(null);[m
+   const [accessibilityReport, setAccessibilityReport] = useState(null);[m
+[32m+[m[32m  const [refinementIterations, setRefinementIterations] = useState([]);[m
+[32m+[m[32m  const [selectedIteration, setSelectedIteration] = useState(null);[m
+ [m
+   useEffect(() => {[m
+     async function initialiseApplication() {[m
+[36m@@ -100,6 +101,8 @@[m [mfunction App() {[m
+     setQualityReport(null);[m
+     setRuntimeReport(null);[m
+     setAccessibilityReport(null);[m
+[32m+[m[32m    setRefinementIterations([]);[m
+[32m+[m[32m    setSelectedIteration(null);[m
+ [m
+     try {[m
+       const response = await fetch("/api/generate", {[m
+[36m@@ -122,15 +125,46 @@[m [mfunction App() {[m
+         );[m
+       }[m
+ [m
+[31m-      setApplication(data.application);[m
+[31m-      setRun(data.run);[m
+[31m-      setQualityReport(data.qualityReport);[m
+[31m-      setRuntimeReport(data.runtimeReport);[m
+[31m-      setAccessibilityReport([m
+[32m+[m[32m          setRun(data.run);[m
+[32m+[m
+[32m+[m[32m      if (workflow === "automated-refinement") {[m
+[32m+[m[32m        const completedRefinements =[m
+[32m+[m[32m          data.refinement?.iterations ?? [];[m
+[32m+[m
+[32m+[m[32m        const allIterations = [[m
+[32m+[m[32m          data.initial,[m
+[32m+[m[32m          ...completedRefinements,[m
+[32m+[m[32m        ];[m
+[32m+[m
+[32m+[m[32m        setRefinementIterations(allIterations);[m
+[32m+[m
+[32m+[m[32m        const finalIteration =[m
+[32m+[m[32m          allIterations[allIterations.length - 1];[m
+[32m+[m
+[32m+[m[32m        setSelectedIteration(finalIteration.iteration);[m
+[32m+[m
+[32m+[m[32m        setApplication(finalIteration.application);[m
+[32m+[m[32m        setQualityReport(finalIteration.qualityReport);[m
+[32m+[m[32m        setRuntimeReport(finalIteration.runtimeReport);[m
+[32m+[m[32m        setAccessibilityReport([m
+[32m+[m[32m          finalIteration.accessibilityReport ??[m
+[32m+[m[32m            finalIteration.runtimeReport?.accessibility ??[m
+[32m+[m[32m            null,[m
+[32m+[m[32m        );[m
+[32m+[m[32m      } else {[m
+[32m+[m[32m        setRefinementIterations([]);[m
+[32m+[m[32m        setSelectedIteration(null);[m
+[32m+[m
+[32m+[m[32m        setApplication(data.application);[m
+[32m+[m[32m        setQualityReport(data.qualityReport);[m
+[32m+[m[32m        setRuntimeReport(data.runtimeReport);[m
+[32m+[m[32m        setAccessibilityReport([m
+           data.accessibilityReport ??[m
+             data.runtimeReport?.accessibility ??[m
+             null,[m
+         );[m
+[32m+[m[32m      }[m
+[32m+[m[41m      [m
+       setActiveResultView("preview");[m
+     } catch (generationError) {[m
+       setError(generationError.message);[m
+[36m@@ -229,8 +263,7 @@[m [mfunction App() {[m
+               type="submit"[m
+               disabled={[m
+                 isGenerating ||[m
+[31m-                !specificationId ||[m
+[31m-                workflow === "automated-refinement"[m
+[32m+[m[32m                !specificationId[m
+               }[m
+             >[m
+               {isGenerating[m
+[36m@@ -265,6 +298,54 @@[m [mfunction App() {[m
+                   {run.model}[m
+                 </p>[m
+               )}[m
+[32m+[m
+[32m+[m[32m              {refinementIterations.length > 0 && ([m
+[32m+[m[32m                <div className="iteration-selector">[m
+[32m+[m[32m                  <label htmlFor="iteration">[m
+[32m+[m[32m                    Refinement iteration[m
+[32m+[m[32m                  </label>[m
+[32m+[m
+[32m+[m[32m                  <select[m
+[32m+[m[32m                    id="iteration"[m
+[32m+[m[32m                    value={selectedIteration ?? ""}[m
+[32m+[m[32m                    onChange={(event) => {[m
+[32m+[m[32m                      const iterationNumber =[m
+[32m+[m[32m                        Number(event.target.value);[m
+[32m+[m
+[32m+[m[32m                      const selected =[m
+[32m+[m[32m                        refinementIterations.find([m
+[32m+[m[32m                          (item) =>[m
+[32m+[m[32m                            item.iteration === iterationNumber,[m
+[32m+[m[32m                        );[m
+[32m+[m
+[32m+[m[32m                      if (!selected) {[m
+[32m+[m[32m                        return;[m
+[32m+[m[32m                      }[m
+[32m+[m
+[32m+[m[32m                      setSelectedIteration(iterationNumber);[m
+[32m+[m[32m                      setApplication(selected.application);[m
+[32m+[m[32m                      setQualityReport(selected.qualityReport);[m
+[32m+[m[32m                      setRuntimeReport(selected.runtimeReport);[m
+[32m+[m[32m                      setAccessibilityReport([m
+[32m+[m[32m                        selected.accessibilityReport ??[m
+[32m+[m[32m                          selected.runtimeReport?.accessibility ??[m
+[32m+[m[32m                          null,[m
+[32m+[m[32m                      );[m
+[32m+[m[32m                    }}[m
+[32m+[m[32m                  >[m
+[32m+[m[32m                    {refinementIterations.map((item) => ([m
+[32m+[m[32m                      <option[m
+[32m+[m[32m                        key={item.iteration}[m
+[32m+[m[32m                        value={item.iteration}[m
+[32m+[m[32m                      >[m
+[32m+[m[32m                        {item.iteration === 0[m
+[32m+[m[32m                          ? "Iteration 0 — Initial generation"[m
+[32m+[m[32m                          : `Iteration ${item.iteration} — Refinement`}[m
+[32m+[m[32m                      </option>[m
+[32m+[m[32m                    ))}[m
+[32m+[m[32m                  </select>[m
+[32m+[m[32m                </div>[m
+[32m+[m[32m              )}[m
+             </div>[m
+ [m
+             <div[m
+[1mdiff --git a/client/vite.config.js b/client/vite.config.js[m
+[1mindex 086550c..b36b6a3 100644[m
+[1m--- a/client/vite.config.js[m
+[1m+++ b/client/vite.config.js[m
+[36m@@ -6,7 +6,7 @@[m [mexport default defineConfig({[m
+   server: {[m
+     proxy: {[m
+       "/api": {[m
+[31m-        target: "http://localhost:3001",[m
+[32m+[m[32m        target: "http://127.0.0.1:3001",[m
+         changeOrigin: true,[m
+       },[m
+     },[m
+[1mdiff --git a/server/src/routes/generationRoutes.js b/server/src/routes/generationRoutes.js[m
+[1mindex 84d74b5..c3c457d 100644[m
+[1m--- a/server/src/routes/generationRoutes.js[m
+[1m+++ b/server/src/routes/generationRoutes.js[m
+[36m@@ -1,15 +1,27 @@[m
+ import express from "express";[m
+ import { buildPrompt } from "../prompts/buildPrompt.js";[m
+ import { generateWithOllama } from "../services/ollamaService.js";[m
+[31m-import { saveGeneratedRun } from "../services/runStorageService.js";[m
+[32m+[m[32mimport {[m
+[32m+[m[32m  saveGeneratedRun,[m
+[32m+[m[32m  saveRefinementRun,[m
+[32m+[m[32m  completeRefinementRun,[m
+[32m+[m[32m} from "../services/runStorageService.js";[m
+ import { getSpecificationById } from "../specifications/index.js";[m
+ import { parseGeneratedApplication } from "../utils/responseParser.js";[m
+ import { analyseApplication } from "../quality/qualityAnalyzer.js";[m
+ import { runRuntimeValidation } from "../services/runtimeValidationService.js";[m
+[32m+[m[32mimport {[m
+[32m+[m[32m  MAX_REFINEMENT_ITERATIONS,[m
+[32m+[m[32m  runRefinementLoop,[m
+[32m+[m[32m} from "../services/refinementService.js";[m
+ [m
+ const router = express.Router();[m
+ [m
+[31m-const supportedWorkflows = ["one-shot", "quality-focused"];[m
+[32m+[m[32mconst supportedWorkflows = [[m
+[32m+[m[32m  "one-shot",[m
+[32m+[m[32m  "quality-focused",[m
+[32m+[m[32m  "automated-refinement",[m
+[32m+[m[32m];[m
+ [m
+ router.post("/", async (request, response) => {[m
+   try {[m
+[36m@@ -44,8 +56,13 @@[m [mrouter.post("/", async (request, response) => {[m
+       });[m
+     }[m
+ [m
+[32m+[m[32m    const initialPromptWorkflow =[m
+[32m+[m[32m      workflow === "automated-refinement"[m
+[32m+[m[32m        ? "quality-focused"[m
+[32m+[m[32m        : workflow;[m
+[32m+[m
+     const prompt = buildPrompt({[m
+[31m-      workflow,[m
+[32m+[m[32m      workflow: initialPromptWorkflow,[m
+       specification,[m
+     });[m
+ [m
+[36m@@ -60,6 +77,85 @@[m [mrouter.post("/", async (request, response) => {[m
+ [m
+     const qualityReport = await analyseApplication(application);[m
+ [m
+[32m+[m[32mif (workflow === "automated-refinement") {[m
+[32m+[m[32m  const runMetadata = await saveRefinementRun({[m
+[32m+[m[32m    application,[m
+[32m+[m[32m    specification,[m
+[32m+[m[32m    workflow,[m
+[32m+[m[32m    model: ollamaResult.model,[m
+[32m+[m[32m    temperature: Number(temperature),[m
+[32m+[m[32m    prompt,[m
+[32m+[m[32m    rawResponse: ollamaResult.rawResponse,[m
+[32m+[m[32m    generationMetrics: ollamaResult.generationMetrics,[m
+[32m+[m[32m    qualityReport,[m
+[32m+[m[32m    maxRefinementIterations:[m
+[32m+[m[32m      MAX_REFINEMENT_ITERATIONS,[m
+[32m+[m[32m  });[m
+[32m+[m
+[32m+[m[32m  const {[m
+[32m+[m[32m    runId,[m
+[32m+[m[32m    runDirectory,[m
+[32m+[m[32m    iterationDirectory,[m
+[32m+[m[32m  } = runMetadata;[m
+[32m+[m
+[32m+[m[32m  const encodedRunId =[m
+[32m+[m[32m    encodeURIComponent(runId);[m
+[32m+[m
+[32m+[m[32m  const initialApplicationUrl =[m
+[32m+[m[32m    `http://localhost:${process.env.PORT || 3001}` +[m
+[32m+[m[32m    `/generated-apps/runs/${encodedRunId}` +[m
+[32m+[m[32m    `/iterations/0/index.html`;[m
+[32m+[m
+[32m+[m[32m  const initialRuntimeReport =[m
+[32m+[m[32m    await runRuntimeValidation({[m
+[32m+[m[32m      applicationUrl: initialApplicationUrl,[m
+[32m+[m[32m      runDirectory: iterationDirectory,[m
+[32m+[m[32m      runId,[m
+[32m+[m[32m      specificationId: specification.id,[m
+[32m+[m[32m    });[m
+[32m+[m
+[32m+[m[32m  const refinementResult =[m
+[32m+[m[32m    await runRefinementLoop({[m
+[32m+[m[32m      runId,[m
+[32m+[m[32m      runDirectory,[m
+[32m+[m[32m      specification,[m
+[32m+[m[32m      initialApplication:[m
+[32m+[m[32m        application,[m
+[32m+[m[32m      initialQualityReport:[m
+[32m+[m[32m        qualityReport,[m
+[32m+[m[32m      initialRuntimeReport:[m
+[32m+[m[32m        initialRuntimeReport,[m
+[32m+[m[32m      initialAccessibilityReport:[m
+[32m+[m[32m        initialRuntimeReport.accessibility,[m
+[32m+[m[32m      temperature:[m
+[32m+[m[32m        Number(temperature),[m
+[32m+[m[32m    });[m
+[32m+[m
+[32m+[m[32m    const completedRunMetadata =[m
+[32m+[m[32m      await completeRefinementRun({[m
+[32m+[m[32m        runDirectory,[m
+[32m+[m[32m        refinementResult,[m
+[32m+[m[32m      });[m
+[32m+[m
+[32m+[m[32m  return response.status(201).json({[m
+[32m+[m[32m    run: {[m
+[32m+[m[32m      ...completedRunMetadata,[m
+[32m+[m[32m      runDirectory,[m
+[32m+[m[32m},[m
+[32m+[m
+[32m+[m[32m    initial: {[m
+[32m+[m[32m      iteration: 0,[m
+[32m+[m[32m      application,[m
+[32m+[m[32m      qualityReport,[m
+[32m+[m[32m      runtimeReport: initialRuntimeReport,[m
+[32m+[m[32m      accessibilityReport:[m
+[32m+[m[32m        initialRuntimeReport.accessibility,[m
+[32m+[m[32m    },[m
+[32m+[m
+[32m+[m[32m    refinement: refinementResult,[m
+[32m+[m[32m  });[m
+[32m+[m[32m}[m
+[32m+[m
+ const runMetadata = await saveGeneratedRun({[m
+   application,[m
+   specification,[m
+[36m@@ -80,18 +176,20 @@[m [mif (!runId || !runDirectory) {[m
+   );[m
+ }[m
+ [m
+[31m-const encodedRunId = encodeURIComponent(runId);[m
+[32m+[m[32mconst encodedRunId =[m
+[32m+[m[32m  encodeURIComponent(runId);[m
+ [m
+ const applicationUrl =[m
+   `http://localhost:${process.env.PORT || 3001}` +[m
+   `/generated-apps/runs/${encodedRunId}/index.html`;[m
+ [m
+[31m-const runtimeReport = await runRuntimeValidation({[m
+[31m-  applicationUrl,[m
+[31m-  runDirectory,[m
+[31m-  runId,[m
+[31m-  specificationId: specification.id,[m
+[31m-});[m
+[32m+[m[32mconst runtimeReport =[m
+[32m+[m[32m  await runRuntimeValidation({[m
+[32m+[m[32m    applicationUrl,[m
+[32m+[m[32m    runDirectory,[m
+[32m+[m[32m    runId,[m
+[32m+[m[32m    specificationId: specification.id,[m
+[32m+[m[32m  });[m
+ [m
+ return response.status(201).json({[m
+   run: runMetadata,[m
+[36m@@ -101,6 +199,7 @@[m [mreturn response.status(201).json({[m
+   accessibilityReport:[m
+     runtimeReport.accessibility,[m
+ });[m
+[32m+[m
+   } catch (error) {[m
+     console.error("Generation failed:", error);[m
+ [m
+[36m@@ -111,4 +210,4 @@[m [mreturn response.status(201).json({[m
+   }[m
+ });[m
+ [m
+[31m-export default router;[m
+\ No newline at end of file[m
+[32m+[m[32mexport default router;[m
+[1mdiff --git a/server/src/services/runStorageService.js b/server/src/services/runStorageService.js[m
+[1mindex 28f3f8b..ad409d6 100644[m
+[1m--- a/server/src/services/runStorageService.js[m
+[1m+++ b/server/src/services/runStorageService.js[m
+[36m@@ -1,5 +1,5 @@[m
+ import { randomUUID } from "node:crypto";[m
+[31m-import { mkdir, writeFile } from "node:fs/promises";[m
+[32m+[m[32mimport { mkdir, readFile, writeFile } from "node:fs/promises";[m
+ import path from "node:path";[m
+ import { fileURLToPath } from "node:url";[m
+ [m
+[36m@@ -38,6 +38,11 @@[m [masync function writeJson(filePath, value) {[m
+   );[m
+ }[m
+ [m
+[32m+[m[32masync function readJson(filePath) {[m
+[32m+[m[32m  const contents = await readFile(filePath, "utf8");[m
+[32m+[m[32m  return JSON.parse(contents);[m
+[32m+[m[32m}[m
+[32m+[m
+ export async function saveGeneratedRun({[m
+   application,[m
+   specification,[m
+[36m@@ -109,4 +114,252 @@[m [mexport async function saveGeneratedRun({[m
+     ...metadata,[m
+     runDirectory,[m
+   };[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mexport async function saveRefinementRun({[m
+[32m+[m[32m  application,[m
+[32m+[m[32m  specification,[m
+[32m+[m[32m  workflow,[m
+[32m+[m[32m  model,[m
+[32m+[m[32m  temperature,[m
+[32m+[m[32m  prompt,[m
+[32m+[m[32m  rawResponse,[m
+[32m+[m[32m  generationMetrics,[m
+[32m+[m[32m  qualityReport,[m
+[32m+[m[32m  maxRefinementIterations,[m
+[32m+[m[32m}) {[m
+[32m+[m[32m  const runId = createRunId();[m
+[32m+[m
+[32m+[m[32m  const runDirectory = path.join([m
+[32m+[m[32m    getRunsDirectory(),[m
+[32m+[m[32m    runId,[m
+[32m+[m[32m  );[m
+[32m+[m
+[32m+[m[32m  const iterationsDirectory = path.join([m
+[32m+[m[32m    runDirectory,[m
+[32m+[m[32m    "iterations",[m
+[32m+[m[32m  );[m
+[32m+[m
+[32m+[m[32m  const iterationDirectory = path.join([m
+[32m+[m[32m    iterationsDirectory,[m
+[32m+[m[32m    "0",[m
+[32m+[m[32m  );[m
+[32m+[m
+[32m+[m[32m  await mkdir(iterationDirectory, {[m
+[32m+[m[32m    recursive: true,[m
+[32m+[m[32m  });[m
+[32m+[m
+[32m+[m[32m  const createdAt = new Date().toISOString();[m
+[32m+[m
+[32m+[m[32m  const iterationMetadata = {[m
+[32m+[m[32m    iteration: 0,[m
+[32m+[m[32m    type: "initial-generation",[m
+[32m+[m[32m    createdAt,[m
+[32m+[m[32m    generationMetrics,[m
+[32m+[m[32m    qualitySummary: qualityReport.summary,[m
+[32m+[m[32m  };[m
+[32m+[m
+[32m+[m[32m  const metadata = {[m
+[32m+[m[32m    runId,[m
+[32m+[m[32m    createdAt,[m
+[32m+[m[32m    specification: {[m
+[32m+[m[32m      id: specification.id,[m
+[32m+[m[32m      name: specification.name,[m
+[32m+[m[32m    },[m
+[32m+[m[32m    workflow,[m
+[32m+[m[32m    model,[m
+[32m+[m[32m    temperature,[m
+[32m+[m[32m    promptVersion: "1.0.0",[m
+[32m+[m[32m    maxRefinementIterations,[m
+[32m+[m[32m    generatedApplication: application.metadata,[m
+[32m+[m[32m    iterations: [[m
+[32m+[m[32m      iterationMetadata,[m
+[32m+[m[32m    ],[m
+[32m+[m[32m  };[m
+[32m+[m
+[32m+[m[32m  await Promise.all([[m
+[32m+[m[32m    writeFile([m
+[32m+[m[32m      path.join(iterationDirectory, "index.html"),[m
+[32m+[m[32m      application.html,[m
+[32m+[m[32m      "utf8",[m
+[32m+[m[32m    ),[m
+[32m+[m[32m    writeFile([m
+[32m+[m[32m      path.join(iterationDirectory, "styles.css"),[m
+[32m+[m[32m      application.css,[m
+[32m+[m[32m      "utf8",[m
+[32m+[m[32m    ),[m
+[32m+[m[32m    writeFile([m
+[32m+[m[32m      path.join(iterationDirectory, "script.js"),[m
+[32m+[m[32m      application.javascript,[m
+[32m+[m[32m      "utf8",[m
+[32m+[m[32m    ),[m
+[32m+[m[32m    writeFile([m
+[32m+[m[32m      path.join(iterationDirectory, "prompt.txt"),[m
+[32m+[m[32m      prompt,[m
+[32m+[m[32m      "utf8",[m
+[32m+[m[32m    ),[m
+[32m+[m[32m    writeFile([m
+[32m+[m[32m      path.join([m
+[32m+[m[32m        iterationDirectory,[m
+[32m+[m[32m        "raw-response.txt",[m
+[32m+[m[32m      ),[m
+[32m+[m[32m      rawResponse,[m
+[32m+[m[32m      "utf8",[m
+[32m+[m[32m    ),[m
+[32m+[m[32m    writeJson([m
+[32m+[m[32m      path.join([m
+[32m+[m[32m        iterationDirectory,[m
+[32m+[m[32m        "metadata.json",[m
+[32m+[m[32m      ),[m
+[32m+[m[32m      iterationMetadata,[m
+[32m+[m[32m    ),[m
+[32m+[m[32m    writeJson([m
+[32m+[m[32m      path.join([m
+[32m+[m[32m        iterationDirectory,[m
+[32m+[m[32m        "quality-report.json",[m
+[32m+[m[32m      ),[m
+[32m+[m[32m      qualityReport,[m
+[32m+[m[32m    ),[m
+[32m+[m[32m    writeJson([m
+[32m+[m[32m      path.join(runDirectory, "metadata.json"),[m
+[32m+[m[32m      metadata,[m
+[32m+[m[32m    ),[m
+[32m+[m[32m  ]);[m
+[32m+[m
+[32m+[m[32m  return {[m
+[32m+[m[32m    ...metadata,[m
+[32m+[m[32m    runDirectory,[m
+[32m+[m[32m    iterationDirectory,[m
+[32m+[m[32m  };[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mexport async function saveRefinementIteration({[m
+[32m+[m[32m  runDirectory,[m
+[32m+[m[32m  iteration,[m
+[32m+[m[32m  application,[m
+[32m+[m[32m  prompt,[m
+[32m+[m[32m  rawResponse,[m
+[32m+[m[32m  generationMetrics,[m
+[32m+[m[32m  qualityReport,[m
+[32m+[m[32m}) {[m
+[32m+[m[32m  if (!Number.isInteger(iteration) || iteration < 1) {[m
+[32m+[m[32m    throw new Error([m
+[32m+[m[32m      "Refinement iteration must be an integer greater than or equal to 1.",[m
+[32m+[m[32m    );[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  const iterationDirectory = path.join([m
+[32m+[m[32m    runDirectory,[m
+[32m+[m[32m    "iterations",[m
+[32m+[m[32m    String(iteration),[m
+[32m+[m[32m  );[m
+[32m+[m
+[32m+[m[32m  await mkdir(iterationDirectory, {[m
+[32m+[m[32m    recursive: false,[m
+[32m+[m[32m  });[m
+[32m+[m
+[32m+[m[32m  const iterationMetadata = {[m
+[32m+[m[32m    iteration,[m
+[32m+[m[32m    type: "refinement",[m
+[32m+[m[32m    createdAt: new Date().toISOString(),[m
+[32m+[m[32m    generationMetrics,[m
+[32m+[m[32m    qualitySummary: qualityReport.summary,[m
+[32m+[m[32m  };[m
+[32m+[m
+[32m+[m[32m  await Promise.all([[m
+[32m+[m[32m    writeFile([m
+[32m+[m[32m      path.join(iterationDirectory, "index.html"),[m
+[32m+[m[32m      application.html,[m
+[32m+[m[32m      "utf8",[m
+[32m+[m[32m    ),[m
+[32m+[m[32m    writeFile([m
+[32m+[m[32m      path.join(iterationDirectory, "styles.css"),[m
+[32m+[m[32m      application.css,[m
+[32m+[m[32m      "utf8",[m
+[32m+[m[32m    ),[m
+[32m+[m[32m    writeFile([m
+[32m+[m[32m      path.join(iterationDirectory, "script.js"),[m
+[32m+[m[32m      application.javascript,[m
+[32m+[m[32m      "utf8",[m
+[32m+[m[32m    ),[m
+[32m+[m[32m    writeFile([m
+[32m+[m[32m      path.join(iterationDirectory, "prompt.txt"),[m
+[32m+[m[32m      prompt,[m
+[32m+[m[32m      "utf8",[m
+[32m+[m[32m    ),[m
+[32m+[m[32m    writeFile([m
+[32m+[m[32m      path.join([m
+[32m+[m[32m        iterationDirectory,[m
+[32m+[m[32m        "raw-response.txt",[m
+[32m+[m[32m      ),[m
+[32m+[m[32m      rawResponse,[m
+[32m+[m[32m      "utf8",[m
+[32m+[m[32m    ),[m
+[32m+[m[32m    writeJson([m
+[32m+[m[32m      path.join([m
+[32m+[m[32m        iterationDirectory,[m
+[32m+[m[32m        "metadata.json",[m
+[32m+[m[32m      ),[m
+[32m+[m[32m      iterationMetadata,[m
+[32m+[m[32m    ),[m
+[32m+[m[32m    writeJson([m
+[32m+[m[32m      path.join([m
+[32m+[m[32m        iterationDirectory,[m
+[32m+[m[32m        "quality-report.json",[m
+[32m+[m[32m      ),[m
+[32m+[m[32m      qualityReport,[m
+[32m+[m[32m    ),[m
+[32m+[m[32m  ]);[m
+[32m+[m
+[32m+[m[32m  return {[m
+[32m+[m[32m    ...iterationMetadata,[m
+[32m+[m[32m    iterationDirectory,[m
+[32m+[m[32m  };[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mexport async function completeRefinementRun({[m
+[32m+[m[32m  runDirectory,[m
+[32m+[m[32m  refinementResult,[m
+[32m+[m[32m}) {[m
+[32m+[m[32m  const metadataPath = path.join([m
+[32m+[m[32m    runDirectory,[m
+[32m+[m[32m    "metadata.json",[m
+[32m+[m[32m  );[m
+[32m+[m
+[32m+[m[32m  const metadata = await readJson(metadataPath);[m
+[32m+[m
+[32m+[m[32m  const completedIterations =[m
+[32m+[m[32m    refinementResult.iterations.map((result) => ({[m
+[32m+[m[32m      iteration: result.iteration,[m
+[32m+[m[32m      type: "refinement",[m
+[32m+[m[32m      completedAt: new Date().toISOString(),[m
+[32m+[m[32m      qualitySummary:[m
+[32m+[m[32m        result.qualityReport?.summary ?? null,[m
+[32m+[m[32m      runtimePassed:[m
+[32m+[m[32m        result.runtimeReport?.summary[m
+[32m+[m[32m          ?.runtimePassed ?? false,[m
+[32m+[m[32m      accessibilityPassed:[m
+[32m+[m[32m        result.runtimeReport?.summary[m
+[32m+[m[32m          ?.accessibilityPassed ?? false,[m
+[32m+[m[32m    }));[m
+[32m+[m
+[32m+[m[32m  metadata.iterations = [[m
+[32m+[m[32m    ...(metadata.iterations || []),[m
+[32m+[m[32m    ...completedIterations,[m
+[32m+[m[32m  ];[m
+[32m+[m
+[32m+[m[32m  metadata.refinement = {[m
+[32m+[m[32m    completedIterations:[m
+[32m+[m[32m      refinementResult.completedIterations,[m
+[32m+[m[32m    stoppedEarly:[m
+[32m+[m[32m      refinementResult.stoppedEarly,[m
+[32m+[m[32m    stopReason:[m
+[32m+[m[32m      refinementResult.stopReason,[m
+[32m+[m[32m    completedAt:[m
+[32m+[m[32m      new Date().toISOString(),[m
+[32m+[m[32m  };[m
+[32m+[m
+[32m+[m[32m  await writeJson(metadataPath, metadata);[m
+[32m+[m
+[32m+[m[32m  return metadata;[m
+ }[m
+\ No newline at end of file[m
