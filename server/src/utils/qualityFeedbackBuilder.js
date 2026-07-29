@@ -138,18 +138,46 @@ function summariseAccessibility(accessibilityReport) {
   };
 }
 
+function summariseFunctionalValidation(functionalReport) {
+  if (!functionalReport) {
+    return null;
+  }
+
+  const failedTests = (functionalReport.tests || [])
+    .filter((test) => !test.passed)
+    .map((test) => ({
+      id: test.id,
+      requirement: test.requirement,
+      error: test.error?.message || null,
+    }));
+
+  return {
+    passed:
+      functionalReport.summary?.passed ?? false,
+    passedCount:
+      functionalReport.summary?.passedCount ?? 0,
+    failedCount:
+      functionalReport.summary?.failedCount ?? 0,
+    totalCount:
+      functionalReport.summary?.totalCount ?? 0,
+    failedTests,
+  };
+}
+
 export function buildQualityFeedback({
   qualityReport,
   runtimeReport,
   accessibilityReport,
+  functionalReport,
 }) {
   if (
     !qualityReport ||
     !runtimeReport ||
-    !accessibilityReport
+    !accessibilityReport ||
+    !functionalReport
   ) {
     throw new Error(
-      "Quality, runtime and accessibility reports are required to build refinement feedback.",
+      "Quality, runtime, accessibility and functional reports are required to build refinement feedback.",
     );
   }
 
@@ -162,6 +190,9 @@ export function buildQualityFeedback({
 
     accessibility:
       summariseAccessibility(accessibilityReport),
+
+    functionalValidation:
+      summariseFunctionalValidation(functionalReport),
   };
 }
 
@@ -179,9 +210,13 @@ export function hasActionableFeedback(feedback) {
   const accessibilityHasIssues =
     (feedback.accessibility?.violationCount ?? 0) > 0;
 
+  const functionalHasIssues =
+    feedback.functionalValidation?.passed === false;
+
   return (
     staticHasIssues ||
     runtimeHasIssues ||
-    accessibilityHasIssues
+    accessibilityHasIssues ||
+    functionalHasIssues
   );
 }

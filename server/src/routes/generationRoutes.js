@@ -115,6 +115,14 @@ if (workflow === "automated-refinement") {
       specificationId: specification.id,
     });
 
+  const initialFunctionalReport =
+    await runFunctionalValidation({
+      applicationUrl: initialApplicationUrl,
+      runDirectory: iterationDirectory,
+      runId,
+      specificationId: specification.id,
+    });
+
   const refinementResult =
     await runRefinementLoop({
       runId,
@@ -128,6 +136,7 @@ if (workflow === "automated-refinement") {
         initialRuntimeReport,
       initialAccessibilityReport:
         initialRuntimeReport.accessibility,
+      initialFunctionalReport,
       temperature:
         Number(temperature),
     });
@@ -151,6 +160,7 @@ if (workflow === "automated-refinement") {
       runtimeReport: initialRuntimeReport,
       accessibilityReport:
         initialRuntimeReport.accessibility,
+      functionalReport: initialFunctionalReport,
     },
 
     refinement: refinementResult,

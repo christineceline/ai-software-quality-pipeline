@@ -7,6 +7,7 @@ import {
 import { buildRefinementPrompt } from "../prompts/buildRefinementPrompt.js";
 import { analyseApplication } from "../quality/qualityAnalyzer.js";
 import { runRuntimeValidation } from "./runtimeValidationService.js";
+import { runFunctionalValidation } from "./functionalValidationService.js";
 import { saveRefinementIteration } from "./runStorageService.js";
 
 export const MAX_REFINEMENT_ITERATIONS = 3;
@@ -17,6 +18,7 @@ export async function refineApplicationOnce({
   qualityReport,
   runtimeReport,
   accessibilityReport,
+  functionalReport,
   temperature = 0,
   iteration = 1,
 }) {
@@ -24,6 +26,7 @@ export async function refineApplicationOnce({
     qualityReport,
     runtimeReport,
     accessibilityReport,
+    functionalReport,
   });
 
   if (!hasActionableFeedback(feedback)) {
@@ -71,6 +74,7 @@ export async function refineAndEvaluateOnce({
   qualityReport,
   runtimeReport,
   accessibilityReport,
+  functionalReport,
   temperature = 0,
   iteration = 1,
 }) {
@@ -80,6 +84,7 @@ export async function refineAndEvaluateOnce({
     qualityReport,
     runtimeReport,
     accessibilityReport,
+    functionalReport,
     temperature,
     iteration,
   });
@@ -125,6 +130,15 @@ export async function refineAndEvaluateOnce({
       specificationId: specification.id,
     });
 
+  const refinedFunctionalReport =
+    await runFunctionalValidation({
+      applicationUrl,
+      runDirectory:
+        savedIteration.iterationDirectory,
+      runId,
+      specificationId: specification.id,
+    });
+
   return {
     refined: true,
     reason: null,
@@ -137,6 +151,8 @@ export async function refineAndEvaluateOnce({
       refinedRuntimeReport,
     accessibilityReport:
       refinedRuntimeReport.accessibility,
+    functionalReport:
+      refinedFunctionalReport,
     feedback:
       refinementResult.feedback,
     prompt:
@@ -156,6 +172,7 @@ export async function runRefinementLoop({
   initialQualityReport,
   initialRuntimeReport,
   initialAccessibilityReport,
+  initialFunctionalReport,
   temperature = 0,
 }) {
   const iterations = [];
@@ -172,6 +189,8 @@ export async function runRefinementLoop({
   let currentAccessibilityReport =
     initialAccessibilityReport;
 
+  let currentFunctionalReport =
+    initialFunctionalReport;
   for (
     let iteration = 1;
     iteration <= MAX_REFINEMENT_ITERATIONS;
@@ -190,6 +209,8 @@ export async function runRefinementLoop({
           currentRuntimeReport,
         accessibilityReport:
           currentAccessibilityReport,
+        functionalReport:
+          currentFunctionalReport,
         temperature,
         iteration,
       });
@@ -218,6 +239,9 @@ export async function runRefinementLoop({
 
     currentAccessibilityReport =
       result.accessibilityReport;
+
+    currentFunctionalReport =
+      result.functionalReport;
   }
 
   return {
