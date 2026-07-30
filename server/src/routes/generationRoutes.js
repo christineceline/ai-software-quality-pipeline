@@ -161,6 +161,8 @@ if (workflow === "automated-refinement") {
       accessibilityReport:
         initialRuntimeReport.accessibility,
       functionalReport: initialFunctionalReport,
+      generationMetrics:
+        generationResult.generationMetrics,
     },
 
     refinement: refinementResult,

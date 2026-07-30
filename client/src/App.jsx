@@ -153,6 +153,9 @@ function App() {
         setSelectedIteration(finalIteration.iteration);
 
         setApplication(finalIteration.application);
+        setGenerationMetrics(
+          finalIteration.generationMetrics ?? null,
+        );
         setQualityReport(finalIteration.qualityReport);
         setRuntimeReport(finalIteration.runtimeReport);
         setAccessibilityReport(
@@ -336,6 +339,9 @@ function App() {
 
                       setSelectedIteration(iterationNumber);
                       setApplication(selected.application);
+                      setGenerationMetrics(
+                        selected.generationMetrics ?? null,
+                      );
                       setQualityReport(selected.qualityReport);
                       setRuntimeReport(selected.runtimeReport);
                       setAccessibilityReport(
