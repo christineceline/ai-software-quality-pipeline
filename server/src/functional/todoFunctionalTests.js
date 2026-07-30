@@ -22,10 +22,16 @@ async function addTask(page, taskText) {
 
     const task = getTaskContainer(page, taskText);
 
-    await task.waitFor({
-    state: "visible",
-    timeout: 3000,
-    });
+    try {
+      await task.waitFor({
+        state: "visible",
+        timeout: 3000,
+      });
+    } catch {
+      throw new Error(
+        "The task was not displayed after it was submitted.",
+      );
+    }
 }
 
 function getTaskContainer(page, taskText) {
@@ -187,10 +193,16 @@ export const todoFunctionalTests = [
 
       await deleteButton.click();
 
-      await task.waitFor({
-        state: "detached",
-        timeout: 3000,
+      try {
+        await task.waitFor({
+          state: "detached",
+          timeout: 3000,
         });
+      } catch {
+        throw new Error(
+          "The task remained visible after the delete control was activated.",
+        );
+      }
     },
   },
 
