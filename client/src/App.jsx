@@ -281,8 +281,7 @@ function App() {
 
           {isGenerating && (
             <p className="information-message" role="status">
-              Ollama is generating the application. Local model
-              generation may take several minutes.
+              Gemini is generating the application. This may take several minutes.
             </p>
           )}
 

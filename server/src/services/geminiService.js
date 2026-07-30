@@ -36,6 +36,21 @@ const applicationSchema = {
   ],
 };
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function isRetryableGeminiError(error) {
+  const status =
+    error?.status ||
+    error?.code ||
+    error?.error?.code;
+
+  return [429, 500, 502, 503, 504].includes(
+    Number(status),
+  );
+}
+
 export async function generateWithGemini({
   prompt,
   model,
