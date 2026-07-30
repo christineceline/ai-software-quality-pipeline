@@ -1,25 +1,62 @@
 async function getQuestionGroups(page) {
   const radios = page.locator('input[type="radio"]');
 
-  const names = await radios.evaluateAll((elements) => [
+  return radios.evaluateAll((elements) => [
     ...new Set(
       elements
         .map((element) => element.name)
         .filter(Boolean),
     ),
   ]);
+}
 
-  return names;
+async function getThreeQuestions(page) {
+  const questionNames =
+    await getQuestionGroups(page);
+
+  if (questionNames.length !== 3) {
+    throw new Error(
+      `The quiz should contain exactly 3 multiple-choice questions, but ${questionNames.length} were found.`,
+    );
+  }
+
+  return questionNames;
+}
+
+async function selectAnswer(page, name) {
+  const option = page
+    .locator(
+      `input[type="radio"][name="${name}"]`,
+    )
+    .first();
+
+  if ((await option.count()) === 0) {
+    throw new Error(
+      `No selectable answer was found for question "${name}".`,
+    );
+  }
+
+  try {
+    await option.check();
+  } catch {
+    throw new Error(
+      `An answer could not be selected for question "${name}".`,
+    );
+  }
+
+  if (!(await option.isChecked())) {
+    throw new Error(
+      `Selecting an answer for question "${name}" did not update its selected state.`,
+    );
+  }
 }
 
 async function answerAllQuestions(page) {
-  const questionNames = await getQuestionGroups(page);
+  const questionNames =
+    await getThreeQuestions(page);
 
   for (const name of questionNames) {
-    await page
-      .locator(`input[type="radio"][name="${name}"]`)
-      .first()
-      .check();
+    await selectAnswer(page, name);
   }
 }
 
@@ -38,22 +75,20 @@ export const quizFunctionalTests = [
       "Include three multiple-choice questions.",
 
     async run(page) {
-      const questionNames = await getQuestionGroups(page);
-
-      if (questionNames.length !== 3) {
-        throw new Error(
-          `Expected 3 questions but found ${questionNames.length}.`,
-        );
-      }
+      const questionNames =
+        await getThreeQuestions(page);
 
       for (const name of questionNames) {
         const options = page.locator(
           `input[type="radio"][name="${name}"]`,
         );
 
-        if ((await options.count()) < 2) {
+        const optionCount =
+          await options.count();
+
+        if (optionCount < 2) {
           throw new Error(
-            `Question "${name}" does not contain multiple answer choices.`,
+            `Question "${name}" has ${optionCount} answer option(s); at least 2 are required for multiple choice.`,
           );
         }
       }
@@ -66,22 +101,28 @@ export const quizFunctionalTests = [
       "Display all questions on a single page.",
 
     async run(page) {
-      const questionNames = await getQuestionGroups(page);
-
-      if (questionNames.length !== 3) {
-        throw new Error(
-          `Expected all 3 questions to be present, but found ${questionNames.length}.`,
-        );
-      }
+      const questionNames =
+        await getThreeQuestions(page);
 
       for (const name of questionNames) {
         const firstOption = page
-          .locator(`input[type="radio"][name="${name}"]`)
+          .locator(
+            `input[type="radio"][name="${name}"]`,
+          )
           .first();
 
-        if (!(await firstOption.isVisible())) {
+        let visible = false;
+
+        try {
+          visible =
+            await firstOption.isVisible();
+        } catch {
+          visible = false;
+        }
+
+        if (!visible) {
           throw new Error(
-            `Question "${name}" is not visible on the page.`,
+            `Question "${name}" was present but not visible on the page.`,
           );
         }
       }
@@ -94,26 +135,11 @@ export const quizFunctionalTests = [
       "Allow the user to select one answer for each question.",
 
     async run(page) {
-      const questionNames = await getQuestionGroups(page);
-
-      if (questionNames.length !== 3) {
-        throw new Error(
-          `Expected 3 questions but found ${questionNames.length}.`,
-        );
-      }
+      const questionNames =
+        await getThreeQuestions(page);
 
       for (const name of questionNames) {
-        const option = page
-          .locator(`input[type="radio"][name="${name}"]`)
-          .first();
-
-        await option.check();
-
-        if (!(await option.isChecked())) {
-          throw new Error(
-            `Unable to select an answer for question "${name}".`,
-          );
-        }
+        await selectAnswer(page, name);
       }
     },
   },
@@ -124,104 +150,131 @@ export const quizFunctionalTests = [
       "Provide a button to submit the answers.",
 
     async run(page) {
-      const submitButton = getSubmitButton(page);
+      const submitButton =
+        getSubmitButton(page);
 
-      if (
-        (await submitButton.count()) === 0 ||
-        !(await submitButton.isVisible())
-      ) {
+      if ((await submitButton.count()) === 0) {
         throw new Error(
-          "Visible quiz submission button was not found.",
+          "No quiz submission button was found.",
+        );
+      }
+
+      if (!(await submitButton.isVisible())) {
+        throw new Error(
+          "The quiz submission button was present but not visible.",
         );
       }
     },
   },
 
   {
-  id: "quiz-final-score",
-  requirement:
-    "Display the final score on the page when the quiz is completed and submitted.",
+    id: "quiz-final-score",
+    requirement:
+      "Display the final score on the page when the quiz is completed and submitted.",
 
-  async run(page) {
-    await answerAllQuestions(page);
+    async run(page) {
+      await answerAllQuestions(page);
 
-    const submitButton = getSubmitButton(page);
+      const submitButton =
+        getSubmitButton(page);
 
-    if ((await submitButton.count()) === 0) {
-      throw new Error(
-        "Quiz submission button was not found.",
-      );
-    }
+      if ((await submitButton.count()) === 0) {
+        throw new Error(
+          "No quiz submission button was found.",
+        );
+      }
 
-    if (!(await submitButton.isEnabled())) {
-      throw new Error(
-        "The quiz submission button remained disabled after answers were selected.",
-      );
-    }
+      if (!(await submitButton.isEnabled())) {
+        throw new Error(
+          "The quiz submission button remained disabled after all questions were answered.",
+        );
+      }
 
-    const score = page
-      .getByText(
-        /(?:score|result|correct).*(?:\d+)|(?:\d+).*(?:score|correct)|\d+\s*(?:\/|out of)\s*3/i,
-      )
-      .first();
+      try {
+        await submitButton.click();
+      } catch {
+        throw new Error(
+          "The completed quiz could not be submitted.",
+        );
+      }
 
-    await submitButton.click();
+      const score = page
+        .getByText(
+          /(?:score|result|correct).*(?:\d+)|(?:\d+).*(?:score|correct)|\d+\s*(?:\/|out of)\s*3/i,
+        )
+        .first();
 
-    try {
-      await score.waitFor({
-        state: "visible",
-        timeout: 3000,
-      });
-    } catch {
-      throw new Error(
-        "The final score was not displayed on the page after the completed quiz was submitted.",
-      );
-    }
+      try {
+        await score.waitFor({
+          state: "visible",
+          timeout: 3000,
+        });
+      } catch {
+        throw new Error(
+          "The final score was not displayed after the completed quiz was submitted.",
+        );
+      }
 
-    const firstScoreText = await score.textContent();
+      const firstScoreText =
+        await score.textContent();
 
-    const firstMatch = firstScoreText?.match(
-      /(\d+)\s*(?:\/|out of)\s*3/i,
-    );
+      const firstMatch =
+        firstScoreText?.match(
+          /(\d+)\s*(?:\/|out of)\s*3/i,
+        );
 
-    if (!firstMatch) {
-      throw new Error(
-        "The displayed final score could not be interpreted.",
-      );
-    }
+      if (!firstMatch) {
+        throw new Error(
+          "A score was displayed, but it was not in a recognisable 0–3 format.",
+        );
+      }
 
-    const firstScore = Number(firstMatch[1]);
+      const firstScore =
+        Number(firstMatch[1]);
 
-    if (firstScore < 0 || firstScore > 3) {
-      throw new Error(
-        `The displayed score ${firstScore}/3 is outside the valid range.`,
-      );
-    }
+      if (
+        firstScore < 0 ||
+        firstScore > 3
+      ) {
+        throw new Error(
+          `The displayed score ${firstScore}/3 is outside the valid range of 0–3.`,
+        );
+      }
 
-    await submitButton.click();
-    await page.waitForTimeout(200);
+      try {
+        await submitButton.click();
+      } catch {
+        throw new Error(
+          "The quiz could not be submitted a second time to verify score stability.",
+        );
+      }
 
-    const secondScoreText = await score.textContent();
+      await page.waitForTimeout(200);
 
-    const secondMatch = secondScoreText?.match(
-      /(\d+)\s*(?:\/|out of)\s*3/i,
-    );
+      const secondScoreText =
+        await score.textContent();
 
-    if (!secondMatch) {
-      throw new Error(
-        "The final score was not displayed correctly after repeated submission.",
-      );
-    }
+      const secondMatch =
+        secondScoreText?.match(
+          /(\d+)\s*(?:\/|out of)\s*3/i,
+        );
 
-    const secondScore = Number(secondMatch[1]);
+      if (!secondMatch) {
+        throw new Error(
+          "The final score was no longer displayed correctly after repeated submission.",
+        );
+      }
 
-    if (secondScore !== firstScore) {
-      throw new Error(
-        `The score changed from ${firstScore}/3 to ${secondScore}/3 when the answers were submitted again.`,
-      );
-    }
+      const secondScore =
+        Number(secondMatch[1]);
+
+      if (secondScore !== firstScore) {
+        throw new Error(
+          `The score changed from ${firstScore}/3 to ${secondScore}/3 even though the answers did not change.`,
+        );
+      }
+    },
   },
-},
 
   {
     id: "quiz-session-memory",
@@ -229,46 +282,50 @@ export const quizFunctionalTests = [
       "Store data only in browser memory for the current page session.",
 
     async run(page) {
-      const questionNames = await getQuestionGroups(page);
+      const questionNames =
+        await getThreeQuestions(page);
 
-      if (questionNames.length === 0) {
-        throw new Error(
-          "No quiz questions were found.",
-        );
-      }
+      await selectAnswer(
+        page,
+        questionNames[0],
+      );
 
-      const firstOption = page
-        .locator(
-          `input[type="radio"][name="${questionNames[0]}"]`,
-        )
-        .first();
-
-      await firstOption.check();
-
-      const browser = page.context().browser();
+      const browser =
+        page.context().browser();
 
       if (!browser) {
         throw new Error(
-          "Unable to access browser for session-memory test.",
+          "Unable to open a fresh browser session for the storage test.",
         );
       }
 
-      const freshContext = await browser.newContext();
+      const freshContext =
+        await browser.newContext();
 
       try {
-        const freshPage = await freshContext.newPage();
+        const freshPage =
+          await freshContext.newPage();
 
-        await freshPage.goto(page.url(), {
-          waitUntil: "load",
-        });
-
-        const checkedAnswers = freshPage.locator(
-          'input[type="radio"]:checked',
-        );
-
-        if ((await checkedAnswers.count()) > 0) {
+        try {
+          await freshPage.goto(page.url(), {
+            waitUntil: "load",
+          });
+        } catch {
           throw new Error(
-            "Quiz answer state persisted into a fresh browser context.",
+            "The application could not be loaded in a fresh browser session for the storage test.",
+          );
+        }
+
+        const checkedAnswers =
+          freshPage.locator(
+            'input[type="radio"]:checked',
+          );
+
+        if (
+          (await checkedAnswers.count()) > 0
+        ) {
+          throw new Error(
+            "Selected quiz answers persisted into a fresh browser session instead of remaining session-only.",
           );
         }
       } finally {

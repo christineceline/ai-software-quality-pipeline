@@ -154,25 +154,41 @@ export const todoFunctionalTests = [
     requirement:
       "Prevent empty tasks from being added.",
 
-    async run(page) {
-      const input = await getTaskInput(page);
-      const addButton = await getAddButton(page);
+      async run(page) {
+        // First prove that task creation works in this test.
+        const validTaskText = "Valid task before empty test";
 
-      const countBefore = await page.locator("li").count();
+        await addTask(page, validTaskText);
 
-      await input.fill("   ");
-      await addButton.click();
-
-      await page.waitForTimeout(200);
-
-      const countAfter = await page.locator("li").count();
-
-      if (countAfter !== countBefore) {
-        throw new Error(
-          `Empty task was added. Task count changed from ${countBefore} to ${countAfter}.`,
+        const validTask = getTaskContainer(
+          page,
+          validTaskText,
         );
+
+        if ((await validTask.count()) === 0) {
+          throw new Error(
+            "Could not verify empty-task prevention because valid task creation failed.",
+          );
+        }
+
+        const input = await getTaskInput(page);
+        const addButton = await getAddButton(page);
+
+        const countBefore = await page.locator("li").count();
+
+        await input.fill("   ");
+        await addButton.click();
+
+        await page.waitForTimeout(200);
+
+        const countAfter = await page.locator("li").count();
+
+        if (countAfter !== countBefore) {
+          throw new Error(
+            "An empty task was added when it should have been rejected.",
+          );
+        }
       }
-    },
   },
 
   {
@@ -242,10 +258,16 @@ export const todoFunctionalTests = [
         )
         .first();
 
+        try {
       await countText.waitFor({
         state: "visible",
         timeout: 3000,
       });
+    } catch {
+      throw new Error(
+        "The incomplete-task count did not show 2 after two tasks were added.",
+      );
+    }
 
     await completeTask(
       page,
@@ -258,10 +280,16 @@ export const todoFunctionalTests = [
         )
         .first();
 
-      await updatedCountText.waitFor({
-        state: "visible",
-        timeout: 3000,
-      });
+            try {
+        await updatedCountText.waitFor({
+          state: "visible",
+          timeout: 3000,
+        });
+      } catch {
+        throw new Error(
+          "The incomplete-task count did not update to 1 after a task was completed.",
+        );
+      }
     },
   },
 
