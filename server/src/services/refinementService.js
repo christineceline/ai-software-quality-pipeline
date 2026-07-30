@@ -53,7 +53,12 @@ export async function refineApplicationOnce({
     generationResult.rawResponse,
   );
 
-  if (applicationsAreIdentical(application, refinedApplication)) {
+if (
+  applicationsAreIdentical(
+    application,
+    refinedApplication,
+  )
+) {
   return {
     refined: false,
     reason: "unchanged-output",
@@ -61,8 +66,21 @@ export async function refineApplicationOnce({
     prompt,
     model: generationResult.model,
     rawResponse: generationResult.rawResponse,
-    generationMetrics: generationResult.generationMetrics,
+    generationMetrics:
+      generationResult.generationMetrics,
   };
+}
+
+return {
+  refined: true,
+  reason: null,
+  application: refinedApplication,
+  feedback,
+  prompt,
+  model: generationResult.model,
+  rawResponse: generationResult.rawResponse,
+  generationMetrics:
+    generationResult.generationMetrics,
 };
 }
 
