@@ -99,39 +99,120 @@ async function completeTask(page, taskText) {
     .or(task.locator('input[type="checkbox"]'))
     .first();
 
+  let completionAttempted = false;
+
   if ((await checkbox.count()) > 0) {
-    await checkbox.click();
-  } else {
+    if (await checkbox.isVisible()) {
+      try {
+        await checkbox.click();
+        completionAttempted = true;
+      } catch {
+        throw new Error(
+          "The visible completion checkbox could not be activated.",
+        );
+      }
+    } else {
+      // Support visually-hidden checkboxes controlled by a visible label.
+      const checkboxId = await checkbox.getAttribute("id");
+
+      if (checkboxId) {
+        const associatedLabel = task
+          .locator(`label[for="${checkboxId}"]`)
+          .first();
+
+        if (
+          (await associatedLabel.count()) > 0 &&
+          (await associatedLabel.isVisible())
+        ) {
+          try {
+            await associatedLabel.click();
+            completionAttempted = true;
+          } catch {
+            throw new Error(
+              "The visible completion control could not be activated.",
+            );
+          }
+        }
+      }
+
+      // Also support a checkbox nested inside a visible label.
+      if (!completionAttempted) {
+        const wrappingLabel = checkbox
+          .locator("xpath=ancestor::label[1]")
+          .first();
+
+        if (
+          (await wrappingLabel.count()) > 0 &&
+          (await wrappingLabel.isVisible())
+        ) {
+          try {
+            await wrappingLabel.click();
+            completionAttempted = true;
+          } catch {
+            throw new Error(
+              "The visible completion control could not be activated.",
+            );
+          }
+        }
+      }
+    }
+  }
+
+  if (!completionAttempted) {
     const completeButton = task
       .getByRole("button", {
         name: /complete|done|finish/i,
       })
       .first();
 
-    if ((await completeButton.count()) > 0) {
-      await completeButton.click();
-    } else {
-      const taskTextElement = task
-        .getByText(taskText, {
-          exact: true,
-        })
-        .first();
-
-      if ((await taskTextElement.count()) === 0) {
+    if (
+      (await completeButton.count()) > 0 &&
+      (await completeButton.isVisible())
+    ) {
+      try {
+        await completeButton.click();
+        completionAttempted = true;
+      } catch {
         throw new Error(
-          "No usable way to interact with the task for completion.",
+          "The task completion button could not be activated.",
         );
       }
-
-      await taskTextElement.click();
     }
+  }
+
+  if (!completionAttempted) {
+    const taskTextElement = task
+      .getByText(taskText, {
+        exact: true,
+      })
+      .first();
+
+    if (
+      (await taskTextElement.count()) > 0 &&
+      (await taskTextElement.isVisible())
+    ) {
+      try {
+        await taskTextElement.click();
+        completionAttempted = true;
+      } catch {
+        throw new Error(
+          "The task could not be marked as completed using its visible task control.",
+        );
+      }
+    }
+  }
+
+  if (!completionAttempted) {
+    throw new Error(
+      "No visible completion control could be activated for the task.",
+    );
   }
 
   await page.waitForTimeout(100);
 
   if (!(await isTaskCompleted(task))) {
     throw new Error(
-      "The task did not expose a completed state after completion was attempted.",
+      "The completion control was activated, but the task did not change to a completed state.",
     );
   }
 }
