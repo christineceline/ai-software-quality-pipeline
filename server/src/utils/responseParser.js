@@ -50,6 +50,27 @@ function validateGeneratedApplication(application) {
     );
   }
 
+  const normalizedHtml =
+  application.html.toLowerCase();
+
+if (
+  !normalizedHtml.includes("<html") ||
+  !normalizedHtml.includes("</html>")
+) {
+  throw new Error(
+    "The generated HTML document is incomplete.",
+  );
+}
+
+if (
+  !normalizedHtml.includes("<body") ||
+  !normalizedHtml.includes("</body>")
+) {
+  throw new Error(
+    "The generated HTML document has an incomplete body.",
+  );
+}
+
   const metadata =
     typeof application.metadata === "object" &&
     application.metadata !== null &&

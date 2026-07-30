@@ -120,6 +120,15 @@ if (!response) {
 
   const rawResponse = response.text;
 
+  const finishReason =
+  response.candidates?.[0]?.finishReason ?? null;
+
+console.log("Gemini finish reason:", finishReason);
+console.log(
+  "Gemini usage:",
+  response.usageMetadata,
+);
+
   if (!rawResponse) {
     throw new Error(
       "Gemini returned an empty response.",
@@ -141,6 +150,7 @@ if (!response) {
       totalTokens:
         response.usageMetadata?.totalTokenCount ??
         null,
+      finishReason,
     },
   };
 }
