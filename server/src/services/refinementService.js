@@ -53,12 +53,7 @@ export async function refineApplicationOnce({
     ollamaResult.rawResponse,
   );
 
-  const applicationUnchanged =
-  refinedApplication.html === application.html &&
-  refinedApplication.css === application.css &&
-  refinedApplication.javascript === application.javascript;
-
-if (applicationUnchanged) {
+  if (applicationsAreIdentical(application, refinedApplication)) {
   return {
     refined: false,
     reason: "unchanged-output",
@@ -68,19 +63,24 @@ if (applicationUnchanged) {
     rawResponse: ollamaResult.rawResponse,
     generationMetrics: ollamaResult.generationMetrics,
   };
+};
 }
 
-  return {
-    refined: true,
-    reason: null,
-    iteration,
-    prompt,
-    feedback,
-    application: refinedApplication,
-    model: ollamaResult.model,
-    rawResponse: ollamaResult.rawResponse,
-    generationMetrics: ollamaResult.generationMetrics,
-  };
+function normaliseSource(source) {
+  return source
+    .replace(/\r\n/g, "\n")
+    .trim();
+}
+
+function applicationsAreIdentical(first, second) {
+  return (
+    normaliseSource(first.html) ===
+      normaliseSource(second.html) &&
+    normaliseSource(first.css) ===
+      normaliseSource(second.css) &&
+    normaliseSource(first.javascript) ===
+      normaliseSource(second.javascript)
+  );
 }
 
 export async function refineAndEvaluateOnce({

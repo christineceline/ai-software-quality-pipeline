@@ -138,47 +138,90 @@ export const quizFunctionalTests = [
   },
 
   {
-    id: "quiz-final-score",
-    requirement:
-      "Display the final score on the page when the quiz is completed and submitted.",
+  id: "quiz-final-score",
+  requirement:
+    "Display the final score on the page when the quiz is completed and submitted.",
 
-    async run(page) {
-      await answerAllQuestions(page);
+  async run(page) {
+    await answerAllQuestions(page);
 
-      const submitButton = getSubmitButton(page);
+    const submitButton = getSubmitButton(page);
 
-      if ((await submitButton.count()) === 0) {
-        throw new Error(
-          "Quiz submission button was not found.",
-        );
-      }
+    if ((await submitButton.count()) === 0) {
+      throw new Error(
+        "Quiz submission button was not found.",
+      );
+    }
 
-      if (!(await submitButton.isEnabled())) {
-        throw new Error(
-          "The quiz submission button remained disabled after answers were selected.",
-        );
-      }
+    if (!(await submitButton.isEnabled())) {
+      throw new Error(
+        "The quiz submission button remained disabled after answers were selected.",
+      );
+    }
 
-      await submitButton.click();
+    const score = page
+      .getByText(
+        /(?:score|result|correct).*(?:\d+)|(?:\d+).*(?:score|correct)|\d+\s*(?:\/|out of)\s*3/i,
+      )
+      .first();
 
-      const score = page
-        .getByText(
-          /(?:score|result|correct).*(?:\d+)|(?:\d+).*(?:score|correct)|\d+\s*(?:\/|out of)\s*3/i,
-        )
-        .first();
+    await submitButton.click();
 
-      try {
-        await score.waitFor({
-          state: "visible",
-          timeout: 3000,
-        });
-      } catch {
-        throw new Error(
-          "The final score was not displayed on the page after the completed quiz was submitted.",
-        );
-      }
-    },
+    try {
+      await score.waitFor({
+        state: "visible",
+        timeout: 3000,
+      });
+    } catch {
+      throw new Error(
+        "The final score was not displayed on the page after the completed quiz was submitted.",
+      );
+    }
+
+    const firstScoreText = await score.textContent();
+
+    const firstMatch = firstScoreText?.match(
+      /(\d+)\s*(?:\/|out of)\s*3/i,
+    );
+
+    if (!firstMatch) {
+      throw new Error(
+        "The displayed final score could not be interpreted.",
+      );
+    }
+
+    const firstScore = Number(firstMatch[1]);
+
+    if (firstScore < 0 || firstScore > 3) {
+      throw new Error(
+        `The displayed score ${firstScore}/3 is outside the valid range.`,
+      );
+    }
+
+    await submitButton.click();
+    await page.waitForTimeout(200);
+
+    const secondScoreText = await score.textContent();
+
+    const secondMatch = secondScoreText?.match(
+      /(\d+)\s*(?:\/|out of)\s*3/i,
+    );
+
+    if (!secondMatch) {
+      throw new Error(
+        "The final score was not displayed correctly after repeated submission.",
+      );
+    }
+
+    const secondScore = Number(secondMatch[1]);
+
+    if (secondScore !== firstScore) {
+      throw new Error(
+        `The score changed from ${firstScore}/3 to ${secondScore}/3 when the answers were submitted again.`,
+      );
+    }
   },
+},
 
   {
     id: "quiz-session-memory",
