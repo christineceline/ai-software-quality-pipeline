@@ -10,7 +10,7 @@ function StatusBadge({ passed, passText = "Pass", failText = "Fail" }) {
   );
 }
 
-function RuntimeReport({ report }) {
+function RuntimeReport({ report, generationMetrics }) {
   if (!report) {
     return null;
   }
@@ -48,6 +48,15 @@ function RuntimeReport({ report }) {
           <dt>Application opened</dt>
           <dd>
             <StatusBadge passed={summary.navigationSuccessful} />
+          </dd>
+        </div>
+
+        <div>
+          <dt>Generation duration</dt>
+          <dd>
+            {generationMetrics?.totalDurationMs != null
+              ? `${(generationMetrics.totalDurationMs / 1000).toFixed(1)} s`
+              : "Unavailable"}
           </dd>
         </div>
 

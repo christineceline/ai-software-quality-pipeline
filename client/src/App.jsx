@@ -43,6 +43,7 @@ function App() {
   const [runtimeReport, setRuntimeReport] = useState(null);
   const [accessibilityReport, setAccessibilityReport] = useState(null);
   const [functionalReport, setFunctionalReport] = useState(null);
+  const [generationMetrics, setGenerationMetrics] = useState(null);
   const [refinementIterations, setRefinementIterations] = useState([]);
   const [selectedIteration, setSelectedIteration] = useState(null);
 
@@ -104,6 +105,7 @@ function App() {
     setRuntimeReport(null);
     setAccessibilityReport(null);
     setFunctionalReport(null);
+    setGenerationMetrics(null);
     setRefinementIterations([]);
     setSelectedIteration(null);
 
@@ -129,6 +131,10 @@ function App() {
       }
 
           setRun(data.run);
+
+          setGenerationMetrics(
+          data.run?.generationMetrics ?? null,
+        );
 
       if (workflow === "automated-refinement") {
         const completedRefinements =
@@ -412,7 +418,7 @@ function App() {
           {activeResultView === "quality" && ( 
             <>
             <QualityReport report={qualityReport} />
-            <RuntimeReport report={runtimeReport} />
+            <RuntimeReport report={runtimeReport}  generationMetrics={generationMetrics} />
             <AccessibilityReport
               report={accessibilityReport}
             />
