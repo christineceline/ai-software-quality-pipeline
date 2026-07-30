@@ -1,4 +1,4 @@
-import { generateWithOllama } from "./ollamaService.js";
+import { generateApplication } from "./generationService.js";
 import { parseGeneratedApplication } from "../utils/responseParser.js";
 import {
   buildQualityFeedback,
@@ -44,13 +44,13 @@ export async function refineApplicationOnce({
     iteration,
   });
 
-  const ollamaResult = await generateWithOllama({
+  const generationResult = await generateApplication({
     prompt,
     temperature,
   });
 
   const refinedApplication = parseGeneratedApplication(
-    ollamaResult.rawResponse,
+    generationResult.rawResponse,
   );
 
   if (applicationsAreIdentical(application, refinedApplication)) {
@@ -59,9 +59,9 @@ export async function refineApplicationOnce({
     reason: "unchanged-output",
     feedback,
     prompt,
-    model: ollamaResult.model,
-    rawResponse: ollamaResult.rawResponse,
-    generationMetrics: ollamaResult.generationMetrics,
+    model: generationResult.model,
+    rawResponse: generationResult.rawResponse,
+    generationMetrics: generationResult.generationMetrics,
   };
 };
 }

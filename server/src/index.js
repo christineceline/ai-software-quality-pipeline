@@ -12,7 +12,8 @@ const port = Number(process.env.PORT) || 3001;
 
 console.log("Environment check:", {
   port,
-  ollamaBaseUrl: process.env.OLLAMA_BASE_URL,
+  aiProvider: process.env.AI_PROVIDER,
+  geminiModel: process.env.GEMINI_MODEL,
   ollamaModel: process.env.OLLAMA_MODEL,
 });
 

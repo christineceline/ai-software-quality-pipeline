@@ -50,6 +50,92 @@ function getTaskContainer(page, taskText) {
     .first();
 }
 
+async function isTaskCompleted(task) {
+  return task.evaluate((element) => {
+    const elements = [
+      element,
+      ...element.querySelectorAll("*"),
+    ];
+
+    return elements.some((candidate) => {
+      const className =
+        typeof candidate.className === "string"
+          ? candidate.className.toLowerCase()
+          : "";
+
+      const ariaChecked =
+        candidate.getAttribute("aria-checked");
+
+      const ariaPressed =
+        candidate.getAttribute("aria-pressed");
+
+      const textDecoration =
+        window.getComputedStyle(candidate)
+          .textDecorationLine;
+
+      const isCheckedCheckbox =
+        candidate instanceof HTMLInputElement &&
+        candidate.type === "checkbox" &&
+        candidate.checked;
+
+      return (
+        isCheckedCheckbox ||
+        className.includes("completed") ||
+        className.includes("complete") ||
+        className.includes("done") ||
+        ariaChecked === "true" ||
+        ariaPressed === "true" ||
+        textDecoration.includes("line-through")
+      );
+    });
+  });
+}
+
+async function completeTask(page, taskText) {
+  const task = getTaskContainer(page, taskText);
+
+  const checkbox = task
+    .getByRole("checkbox")
+    .or(task.locator('input[type="checkbox"]'))
+    .first();
+
+  if ((await checkbox.count()) > 0) {
+    await checkbox.click();
+  } else {
+    const completeButton = task
+      .getByRole("button", {
+        name: /complete|done|finish/i,
+      })
+      .first();
+
+    if ((await completeButton.count()) > 0) {
+      await completeButton.click();
+    } else {
+      const taskTextElement = task
+        .getByText(taskText, {
+          exact: true,
+        })
+        .first();
+
+      if ((await taskTextElement.count()) === 0) {
+        throw new Error(
+          "No usable way to interact with the task for completion.",
+        );
+      }
+
+      await taskTextElement.click();
+    }
+  }
+
+  await page.waitForTimeout(100);
+
+  if (!(await isTaskCompleted(task))) {
+    throw new Error(
+      "The task did not expose a completed state after completion was attempted.",
+    );
+  }
+}
+
 export const todoFunctionalTests = [
   {
     id: "todo-add-task",
@@ -98,72 +184,7 @@ export const todoFunctionalTests = [
       const taskText = "Task to complete";
 
       await addTask(page, taskText);
-
-      const task = getTaskContainer(page, taskText);
-
-      const checkbox = task
-        .getByRole("checkbox")
-        .or(task.locator('input[type="checkbox"]'))
-        .first();
-
-      if ((await checkbox.count()) > 0) {
-        await checkbox.check();
-
-        if (!(await checkbox.isChecked())) {
-          throw new Error(
-            "Task checkbox was not checked after completion.",
-          );
-        }
-
-        return;
-      }
-
-      const completeButton = task
-        .getByRole("button", {
-          name: /complete|done|finish/i,
-        })
-        .first();
-
-      if ((await completeButton.count()) === 0) {
-        throw new Error(
-          "No completion control found for the added task.",
-        );
-      }
-
-      await completeButton.click();
-
-      const completed =
-        await task.evaluate((element) => {
-          const className =
-            typeof element.className === "string"
-              ? element.className.toLowerCase()
-              : "";
-
-          const ariaChecked =
-            element.getAttribute("aria-checked");
-
-          const ariaPressed =
-            element.getAttribute("aria-pressed");
-
-          const textDecoration =
-            window.getComputedStyle(element)
-              .textDecorationLine;
-
-          return (
-            className.includes("completed") ||
-            className.includes("complete") ||
-            className.includes("done") ||
-            ariaChecked === "true" ||
-            ariaPressed === "true" ||
-            textDecoration.includes("line-through")
-          );
-        });
-
-      if (!completed) {
-        throw new Error(
-          "Completion control was activated but the task did not expose a completed state.",
-        );
-      }
+      await completeTask(page, taskText);
     },
   },
 
@@ -226,33 +247,10 @@ export const todoFunctionalTests = [
         timeout: 3000,
       });
 
-      const firstTask = getTaskContainer(
-        page,
-        "Incomplete task one",
-      );
-
-      const checkbox = firstTask
-        .getByRole("checkbox")
-        .or(firstTask.locator('input[type="checkbox"]'))
-        .first();
-
-      if ((await checkbox.count()) > 0) {
-        await checkbox.check();
-      } else {
-        const completeButton = firstTask
-          .getByRole("button", {
-            name: /complete|done|finish/i,
-          })
-          .first();
-
-        if ((await completeButton.count()) === 0) {
-          throw new Error(
-            "No completion control found for incomplete-count test.",
-          );
-        }
-
-        await completeButton.click();
-      }
+    await completeTask(
+      page,
+      "Incomplete task one",
+    );
 
       const updatedCountText = page
         .getByText(
