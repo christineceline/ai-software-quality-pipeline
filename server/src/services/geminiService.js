@@ -75,15 +75,48 @@ export async function generateWithGemini({
 
   const startedAt = Date.now();
 
-  const response = await ai.models.generateContent({
-    model: selectedModel,
-    contents: prompt,
-    config: {
-      temperature,
-      responseMimeType: "application/json",
-      responseSchema: applicationSchema,
-    },
-  });
+ let response;
+let lastError;
+
+const maxAttempts = 4;
+
+for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+  try {
+    response = await ai.models.generateContent({
+      model: selectedModel,
+      contents: prompt,
+      config: {
+        temperature,
+        responseMimeType: "application/json",
+        responseSchema: applicationSchema,
+      },
+    });
+
+    break;
+  } catch (error) {
+    lastError = error;
+
+    if (
+      !isRetryableGeminiError(error) ||
+      attempt === maxAttempts
+    ) {
+      throw error;
+    }
+
+    const baseDelay = 1000 * 2 ** (attempt - 1);
+    const jitter = Math.floor(Math.random() * 500);
+
+    console.warn(
+      `Gemini request failed with transient error. Retrying ${attempt}/${maxAttempts - 1}...`,
+    );
+
+    await sleep(baseDelay + jitter);
+  }
+}
+
+if (!response) {
+  throw lastError;
+}
 
   const rawResponse = response.text;
 
