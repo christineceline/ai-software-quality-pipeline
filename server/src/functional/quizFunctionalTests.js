@@ -153,6 +153,12 @@ export const quizFunctionalTests = [
         );
       }
 
+      if (!(await submitButton.isEnabled())) {
+        throw new Error(
+          "The quiz submission button remained disabled after answers were selected.",
+        );
+      }
+
       await submitButton.click();
 
       const score = page
@@ -161,16 +167,16 @@ export const quizFunctionalTests = [
         )
         .first();
 
-        try {
+      try {
         await score.waitFor({
-            state: "visible",
-            timeout: 3000,
+          state: "visible",
+          timeout: 3000,
         });
-        } catch {
+      } catch {
         throw new Error(
-            "The final score was not displayed on the page after the completed quiz was submitted.",
+          "The final score was not displayed on the page after the completed quiz was submitted.",
         );
-        }
+      }
     },
   },
 
