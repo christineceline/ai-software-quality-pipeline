@@ -53,6 +53,23 @@ export async function refineApplicationOnce({
     ollamaResult.rawResponse,
   );
 
+  const applicationUnchanged =
+  refinedApplication.html === application.html &&
+  refinedApplication.css === application.css &&
+  refinedApplication.javascript === application.javascript;
+
+if (applicationUnchanged) {
+  return {
+    refined: false,
+    reason: "unchanged-output",
+    feedback,
+    prompt,
+    model: ollamaResult.model,
+    rawResponse: ollamaResult.rawResponse,
+    generationMetrics: ollamaResult.generationMetrics,
+  };
+}
+
   return {
     refined: true,
     reason: null,
