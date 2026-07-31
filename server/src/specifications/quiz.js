@@ -34,9 +34,9 @@ const quizSpecification = {
           "Apply to each individual question container. This test ID must appear exactly three times.",
       },
       {
-        testId: "quiz-option",
+         testId: "quiz-option",
         requirement:
-          "Apply to each selectable answer control. Each question must contain at least two.",
+          "Apply to the visible user-activatable control for each answer option. If a radio input is visually represented by a clickable label or wrapper, apply this test ID to that visible label or wrapper rather than the underlying radio input. Each question must contain at least two.",
       },
       {
         testId: "quiz-submit",

@@ -213,101 +213,66 @@ export const quizFunctionalTests = [
     },
   },
 
-  {
-    id: "quiz-select-answers",
+{
+  id: "quiz-select-answers",
 
-    requirement:
-      "Allow the user to select exactly one answer for each question.",
+  requirement:
+    "Allow the user to select exactly one answer for each question.",
 
-    async run(page) {
-      const questions =
-        await getThreeQuestions(page);
+  async run(page) {
+    const questions =
+      await getThreeQuestions(page);
 
-      for (
-        let index = 0;
-        index < 3;
-        index++
-      ) {
-        const question =
-          questions.nth(index);
+    for (
+      let index = 0;
+      index < 3;
+      index++
+    ) {
+      const question =
+        questions.nth(index);
 
-        const options =
-          question.getByTestId(
-            "quiz-option",
+      const options =
+        question.getByTestId(
+          "quiz-option",
+        );
+
+      const first =
+        options.first();
+
+      const second =
+        options.nth(1);
+
+      await first.click();
+      await second.click();
+
+      /*
+       * If native radios are used inside the
+       * test-hook elements, verify exactly one
+       * remains checked.
+       */
+      const radios = question.locator(
+        'input[type="radio"]',
+      );
+
+      if ((await radios.count()) > 0) {
+        const selectedCount =
+          await radios.evaluateAll(
+            (elements) =>
+              elements.filter(
+                (element) =>
+                  element.checked,
+              ).length,
           );
 
-        const first =
-          options.first();
-
-        const second =
-          options.nth(1);
-
-        await first.click();
-
-        /*
-         * Verify actual selection where the generated
-         * control exposes native or ARIA state.
-         */
-        const firstSelected =
-          await first.evaluate(
-            (element) => {
-              if (
-                element instanceof
-                  HTMLInputElement
-              ) {
-                return element.checked;
-              }
-
-              return (
-                element.getAttribute(
-                  "aria-checked",
-                ) === "true" ||
-                element.getAttribute(
-                  "aria-pressed",
-                ) === "true"
-              );
-            },
+        if (selectedCount !== 1) {
+          throw new Error(
+            `Question ${index + 1} did not maintain exactly one selected answer.`,
           );
-
-        /*
-         * A custom option may not expose native state.
-         * In that case the final submission test still
-         * verifies that the controls function.
-         */
-        await second.click();
-
-        const nativeRadioGroup =
-          await second.evaluate(
-            (element) =>
-              element instanceof
-                HTMLInputElement &&
-              element.type === "radio",
-          );
-
-        if (nativeRadioGroup) {
-          const selectedCount =
-            await options.evaluateAll(
-              (elements) =>
-                elements.filter(
-                  (element) =>
-                    element instanceof
-                      HTMLInputElement &&
-                    element.checked,
-                ).length,
-            );
-
-          if (selectedCount !== 1) {
-            throw new Error(
-              `Question ${index + 1} did not maintain exactly one selected answer.`,
-            );
-          }
         }
-
-        // Avoid unused-value lint errors.
-        void firstSelected;
       }
-    },
+    }
   },
+},
 
   {
     id: "quiz-submit",
