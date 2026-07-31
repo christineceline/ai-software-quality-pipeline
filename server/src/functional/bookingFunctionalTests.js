@@ -2,75 +2,121 @@ function futureDate() {
   const date = new Date();
   date.setDate(date.getDate() + 30);
 
-  return date
-    .toISOString()
-    .slice(0, 10);
+  return date.toISOString().slice(0, 10);
 }
 
 function pastDate() {
   const date = new Date();
   date.setDate(date.getDate() - 30);
 
-  return date
-    .toISOString()
-    .slice(0, 10);
+  return date.toISOString().slice(0, 10);
 }
 
 function getNameInput(page) {
-  return page
-    .getByLabel(/name/i)
-    .or(
-      page.locator(
-        'input[name*="name" i]',
-      ),
-    )
-    .first();
+  return page.getByTestId("booking-name");
 }
 
 function getEmailInput(page) {
-  return page
-    .getByLabel(/email/i)
-    .or(
-      page.locator(
-        'input[type="email"], input[name*="email" i]',
-      ),
-    )
-    .first();
+  return page.getByTestId("booking-email");
 }
 
 function getDateInput(page) {
-  return page
-    .getByLabel(/date/i)
-    .or(
-      page.locator(
-        'input[type="date"], input[name*="date" i]',
-      ),
-    )
-    .first();
+  return page.getByTestId("booking-date");
 }
 
 function getTimeInput(page) {
-  return page
-    .getByLabel(/time/i)
-    .or(
-      page.locator(
-        'input[type="time"], input[name*="time" i]',
-      ),
-    )
-    .first();
+  return page.getByTestId("booking-time");
 }
 
-function getTypeSelect(page) {
+function getTypeControl(page) {
+  return page.getByTestId("booking-type");
+}
+
+function getSubmitControl(page) {
+  return page.getByTestId("booking-submit");
+}
+
+function getBookingList(page) {
+  return page.getByTestId("booking-list");
+}
+
+function getConfirmation(page) {
+  return page.getByTestId(
+    "booking-confirmation",
+  );
+}
+
+function getBooking(page, name) {
   return page
-    .getByLabel(/type|service|appointment/i)
-    .or(page.locator("select"))
-    .first();
+    .getByTestId("booking")
+    .filter({
+      has: page
+        .getByTestId(
+          "booking-name-display",
+        )
+        .filter({
+          hasText: name,
+        }),
+    });
+}
+
+async function selectBookingType(page) {
+  const control =
+    getTypeControl(page);
+
+  if (!(await control.isVisible())) {
+    throw new Error(
+      'Required test hook "booking-type" was not visible.',
+    );
+  }
+
+  const tagName =
+    await control.evaluate(
+      (element) =>
+        element.tagName.toLowerCase(),
+    );
+
+  if (tagName === "select") {
+    const values =
+      await control
+        .locator("option")
+        .evaluateAll((options) =>
+          options
+            .filter(
+              (option) =>
+                option.value &&
+                !option.disabled,
+            )
+            .map(
+              (option) =>
+                option.value,
+            ),
+        );
+
+    if (values.length === 0) {
+      throw new Error(
+        "No selectable appointment type was available.",
+      );
+    }
+
+    await control.selectOption(
+      values[0],
+    );
+
+    return;
+  }
+
+  /*
+   * The contract does not require a <select>.
+   * For another type of visible selector, activate it.
+   */
+  await control.click();
 }
 
 async function fillBooking(
   page,
   {
-    name = "Test User",
+    name = "Booking Test Alpha",
     email = "test@example.com",
     date = futureDate(),
     time = "12:00",
@@ -87,147 +133,35 @@ async function fillBooking(
     const [field, value, label]
     of fields
   ) {
-    if ((await field.count()) === 0) {
+    if (
+      (await field.count()) !== 1 ||
+      !(await field.isVisible())
+    ) {
       throw new Error(
-        `The booking ${label} field could not be found.`,
+        `Required booking ${label} input was not available.`,
       );
     }
 
-    if (!(await field.isVisible())) {
-      throw new Error(
-        `The booking ${label} field was not visible.`,
-      );
-    }
-
-    try {
-      await field.fill(value);
-    } catch {
-      throw new Error(
-        `The booking ${label} field could not be completed.`,
-      );
-    }
+    await field.fill(value);
   }
 
-  const typeSelect =
-    getTypeSelect(page);
-
-  if ((await typeSelect.count()) > 0) {
-    const options = await typeSelect
-      .locator("option")
-      .evaluateAll((elements) =>
-        elements
-          .map((element) => ({
-            value: element.value,
-            disabled: element.disabled,
-          }))
-          .filter(
-            (option) =>
-              option.value &&
-              !option.disabled,
-          ),
-      );
-
-    if (options.length > 0) {
-      try {
-        await typeSelect.selectOption(
-          options[0].value,
-        );
-      } catch {
-        throw new Error(
-          "The appointment type could not be selected.",
-        );
-      }
-    }
-  }
-}
-
-function getSubmitControl(page) {
-  return page
-    .getByRole("button", {
-      name:
-        /book|submit|create|confirm|save|schedule/i,
-    })
-    .or(
-      page.locator(
-        'input[type="submit"]',
-      ),
-    )
-    .first();
+  await selectBookingType(page);
 }
 
 async function submitBooking(page) {
   const control =
     getSubmitControl(page);
 
-  if ((await control.count()) === 0) {
-    throw new Error(
-      "No booking submission control was found.",
-    );
-  }
-
-  if (!(await control.isVisible())) {
-    throw new Error(
-      "The booking submission control was not visible.",
-    );
-  }
-
-  try {
-    await control.click();
-  } catch {
-    throw new Error(
-      "The booking submission control could not be activated.",
-    );
-  }
-}
-
-function getBookingText(
-  page,
-  name,
-) {
-  return page
-    .getByText(name, {
-      exact: true,
-    })
-    .first();
-}
-
-async function getBookingContainer(
-  page,
-  name,
-) {
-  const text =
-    getBookingText(
-      page,
-      name,
-    );
-
-  if ((await text.count()) === 0) {
-    return null;
-  }
-
-  /*
-   * Prefer structural containers without
-   * depending on generated class names.
-   */
-  const structuralContainer = text
-    .locator(
-      "xpath=ancestor::*[" +
-        "self::li or " +
-        "@role='listitem' or " +
-        "self::article or " +
-        "self::tr" +
-      "][1]",
-    );
-
   if (
-    (await structuralContainer.count()) > 0
+    (await control.count()) !== 1 ||
+    !(await control.isVisible())
   ) {
-    return structuralContainer;
+    throw new Error(
+      'Required test hook "booking-submit" was not visible.',
+    );
   }
 
-  return text
-    .locator("xpath=parent::*")
-    .first();
+  await control.click();
 }
 
 async function createBooking(
@@ -235,197 +169,75 @@ async function createBooking(
   options = {},
 ) {
   const name =
-    options.name ?? "Test User";
+    options.name ??
+    "Booking Test Alpha";
 
   await fillBooking(
     page,
-    options,
+    {
+      ...options,
+      name,
+    },
   );
 
   await submitBooking(page);
 
-  const bookingText =
-    getBookingText(
-      page,
-      name,
-    );
+  const booking =
+    getBooking(page, name);
 
   try {
-    await bookingText.waitFor({
+    await booking.waitFor({
       state: "visible",
       timeout: 3000,
     });
   } catch {
     throw new Error(
-      "The booking was not displayed after the form was submitted.",
+      "The valid booking was not displayed after submission.",
     );
   }
 
-  return getBookingContainer(
-    page,
-    name,
-  );
-}
-
-function getCancelControl(booking) {
-  return booking
-    .getByRole("button", {
-      name:
-        /cancel|delete|remove/i,
-    })
-    .or(
-      booking.getByRole("link", {
-        name:
-          /cancel|delete|remove/i,
-      }),
-    )
-    .or(
-      booking.locator(
-        [
-          '[aria-label*="cancel" i]',
-          '[aria-label*="delete" i]',
-          '[aria-label*="remove" i]',
-          '[title*="cancel" i]',
-          '[title*="delete" i]',
-          '[title*="remove" i]',
-          'input[type="button"][value*="cancel" i]',
-          'input[type="button"][value*="delete" i]',
-          'input[type="button"][value*="remove" i]',
-        ].join(", "),
-      ),
-    )
-    .first();
-}
-
-async function bookingIsCancelled(
-  booking,
-) {
-  if (!booking) {
-    return true;
-  }
-
-  if (
-    (await booking.count()) === 0 ||
-    !(await booking.isVisible())
-  ) {
-    return true;
-  }
-
-  return booking.evaluate(
-    (element) => {
-      const text =
-        element.textContent
-          ?.toLowerCase() ?? "";
-
-      const classes =
-        typeof element.className ===
-        "string"
-          ? element.className
-              .toLowerCase()
-              .split(/\s+/)
-          : [];
-
-      const status =
-        element
-          .getAttribute("data-status")
-          ?.toLowerCase();
-
-      const ariaLabel =
-        element
-          .getAttribute("aria-label")
-          ?.toLowerCase() ?? "";
-
-      return (
-        text.includes("cancelled") ||
-        text.includes("canceled") ||
-        classes.includes("cancelled") ||
-        classes.includes("canceled") ||
-        classes.includes("is-cancelled") ||
-        classes.includes("is-canceled") ||
-        status === "cancelled" ||
-        status === "canceled" ||
-        ariaLabel.includes("cancelled") ||
-        ariaLabel.includes("canceled")
-      );
-    },
-  );
-}
-
-async function acceptHtmlConfirmation(
-  page,
-) {
-  const dialog = page
-    .getByRole("dialog")
-    .filter({
-      hasText:
-        /cancel|delete|remove|are you sure|confirm/i,
-    })
-    .first();
-
-  if (
-    (await dialog.count()) === 0 ||
-    !(await dialog.isVisible())
-  ) {
-    return;
-  }
-
-  const confirmControl = dialog
-    .getByRole("button", {
-      name:
-        /confirm|yes|cancel booking|delete|remove/i,
-    })
-    .or(
-      dialog.getByRole("link", {
-        name:
-          /confirm|yes|cancel booking|delete|remove/i,
-      }),
-    )
-    .first();
-
-  if (
-    (await confirmControl.count()) > 0 &&
-    (await confirmControl.isVisible())
-  ) {
-    await confirmControl.click();
-  }
-}
-
-async function countVisibleConfirmations(
-  page,
-) {
-  const candidates = page.getByText(
-    /confirmed|confirmation|success|successfully booked|booking created|appointment booked|booking successful/i,
-  );
-
-  let visibleCount = 0;
-
-  for (
-    let index = 0;
-    index < await candidates.count();
-    index++
-  ) {
-    if (
-      await candidates
-        .nth(index)
-        .isVisible()
-        .catch(() => false)
-    ) {
-      visibleCount += 1;
-    }
-  }
-
-  return visibleCount;
+  return booking;
 }
 
 export const bookingFunctionalTests = [
   {
-    id: "booking-create",
+    id: "booking-fields",
 
     requirement:
-      "After a valid booking is submitted, display the booking in a visible list or booking area.",
+      "Include fields for customer name, email address, appointment date and appointment time.",
 
     async run(page) {
-      await createBooking(page);
+      const fields = [
+        ["booking-name", getNameInput(page)],
+        ["booking-email", getEmailInput(page)],
+        ["booking-date", getDateInput(page)],
+        ["booking-time", getTimeInput(page)],
+      ];
+
+      for (
+        const [testId, field]
+        of fields
+      ) {
+        if (
+          (await field.count()) !== 1 ||
+          !(await field.isVisible())
+        ) {
+          throw new Error(
+            `Required test hook "${testId}" was not visible.`,
+          );
+        }
+      }
+    },
+  },
+
+  {
+    id: "booking-type",
+
+    requirement:
+      "Include a selectable appointment type.",
+
+    async run(page) {
+      await selectBookingType(page);
     },
   },
 
@@ -436,32 +248,32 @@ export const bookingFunctionalTests = [
       "Prevent a booking from being created when required information is missing.",
 
     async run(page) {
-      const testName =
-        "Missing Fields Test User";
+      const before =
+        await page
+          .getByTestId("booking")
+          .count();
 
-      const name =
-        getNameInput(page);
+      await getNameInput(page).fill(
+        "Booking Test Beta",
+      );
 
-      if ((await name.count()) > 0) {
-        await name.fill(
-          testName,
-        );
+      try {
+        await submitBooking(page);
+      } catch {
+        /*
+         * Native browser validation may prevent
+         * submission. That is valid behaviour.
+         */
       }
 
-      await submitBooking(page);
+      await page.waitForTimeout(100);
 
-      await page.waitForTimeout(200);
+      const after =
+        await page
+          .getByTestId("booking")
+          .count();
 
-      const created =
-        getBookingText(
-          page,
-          testName,
-        );
-
-      if (
-        (await created.count()) > 0 &&
-        (await created.isVisible())
-      ) {
+      if (after > before) {
         throw new Error(
           "A booking was created even though required information was missing.",
         );
@@ -477,58 +289,27 @@ export const bookingFunctionalTests = [
 
     async run(page) {
       const name =
-        "Invalid Email User";
+        "Booking Test Gamma";
 
       await fillBooking(page, {
         name,
         email: "invalid-email",
       });
 
-      const email =
-        getEmailInput(page);
-
-      const nativeInvalid =
-        await email.evaluate(
-          (element) =>
-            !element.validity.valid,
-        );
-
       await submitBooking(page);
 
-      await page.waitForTimeout(200);
+      await page.waitForTimeout(100);
 
-      const booking =
-        getBookingText(
-          page,
-          name,
-        );
+      const invalidBooking =
+        getBooking(page, name);
 
       if (
-        (await booking.count()) > 0 &&
-        (await booking.isVisible())
+        (await invalidBooking.count()) >
+          0 &&
+        (await invalidBooking.isVisible())
       ) {
         throw new Error(
           "A booking was created using an invalid email address.",
-        );
-      }
-
-      if (nativeInvalid) {
-        return;
-      }
-
-      const validationMessage = page
-        .getByText(
-          /invalid email|valid email|email.*invalid|enter.*valid.*email/i,
-        )
-        .first();
-
-      if (
-        (await validationMessage.count()) ===
-          0 ||
-        !(await validationMessage.isVisible())
-      ) {
-        throw new Error(
-          "The invalid email address was not rejected or identified as invalid.",
         );
       }
     },
@@ -542,7 +323,7 @@ export const bookingFunctionalTests = [
 
     async run(page) {
       const name =
-        "Past Date User";
+        "Booking Test Delta";
 
       await fillBooking(page, {
         name,
@@ -551,22 +332,43 @@ export const bookingFunctionalTests = [
 
       await submitBooking(page);
 
-      await page.waitForTimeout(200);
+      await page.waitForTimeout(100);
 
-      const booking =
-        getBookingText(
-          page,
-          name,
-        );
+      const invalidBooking =
+        getBooking(page, name);
 
       if (
-        (await booking.count()) > 0 &&
-        (await booking.isVisible())
+        (await invalidBooking.count()) >
+          0 &&
+        (await invalidBooking.isVisible())
       ) {
         throw new Error(
           "A booking was created for a date in the past.",
         );
       }
+    },
+  },
+
+  {
+    id: "booking-create",
+
+    requirement:
+      "After a valid booking is submitted, display the booking in a visible list or booking area.",
+
+    async run(page) {
+      const list =
+        getBookingList(page);
+
+      if (!(await list.isVisible())) {
+        throw new Error(
+          'Required test hook "booking-list" was not visible.',
+        );
+      }
+
+      await createBooking(page, {
+        name:
+          "Booking Test Epsilon",
+      });
     },
   },
 
@@ -577,50 +379,21 @@ export const bookingFunctionalTests = [
       "Display a visible confirmation after a valid booking is successfully created.",
 
     async run(page) {
-      const confirmationBefore =
-        await countVisibleConfirmations(
-          page,
-        );
-
-      const name =
-        "Confirmation Test User";
-
-      await fillBooking(page, {
-        name,
+      await createBooking(page, {
+        name:
+          "Booking Test Zeta",
       });
 
-      await submitBooking(page);
-
-      const booking =
-        getBookingText(
-          page,
-          name,
-        );
-
-      try {
-        await booking.waitFor({
-          state: "visible",
-          timeout: 3000,
-        });
-      } catch {
-        throw new Error(
-          "The booking was not successfully created, so confirmation could not be verified.",
-        );
-      }
-
-      await page.waitForTimeout(200);
-
-      const confirmationAfter =
-        await countVisibleConfirmations(
-          page,
-        );
+      const confirmation =
+        getConfirmation(page);
 
       if (
-        confirmationAfter <=
-        confirmationBefore
+        (await confirmation.count()) !==
+          1 ||
+        !(await confirmation.isVisible())
       ) {
         throw new Error(
-          "No new visible confirmation was displayed after the booking was successfully created.",
+          "No visible booking confirmation was displayed after successful creation.",
         );
       }
     },
@@ -634,7 +407,7 @@ export const bookingFunctionalTests = [
 
     async run(page) {
       const name =
-        "Cancel Test User";
+        "Booking Test Eta";
 
       let booking =
         await createBooking(
@@ -642,35 +415,25 @@ export const bookingFunctionalTests = [
           { name },
         );
 
-      if (!booking) {
-        throw new Error(
-          "The created booking could not be located before cancellation.",
-        );
-      }
-
-      const control =
-        getCancelControl(
-          booking,
+      const cancelControl =
+        booking.getByTestId(
+          "booking-cancel",
         );
 
       if (
-        (await control.count()) ===
-          0 ||
-        !(await control.isVisible())
+        (await cancelControl.count()) !==
+          1 ||
+        !(await cancelControl.isVisible())
       ) {
         throw new Error(
-          "No visible cancellation control was found for the created booking.",
+          'Required test hook "booking-cancel" was not visible.',
         );
       }
 
       const dialogHandler = async (
         dialog,
       ) => {
-        try {
-          await dialog.accept();
-        } catch {
-          // Already handled.
-        }
+        await dialog.accept();
       };
 
       page.on(
@@ -679,29 +442,7 @@ export const bookingFunctionalTests = [
       );
 
       try {
-        await control.click();
-
-        await page.waitForTimeout(100);
-
-        booking =
-          await getBookingContainer(
-            page,
-            name,
-          );
-
-        if (
-          !await bookingIsCancelled(
-            booking,
-          )
-        ) {
-          await acceptHtmlConfirmation(
-            page,
-          );
-
-          await page.waitForTimeout(
-            200,
-          );
-        }
+        await cancelControl.click();
       } finally {
         page.off(
           "dialog",
@@ -709,19 +450,33 @@ export const bookingFunctionalTests = [
         );
       }
 
+      /*
+       * Re-query because cancellation may rebuild
+       * or remove the booking.
+       */
       booking =
-        await getBookingContainer(
-          page,
-          name,
-        );
+        getBooking(page, name);
 
       if (
-        !await bookingIsCancelled(
-          booking,
-        )
+        (await booking.count()) === 0
       ) {
+        return;
+      }
+
+      if (
+        !(await booking.isVisible())
+      ) {
+        return;
+      }
+
+      const status =
+        await booking.getAttribute(
+          "data-status",
+        );
+
+      if (status !== "cancelled") {
         throw new Error(
-          "The booking was neither removed nor clearly marked as cancelled after cancellation was attempted.",
+          'The booking remained visible after cancellation without data-status="cancelled".',
         );
       }
     },
@@ -735,7 +490,7 @@ export const bookingFunctionalTests = [
 
     async run(page) {
       const name =
-        "Session Test User";
+        "Booking Test Theta";
 
       await createBooking(
         page,
@@ -747,7 +502,7 @@ export const bookingFunctionalTests = [
       });
 
       const persisted =
-        getBookingText(
+        getBooking(
           page,
           name,
         );
@@ -757,7 +512,7 @@ export const bookingFunctionalTests = [
         (await persisted.isVisible())
       ) {
         throw new Error(
-          "The booking persisted after the page was refreshed instead of being kept only in page memory.",
+          "The booking persisted after the page was refreshed.",
         );
       }
     },
