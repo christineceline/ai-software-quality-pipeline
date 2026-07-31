@@ -290,7 +290,7 @@ function App() {
 
           {isGenerating && (
             <p className="information-message" role="status">
-              Gemini is generating the application. This may take several minutes.
+              The AI is generating the application. This may take several minutes.
             </p>
           )}
 

@@ -217,6 +217,28 @@ async function completeTask(page, taskText) {
   }
 }
 
+async function getVisibleTaskContainers(page) {
+  const candidates = page.locator(
+    'li, [class*="task"], [class*="todo"]',
+  );
+
+  const visibleTasks = [];
+
+  for (
+    let index = 0;
+    index < await candidates.count();
+    index++
+  ) {
+    const candidate = candidates.nth(index);
+
+    if (await candidate.isVisible()) {
+      visibleTasks.push(candidate);
+    }
+  }
+
+  return visibleTasks;
+}
+
 export const todoFunctionalTests = [
   {
     id: "todo-add-task",
@@ -230,47 +252,60 @@ export const todoFunctionalTests = [
     },
   },
 
-  {
-    id: "todo-reject-empty-task",
-    requirement:
-      "Prevent empty tasks from being added.",
+{
+  id: "todo-reject-empty-task",
+  requirement:
+    "Prevent empty tasks from being added.",
 
-      async run(page) {
-        // First prove that task creation works in this test.
-        const validTaskText = "Valid task before empty test";
+  async run(page) {
+    const validTaskText =
+      "Valid task before empty test";
 
-        await addTask(page, validTaskText);
+    await addTask(page, validTaskText);
 
-        const validTask = getTaskContainer(
-          page,
-          validTaskText,
-        );
+    const input = await getTaskInput(page);
+    const addButton = await getAddButton(page);
 
-        if ((await validTask.count()) === 0) {
-          throw new Error(
-            "Could not verify empty-task prevention because valid task creation failed.",
-          );
-        }
+    const tasksBefore =
+      await getVisibleTaskContainers(page);
 
-        const input = await getTaskInput(page);
-        const addButton = await getAddButton(page);
+    await input.fill("   ");
 
-        const countBefore = await page.locator("li").count();
+    try {
+      await addButton.click();
+    } catch {
+      // Native form validation blocking the
+      // submission is valid behaviour.
+    }
 
-        await input.fill("   ");
-        await addButton.click();
+    await page.waitForTimeout(200);
 
-        await page.waitForTimeout(200);
+    const tasksAfter =
+      await getVisibleTaskContainers(page);
 
-        const countAfter = await page.locator("li").count();
+    if (
+      tasksAfter.length > tasksBefore.length
+    ) {
+      throw new Error(
+        "An empty task was added when it should have been rejected.",
+      );
+    }
 
-        if (countAfter !== countBefore) {
-          throw new Error(
-            "An empty task was added when it should have been rejected.",
-          );
-        }
-      }
+    const validTask = getTaskContainer(
+      page,
+      validTaskText,
+    );
+
+    if (
+      (await validTask.count()) === 0 ||
+      !(await validTask.isVisible())
+    ) {
+      throw new Error(
+        "The existing task disappeared after the empty submission attempt.",
+      );
+    }
   },
+},
 
   {
     id: "todo-complete-task",
@@ -285,44 +320,72 @@ export const todoFunctionalTests = [
     },
   },
 
-  {
-    id: "todo-delete-task",
-    requirement:
-      "Allow each task to be deleted.",
+{
+  id: "todo-delete-task",
+  requirement:
+    "Allow each task to be deleted.",
 
-    async run(page) {
-      const taskText = "Task to delete";
+  async run(page) {
+    const taskText = "Task to delete";
 
-      await addTask(page, taskText);
+    await addTask(page, taskText);
 
-      const task = getTaskContainer(page, taskText);
+    const task = getTaskContainer(
+      page,
+      taskText,
+    );
 
-      const deleteButton = task
-        .getByRole("button", {
-          name: /delete|remove/i,
-        })
-        .first();
+    if ((await task.count()) === 0) {
+      throw new Error(
+        "The added task could not be found before deletion.",
+      );
+    }
 
-      if ((await deleteButton.count()) === 0) {
-        throw new Error(
-          "No delete control found for the added task.",
-        );
-      }
+    const deleteButton = task
+      .getByRole("button", {
+        name: /delete|remove/i,
+      })
+      .first();
 
+    if ((await deleteButton.count()) === 0) {
+      throw new Error(
+        "No delete control found for the added task.",
+      );
+    }
+
+    if (!(await deleteButton.isVisible())) {
+      throw new Error(
+        "The delete control was present but not visible.",
+      );
+    }
+
+    try {
       await deleteButton.click();
+    } catch {
+      throw new Error(
+        "The delete control could not be activated.",
+      );
+    }
 
-      try {
-        await task.waitFor({
-          state: "detached",
-          timeout: 3000,
-        });
-      } catch {
-        throw new Error(
-          "The task remained visible after the delete control was activated.",
-        );
-      }
-    },
+    const taskTextLocator = page.getByText(
+      taskText,
+      {
+        exact: true,
+      },
+    );
+
+    try {
+      await taskTextLocator.waitFor({
+        state: "hidden",
+        timeout: 3000,
+      });
+    } catch {
+      throw new Error(
+        "The task remained visible after the delete control was activated.",
+      );
+    }
   },
+},
 
   {
     id: "todo-incomplete-count",

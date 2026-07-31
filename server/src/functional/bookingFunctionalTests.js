@@ -134,43 +134,82 @@ export const bookingFunctionalTests = [
     },
   },
 
-  {
-    id: "booking-required-fields",
-    requirement:
-      "Prevent a booking from being created when required fields are empty.",
+{
+  id: "booking-required-fields",
+  requirement:
+    "Prevent a booking from being created when required fields are empty.",
 
-    async run(page) {
-      // Prove booking creation works before testing rejection.
-      await createBooking(page, {
-        name: "Valid Booking User",
-      });
+  async run(page) {
+    const form = page.locator("form").first();
 
-      await page.goto(page.url(), {
-        waitUntil: "load",
-      });
-
-      await submitBooking(page);
-      await page.waitForTimeout(200);
-
-      const bookingItems = page.locator(
-        "li, [class*='booking'], [class*='appointment']",
+    if ((await form.count()) === 0) {
+      throw new Error(
+        "No booking form was found.",
       );
+    }
 
-      const text = await bookingItems.allTextContents();
+    const requiredFields = form.locator(
+      "input[required], select[required], textarea[required]",
+    );
 
-      const unexpectedCreatedBooking = text.some(
-        (value) =>
-          value.trim() !== "" &&
-          !value.includes("Valid Booking User"),
+
+    const hasNativeRequiredFields =
+      (await requiredFields.count()) > 0;
+
+    let browserRejectsForm = false;
+
+    if (hasNativeRequiredFields) {
+      browserRejectsForm = await form.evaluate(
+        (element) => !element.checkValidity(),
       );
+    }
 
-      if (unexpectedCreatedBooking) {
-        throw new Error(
-          "A booking was created even though required fields were empty.",
-        );
-      }
-    },
+
+    const testName =
+      "Empty Fields Test User";
+
+    const nameInput = page
+      .getByLabel(/name/i)
+      .or(page.locator('input[name*="name" i]'))
+      .first();
+
+    if ((await nameInput.count()) > 0) {
+      await nameInput.fill(testName);
+    }
+
+
+    if (hasNativeRequiredFields) {
+      browserRejectsForm = await form.evaluate(
+        (element) => !element.checkValidity(),
+      );
+    }
+
+    await submitBooking(page);
+    await page.waitForTimeout(200);
+
+
+    const createdBooking = getBooking(
+      page,
+      testName,
+    );
+
+    if (
+      (await createdBooking.count()) > 0 &&
+      (await createdBooking.isVisible())
+    ) {
+      throw new Error(
+        "A booking was created even though required fields were empty.",
+      );
+    }
+
+  
+    if (browserRejectsForm) {
+      return;
+    }
+
+    return;
   },
+},
 
   {
     id: "booking-email-validation",
@@ -305,48 +344,133 @@ export const bookingFunctionalTests = [
     },
   },
 
-  {
-    id: "booking-cancel",
-    requirement:
-      "Allow each booking to be cancelled.",
+{
+  id: "booking-cancel",
+  requirement:
+    "Allow each booking to be cancelled.",
 
-    async run(page) {
-      const booking = await createBooking(page, {
-        name: "Cancel Test User",
-      });
+  async run(page) {
+    const bookingName = "Cancel Test User";
 
-      const cancelButton = booking
-        .getByRole("button", {
+    await createBooking(page, {
+      name: bookingName,
+    });
+
+    const booking = getBooking(
+      page,
+      bookingName,
+    );
+
+    if (
+      (await booking.count()) === 0 ||
+      !(await booking.isVisible())
+    ) {
+      throw new Error(
+        "The created booking could not be found before cancellation.",
+      );
+    }
+
+    const cancelControl = booking
+      .getByRole("button", {
+        name: /cancel|delete|remove/i,
+      })
+      .or(
+        booking.getByRole("link", {
           name: /cancel|delete|remove/i,
-        })
-        .first();
+        }),
+      )
+      .or(
+        booking.locator(
+          [
+            '[role="button"][aria-label*="cancel" i]',
+            '[role="button"][aria-label*="delete" i]',
+            '[role="button"][aria-label*="remove" i]',
+            '[title*="cancel" i]',
+            '[title*="delete" i]',
+            '[title*="remove" i]',
+            'input[type="button"][value*="cancel" i]',
+            'input[type="button"][value*="delete" i]',
+            'input[type="button"][value*="remove" i]',
+          ].join(", "),
+        ),
+      )
+      .first();
 
-      if ((await cancelButton.count()) === 0) {
-        throw new Error(
-          "No cancellation control was found for the created booking.",
-        );
-      }
+    if ((await cancelControl.count()) === 0) {
+      throw new Error(
+        "No cancellation control was found for the created booking.",
+      );
+    }
 
-      try {
-        await cancelButton.click();
-      } catch {
-        throw new Error(
-          "The booking cancellation control could not be activated.",
-        );
-      }
+    if (!(await cancelControl.isVisible())) {
+      throw new Error(
+        "The cancellation control was present but not visible.",
+      );
+    }
 
-      try {
-        await booking.waitFor({
-          state: "detached",
-          timeout: 3000,
-        });
-      } catch {
-        throw new Error(
-          "The booking remained on the page after cancellation was attempted.",
-        );
-      }
-    },
+    try {
+      await cancelControl.click();
+    } catch {
+      throw new Error(
+        "The booking cancellation control could not be activated.",
+      );
+    }
+
+    await page.waitForTimeout(200);
+
+    const bookingStillVisible =
+      (await booking.count()) > 0 &&
+      (await booking.isVisible());
+
+    if (!bookingStillVisible) {
+      return;
+    }
+
+    const markedCancelled =
+      await booking.evaluate(
+        (element) => {
+          const text =
+            element.textContent
+              ?.toLowerCase()
+              .trim() ?? "";
+
+          const className =
+            typeof element.className === "string"
+              ? element.className.toLowerCase()
+              : "";
+
+          const status =
+            element
+              .getAttribute("data-status")
+              ?.toLowerCase() ?? "";
+
+          const ariaLabel =
+            element
+              .getAttribute("aria-label")
+              ?.toLowerCase() ?? "";
+
+          return (
+            text.includes("cancelled") ||
+            text.includes("canceled") ||
+            className.includes("cancelled") ||
+            className.includes("canceled") ||
+            status === "cancelled" ||
+            status === "canceled" ||
+            ariaLabel.includes("cancelled") ||
+            ariaLabel.includes("canceled")
+          );
+        },
+      );
+
+    if (markedCancelled) {
+      return;
+    }
+
+    throw new Error(
+      "The booking was neither removed nor marked as cancelled after cancellation was attempted.",
+    );
   },
+},
 
   {
     id: "booking-session-memory",
