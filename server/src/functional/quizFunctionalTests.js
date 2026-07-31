@@ -362,82 +362,73 @@ export const quizFunctionalTests = [
   },
 
   {
-    id: "quiz-session-memory",
+  id: "quiz-session-memory",
 
-    requirement:
-      "Keep quiz selections and results in page memory only. Refreshing or reopening the page must reset the quiz state.",
+  requirement:
+    "Keep quiz selections and results in page memory only. Refreshing or reopening the page must reset the quiz state.",
 
-    async run(page) {
-      await answerAllQuestions(page);
-      await submitQuiz(page);
+  async run(page) {
+    await answerAllQuestions(page);
+    await submitQuiz(page);
 
-      await readScore(page);
+    // Prove that a result existed before reload.
+    await readScore(page);
 
-      await page.reload({
-        waitUntil: "load",
-      });
+    await page.reload({
+      waitUntil: "load",
+    });
 
-      /*
-       * The result may remain in the DOM as a hidden
-       * placeholder. It must not retain a score.
-       */
-      const scoreElement =
-        getScoreElement(page);
+    const scoreElement =
+      getScoreElement(page);
 
-      if (
-        (await scoreElement.count()) > 0
-      ) {
-        const value =
-          await scoreElement.getAttribute(
-            "data-score",
-          );
-
-        const visible =
-          await scoreElement
-            .isVisible()
-            .catch(() => false);
-
-        if (
-          visible &&
-          ["0", "1", "2", "3"].includes(
-            value,
-          )
-        ) {
-          throw new Error(
-            "The quiz result persisted after the page was refreshed.",
-          );
-        }
-      }
-
-      /*
-       * Check native selection state where applicable.
-       */
-      const selectedInputs =
-        page.locator(
-          '[data-testid="quiz-option"]:checked',
+    if ((await scoreElement.count()) === 1) {
+      const scoreAfterReload =
+        await scoreElement.getAttribute(
+          "data-score",
         );
 
       if (
-        (await selectedInputs.count()) > 0
+        scoreAfterReload !== null &&
+        scoreAfterReload !== ""
       ) {
         throw new Error(
-          "Quiz selections persisted after the page was refreshed.",
+          "The quiz result persisted after the page was refreshed.",
         );
       }
+    }
 
-      const selectedAria =
-        page.locator(
-          '[data-testid="quiz-option"][aria-checked="true"], ' +
-          '[data-testid="quiz-option"][aria-pressed="true"]',
-        );
+    /*
+     * Native selections must also reset.
+     */
+    const checkedInputs = page.locator(
+      '[data-testid="quiz-option"] input[type="radio"]:checked, ' +
+      'input[data-testid="quiz-option"][type="radio"]:checked',
+    );
 
-      if (
-        (await selectedAria.count()) > 0
-      ) {
-        throw new Error(
-          "Quiz selections persisted after the page was refreshed.",
-        );
-      }
-    },
+    if (
+      (await checkedInputs.count()) > 0
+    ) {
+      throw new Error(
+        "Quiz selections persisted after the page was refreshed.",
+      );
+    }
+
+    /*
+     * Also support custom option controls exposing
+     * ARIA selection state.
+     */
+    const selectedOptions = page.locator(
+      '[data-testid="quiz-option"][aria-checked="true"], ' +
+      '[data-testid="quiz-option"][aria-pressed="true"]',
+    );
+
+    if (
+      (await selectedOptions.count()) > 0
+    ) {
+      throw new Error(
+        "Quiz selections persisted after the page was refreshed.",
+      );
+    }
   },
+},
 ];

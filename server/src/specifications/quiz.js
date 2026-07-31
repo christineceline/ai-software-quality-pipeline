@@ -51,12 +51,12 @@ const quizSpecification = {
     ],
 
     stateAttributes: [
-      {
-        attribute: "data-score",
-        appliesTo: "quiz-score",
-        requirement:
-          'After submission, the element with data-testid="quiz-score" must expose the numeric score using data-score="0", "1", "2" or "3".',
-      },
+    {
+      attribute: "data-score",
+      appliesTo: "quiz-score",
+      requirement:
+        'Before the quiz is submitted, data-score must be absent or empty. After submission, the element with data-testid="quiz-score" must expose the numeric result using data-score="0", "1", "2" or "3". Refreshing the page must return data-score to the absent or empty state.',
+    },
     ],
   },
 
