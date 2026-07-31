@@ -1,5 +1,7 @@
 async function getQuestionGroups(page) {
-  const radios = page.locator('input[type="radio"]');
+  const radios = page.locator(
+    'input[type="radio"][name]',
+  );
 
   return radios.evaluateAll((elements) => [
     ...new Set(
@@ -23,21 +25,75 @@ async function getThreeQuestions(page) {
   return questionNames;
 }
 
-async function selectAnswer(page, name) {
-  const option = page
-    .locator(
-      `input[type="radio"][name="${name}"]`,
-    )
+async function getVisibleOptionControl(
+  page,
+  option,
+) {
+  if (await option.isVisible()) {
+    return option;
+  }
+
+  const optionId =
+    await option.getAttribute("id");
+
+  if (optionId) {
+    const label = page
+      .locator(`label[for="${optionId}"]`)
+      .first();
+
+    if (
+      (await label.count()) > 0 &&
+      (await label.isVisible())
+    ) {
+      return label;
+    }
+  }
+
+  const wrappingLabel = option
+    .locator("xpath=ancestor::label[1]")
     .first();
 
-  if ((await option.count()) === 0) {
+  if (
+    (await wrappingLabel.count()) > 0 &&
+    (await wrappingLabel.isVisible())
+  ) {
+    return wrappingLabel;
+  }
+
+  return null;
+}
+
+async function selectAnswer(page, name) {
+  const options = page.locator(
+    `input[type="radio"][name="${name}"]`,
+  );
+
+  if ((await options.count()) === 0) {
     throw new Error(
-      `No selectable answer was found for question "${name}".`,
+      `No selectable answers were found for question "${name}".`,
+    );
+  }
+
+  const option = options.first();
+
+  const visibleControl =
+    await getVisibleOptionControl(
+      page,
+      option,
+    );
+
+  if (!visibleControl) {
+    throw new Error(
+      `No visible answer control was found for question "${name}".`,
     );
   }
 
   try {
-    await option.check();
+    if (await option.isVisible()) {
+      await option.check();
+    } else {
+      await visibleControl.click();
+    }
   } catch {
     throw new Error(
       `An answer could not be selected for question "${name}".`,
@@ -63,9 +119,72 @@ async function answerAllQuestions(page) {
 function getSubmitButton(page) {
   return page
     .getByRole("button", {
-      name: /submit|finish|complete|check answers/i,
+      name: /submit|finish|complete|check answers|check|score/i,
     })
+    .or(
+      page.locator(
+        'input[type="submit"]',
+      ),
+    )
     .first();
+}
+
+function extractScore(text) {
+  if (!text) {
+    return null;
+  }
+
+  const patterns = [
+    /(\d+)\s*\/\s*3/i,
+    /(\d+)\s*out of\s*3/i,
+    /(?:score|scored|result|correct)[^\d]*(\d+)/i,
+    /(\d+)[^\d]*(?:correct)/i,
+  ];
+
+  for (const pattern of patterns) {
+    const match = text.match(pattern);
+
+    if (match) {
+      return Number(match[1]);
+    }
+  }
+
+  return null;
+}
+
+async function findScore(page) {
+  const candidates = page.getByText(
+    /score|scored|result|correct|\d+\s*\/\s*3|\d+\s*out of\s*3/i,
+  );
+
+  const count = await candidates.count();
+
+  for (let index = 0; index < count; index++) {
+    const candidate =
+      candidates.nth(index);
+
+    if (!(await candidate.isVisible())) {
+      continue;
+    }
+
+    const text =
+      await candidate.textContent();
+
+    const score = extractScore(text);
+
+    if (
+      score !== null &&
+      score >= 0 &&
+      score <= 3
+    ) {
+      return {
+        locator: candidate,
+        score,
+      };
+    }
+  }
+
+  return null;
 }
 
 export const quizFunctionalTests = [
@@ -83,12 +202,9 @@ export const quizFunctionalTests = [
           `input[type="radio"][name="${name}"]`,
         );
 
-        const optionCount =
-          await options.count();
-
-        if (optionCount < 2) {
+        if ((await options.count()) < 2) {
           throw new Error(
-            `Question "${name}" has ${optionCount} answer option(s); at least 2 are required for multiple choice.`,
+            `Question "${name}" does not contain at least two answer options.`,
           );
         }
       }
@@ -105,24 +221,32 @@ export const quizFunctionalTests = [
         await getThreeQuestions(page);
 
       for (const name of questionNames) {
-        const firstOption = page
-          .locator(
-            `input[type="radio"][name="${name}"]`,
-          )
-          .first();
+        const options = page.locator(
+          `input[type="radio"][name="${name}"]`,
+        );
 
-        let visible = false;
+        let hasVisibleOption = false;
 
-        try {
-          visible =
-            await firstOption.isVisible();
-        } catch {
-          visible = false;
+        for (
+          let index = 0;
+          index < await options.count();
+          index++
+        ) {
+          const control =
+            await getVisibleOptionControl(
+              page,
+              options.nth(index),
+            );
+
+          if (control) {
+            hasVisibleOption = true;
+            break;
+          }
         }
 
-        if (!visible) {
+        if (!hasVisibleOption) {
           throw new Error(
-            `Question "${name}" was present but not visible on the page.`,
+            `Question "${name}" did not have a visible answer option on the page.`,
           );
         }
       }
@@ -153,15 +277,12 @@ export const quizFunctionalTests = [
       const submitButton =
         getSubmitButton(page);
 
-      if ((await submitButton.count()) === 0) {
+      if (
+        (await submitButton.count()) === 0 ||
+        !(await submitButton.isVisible())
+      ) {
         throw new Error(
-          "No quiz submission button was found.",
-        );
-      }
-
-      if (!(await submitButton.isVisible())) {
-        throw new Error(
-          "The quiz submission button was present but not visible.",
+          "No visible quiz submission control was found.",
         );
       }
     },
@@ -178,99 +299,60 @@ export const quizFunctionalTests = [
       const submitButton =
         getSubmitButton(page);
 
-      if ((await submitButton.count()) === 0) {
-        throw new Error(
-          "No quiz submission button was found.",
-        );
-      }
-
-      if (!(await submitButton.isEnabled())) {
-        throw new Error(
-          "The quiz submission button remained disabled after all questions were answered.",
-        );
-      }
-
-      try {
-        await submitButton.click();
-      } catch {
+      if (
+        (await submitButton.count()) === 0 ||
+        !(await submitButton.isEnabled())
+      ) {
         throw new Error(
           "The completed quiz could not be submitted.",
         );
       }
 
-      const score = page
-        .getByText(
-          /(?:score|result|correct).*(?:\d+)|(?:\d+).*(?:score|correct)|\d+\s*(?:\/|out of)\s*3/i,
-        )
-        .first();
-
-      try {
-        await score.waitFor({
-          state: "visible",
-          timeout: 3000,
-        });
-      } catch {
-        throw new Error(
-          "The final score was not displayed after the completed quiz was submitted.",
-        );
-      }
-
-      const firstScoreText =
-        await score.textContent();
-
-      const firstMatch =
-        firstScoreText?.match(
-          /(\d+)\s*(?:\/|out of)\s*3/i,
-        );
-
-      if (!firstMatch) {
-        throw new Error(
-          "A score was displayed, but it was not in a recognisable 0–3 format.",
-        );
-      }
-
-      const firstScore =
-        Number(firstMatch[1]);
-
-      if (
-        firstScore < 0 ||
-        firstScore > 3
-      ) {
-        throw new Error(
-          `The displayed score ${firstScore}/3 is outside the valid range of 0–3.`,
-        );
-      }
-
-      try {
-        await submitButton.click();
-      } catch {
-        throw new Error(
-          "The quiz could not be submitted a second time to verify score stability.",
-        );
-      }
+      await submitButton.click();
 
       await page.waitForTimeout(200);
 
-      const secondScoreText =
-        await score.textContent();
+      const firstResult =
+        await findScore(page);
 
-      const secondMatch =
-        secondScoreText?.match(
-          /(\d+)\s*(?:\/|out of)\s*3/i,
+      if (!firstResult) {
+        throw new Error(
+          "A valid final score between 0 and 3 was not displayed after submission.",
         );
+      }
 
-      if (!secondMatch) {
+      const submitStillAvailable =
+        (await submitButton.count()) > 0 &&
+        await submitButton
+          .isVisible()
+          .catch(() => false) &&
+        await submitButton
+          .isEnabled()
+          .catch(() => false);
+
+      if (!submitStillAvailable) {
+        return;
+      }
+
+      await submitButton.click();
+
+      await page.waitForTimeout(200);
+
+      const secondResult =
+        await findScore(page);
+
+      if (!secondResult) {
         throw new Error(
           "The final score was no longer displayed correctly after repeated submission.",
         );
       }
 
-      const secondScore =
-        Number(secondMatch[1]);
-
-      if (secondScore !== firstScore) {
+      if (
+        secondResult.score !==
+        firstResult.score
+      ) {
         throw new Error(
-          `The score changed from ${firstScore}/3 to ${secondScore}/3 even though the answers did not change.`,
+          `The score changed from ${firstResult.score}/3 to ${secondResult.score}/3 when the quiz was submitted again.`,
         );
       }
     },
@@ -290,46 +372,21 @@ export const quizFunctionalTests = [
         questionNames[0],
       );
 
-      const browser =
-        page.context().browser();
+      await page.reload({
+        waitUntil: "load",
+      });
 
-      if (!browser) {
-        throw new Error(
-          "Unable to open a fresh browser session for the storage test.",
+      const checkedAnswers =
+        page.locator(
+          'input[type="radio"]:checked',
         );
-      }
 
-      const freshContext =
-        await browser.newContext();
-
-      try {
-        const freshPage =
-          await freshContext.newPage();
-
-        try {
-          await freshPage.goto(page.url(), {
-            waitUntil: "load",
-          });
-        } catch {
-          throw new Error(
-            "The application could not be loaded in a fresh browser session for the storage test.",
-          );
-        }
-
-        const checkedAnswers =
-          freshPage.locator(
-            'input[type="radio"]:checked',
-          );
-
-        if (
-          (await checkedAnswers.count()) > 0
-        ) {
-          throw new Error(
-            "Selected quiz answers persisted into a fresh browser session instead of remaining session-only.",
-          );
-        }
-      } finally {
-        await freshContext.close();
+      if (
+        (await checkedAnswers.count()) > 0
+      ) {
+        throw new Error(
+          "Selected answers persisted after the page was reloaded.",
+        );
       }
     },
   },

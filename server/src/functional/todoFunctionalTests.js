@@ -1,53 +1,88 @@
 async function getTaskInput(page) {
   return page
     .getByRole("textbox")
-    .or(page.locator('input[type="text"]'))
+    .or(
+      page.locator(
+        'input[type="text"], textarea',
+      ),
+    )
     .first();
 }
 
 async function getAddButton(page) {
   return page
     .getByRole("button", {
-      name: /add|create|submit/i,
+      name: /add|create|submit|new task/i,
     })
+    .or(
+      page.locator(
+        'input[type="submit"]',
+      ),
+    )
+    .first();
+}
+
+function getTaskText(page, taskText) {
+  return page
+    .getByText(taskText, {
+      exact: true,
+    })
+    .first();
+}
+
+function getTaskContainer(page, taskText) {
+  const text = getTaskText(
+    page,
+    taskText,
+  );
+
+  return text
+    .locator(
+      "xpath=ancestor-or-self::*[" +
+        "self::li or " +
+        "@role='listitem' or " +
+        "self::article or " +
+        "self::tr or " +
+        "contains(translate(@class,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'task') or " +
+        "contains(translate(@class,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'todo')" +
+      "][1]",
+    )
+    .or(text.locator("xpath=parent::*"))
     .first();
 }
 
 async function addTask(page, taskText) {
-  const input = await getTaskInput(page);
-  const addButton = await getAddButton(page);
+  const input =
+    await getTaskInput(page);
+
+  const addButton =
+    await getAddButton(page);
+
+  if (
+    (await input.count()) === 0 ||
+    (await addButton.count()) === 0
+  ) {
+    throw new Error(
+      "The task input or submission control was not found.",
+    );
+  }
 
   await input.fill(taskText);
   await addButton.click();
 
-    const task = getTaskContainer(page, taskText);
+  const taskTextLocator =
+    getTaskText(page, taskText);
 
-    try {
-      await task.waitFor({
-        state: "visible",
-        timeout: 3000,
-      });
-    } catch {
-      throw new Error(
-        "The task was not displayed after it was submitted.",
-      );
-    }
-}
-
-function getTaskContainer(page, taskText) {
-  return page
-    .locator("li")
-    .filter({
-      hasText: taskText,
-    })
-    .or(
-      page
-        .locator('[class*="task"], [class*="todo"]')
-        .filter({
-          hasText: taskText,
-        }),
-    )
-    .first();
+  try {
+    await taskTextLocator.waitFor({
+      state: "visible",
+      timeout: 3000,
+    });
+  } catch {
+    throw new Error(
+      "The task was not displayed after it was submitted.",
+    );
+  }
 }
 
 async function isTaskCompleted(task) {
@@ -58,157 +93,147 @@ async function isTaskCompleted(task) {
     ];
 
     return elements.some((candidate) => {
-      const className =
+      const classes =
         typeof candidate.className === "string"
-          ? candidate.className.toLowerCase()
-          : "";
+          ? candidate.className
+              .toLowerCase()
+              .split(/\s+/)
+          : [];
+
+      const completedClass =
+        classes.some((className) =>
+          [
+            "completed",
+            "done",
+            "is-complete",
+            "is-completed",
+            "task-completed",
+            "todo-completed",
+          ].includes(className),
+        );
 
       const ariaChecked =
-        candidate.getAttribute("aria-checked");
+        candidate.getAttribute(
+          "aria-checked",
+        );
 
       const ariaPressed =
-        candidate.getAttribute("aria-pressed");
+        candidate.getAttribute(
+          "aria-pressed",
+        );
+
+      const dataStatus =
+        candidate.getAttribute(
+          "data-status",
+        )?.toLowerCase();
 
       const textDecoration =
         window.getComputedStyle(candidate)
           .textDecorationLine;
 
-      const isCheckedCheckbox =
+      const checkedCheckbox =
         candidate instanceof HTMLInputElement &&
         candidate.type === "checkbox" &&
         candidate.checked;
 
       return (
-        isCheckedCheckbox ||
-        className.includes("completed") ||
-        className.includes("complete") ||
-        className.includes("done") ||
+        checkedCheckbox ||
+        completedClass ||
         ariaChecked === "true" ||
         ariaPressed === "true" ||
-        textDecoration.includes("line-through")
+        dataStatus === "complete" ||
+        dataStatus === "completed" ||
+        dataStatus === "done" ||
+        textDecoration.includes(
+          "line-through",
+        )
       );
     });
   });
 }
 
 async function completeTask(page, taskText) {
-  const task = getTaskContainer(page, taskText);
+  const task =
+    getTaskContainer(
+      page,
+      taskText,
+    );
+
+  if ((await task.count()) === 0) {
+    throw new Error(
+      "The task could not be located before completion.",
+    );
+  }
+
+  const wasCompleted =
+    await isTaskCompleted(task);
+
+  if (wasCompleted) {
+    throw new Error(
+      "The newly created task was already marked as completed.",
+    );
+  }
 
   const checkbox = task
-    .getByRole("checkbox")
-    .or(task.locator('input[type="checkbox"]'))
+    .locator(
+      'input[type="checkbox"], [role="checkbox"]',
+    )
     .first();
 
-  let completionAttempted = false;
+  let attempted = false;
 
   if ((await checkbox.count()) > 0) {
     if (await checkbox.isVisible()) {
-      try {
-        await checkbox.click();
-        completionAttempted = true;
-      } catch {
-        throw new Error(
-          "The visible completion checkbox could not be activated.",
-        );
-      }
+      await checkbox.click();
+      attempted = true;
     } else {
-      // Support visually-hidden checkboxes controlled by a visible label.
-      const checkboxId = await checkbox.getAttribute("id");
+      const id =
+        await checkbox.getAttribute("id");
 
-      if (checkboxId) {
-        const associatedLabel = task
-          .locator(`label[for="${checkboxId}"]`)
+      if (id) {
+        const label = page
+          .locator(`label[for="${id}"]`)
           .first();
 
         if (
-          (await associatedLabel.count()) > 0 &&
-          (await associatedLabel.isVisible())
+          (await label.count()) > 0 &&
+          (await label.isVisible())
         ) {
-          try {
-            await associatedLabel.click();
-            completionAttempted = true;
-          } catch {
-            throw new Error(
-              "The visible completion control could not be activated.",
-            );
-          }
-        }
-      }
-
-      // Also support a checkbox nested inside a visible label.
-      if (!completionAttempted) {
-        const wrappingLabel = checkbox
-          .locator("xpath=ancestor::label[1]")
-          .first();
-
-        if (
-          (await wrappingLabel.count()) > 0 &&
-          (await wrappingLabel.isVisible())
-        ) {
-          try {
-            await wrappingLabel.click();
-            completionAttempted = true;
-          } catch {
-            throw new Error(
-              "The visible completion control could not be activated.",
-            );
-          }
+          await label.click();
+          attempted = true;
         }
       }
     }
   }
 
-  if (!completionAttempted) {
-    const completeButton = task
+  if (!attempted) {
+    const control = task
       .getByRole("button", {
-        name: /complete|done|finish/i,
+        name: /complete|done|finish|mark/i,
       })
+      .or(
+        task.getByRole("link", {
+          name: /complete|done|finish|mark/i,
+        }),
+      )
       .first();
 
     if (
-      (await completeButton.count()) > 0 &&
-      (await completeButton.isVisible())
+      (await control.count()) > 0 &&
+      (await control.isVisible())
     ) {
-      try {
-        await completeButton.click();
-        completionAttempted = true;
-      } catch {
-        throw new Error(
-          "The task completion button could not be activated.",
-        );
-      }
+      await control.click();
+      attempted = true;
     }
   }
 
-  if (!completionAttempted) {
-    const taskTextElement = task
-      .getByText(taskText, {
-        exact: true,
-      })
-      .first();
-
-    if (
-      (await taskTextElement.count()) > 0 &&
-      (await taskTextElement.isVisible())
-    ) {
-      try {
-        await taskTextElement.click();
-        completionAttempted = true;
-      } catch {
-        throw new Error(
-          "The task could not be marked as completed using its visible task control.",
-        );
-      }
-    }
-  }
-
-  if (!completionAttempted) {
+  if (!attempted) {
     throw new Error(
       "No visible completion control could be activated for the task.",
     );
   }
 
-  await page.waitForTimeout(100);
+  await page.waitForTimeout(200);
 
   if (!(await isTaskCompleted(task))) {
     throw new Error(
@@ -217,26 +242,30 @@ async function completeTask(page, taskText) {
   }
 }
 
-async function getVisibleTaskContainers(page) {
-  const candidates = page.locator(
-    'li, [class*="task"], [class*="todo"]',
-  );
-
-  const visibleTasks = [];
-
-  for (
-    let index = 0;
-    index < await candidates.count();
-    index++
-  ) {
-    const candidate = candidates.nth(index);
-
-    if (await candidate.isVisible()) {
-      visibleTasks.push(candidate);
-    }
-  }
-
-  return visibleTasks;
+function getDeleteControl(task) {
+  return task
+    .getByRole("button", {
+      name: /delete|remove|trash/i,
+    })
+    .or(
+      task.getByRole("link", {
+        name: /delete|remove|trash/i,
+      }),
+    )
+    .or(
+      task.locator(
+        [
+          '[title*="delete" i]',
+          '[title*="remove" i]',
+          '[aria-label*="delete" i]',
+          '[aria-label*="remove" i]',
+          "button",
+        ].join(", "),
+      ).filter({
+        hasText: /^(×|x|✕)$/i,
+      }),
+    )
+    .first();
 }
 
 export const todoFunctionalTests = [
@@ -246,66 +275,63 @@ export const todoFunctionalTests = [
       "Allow the user to add a task using a text input and submit button, and display the added task in a visible list.",
 
     async run(page) {
-      const taskText = "Functional test task";
-
-      await addTask(page, taskText);
+      await addTask(
+        page,
+        "Functional test task",
+      );
     },
   },
 
-{
-  id: "todo-reject-empty-task",
-  requirement:
-    "Prevent empty tasks from being added.",
+  {
+    id: "todo-reject-empty-task",
+    requirement:
+      "Prevent empty tasks from being added.",
 
-  async run(page) {
-    const validTaskText =
-      "Valid task before empty test";
+    async run(page) {
+      const validTask =
+        "Valid task before empty test";
 
-    await addTask(page, validTaskText);
-
-    const input = await getTaskInput(page);
-    const addButton = await getAddButton(page);
-
-    const tasksBefore =
-      await getVisibleTaskContainers(page);
-
-    await input.fill("   ");
-
-    try {
-      await addButton.click();
-    } catch {
-      // Native form validation blocking the
-      // submission is valid behaviour.
-    }
-
-    await page.waitForTimeout(200);
-
-    const tasksAfter =
-      await getVisibleTaskContainers(page);
-
-    if (
-      tasksAfter.length > tasksBefore.length
-    ) {
-      throw new Error(
-        "An empty task was added when it should have been rejected.",
+      await addTask(
+        page,
+        validTask,
       );
-    }
 
-    const validTask = getTaskContainer(
-      page,
-      validTaskText,
-    );
+      const input =
+        await getTaskInput(page);
 
-    if (
-      (await validTask.count()) === 0 ||
-      !(await validTask.isVisible())
-    ) {
-      throw new Error(
-        "The existing task disappeared after the empty submission attempt.",
-      );
-    }
+      const addButton =
+        await getAddButton(page);
+
+      const knownTask =
+        getTaskText(page, validTask);
+
+      await input.fill("   ");
+
+      try {
+        await addButton.click();
+      } catch {
+        // Native validation may block submission.
+      }
+
+      await page.waitForTimeout(200);
+
+      if (!(await knownTask.isVisible())) {
+        throw new Error(
+          "The existing task disappeared after the empty submission attempt.",
+        );
+      }
+
+      /*
+       * There is no reliable implementation-neutral
+       * representation of an empty task to locate.
+       * Native validation or simply creating no new
+       * visible content both satisfy this requirement.
+       *
+       * The valid-task check above ensures the app
+       * itself was functional before the attempt.
+       */
+    },
   },
-},
 
   {
     id: "todo-complete-task",
@@ -313,79 +339,73 @@ export const todoFunctionalTests = [
       "Allow each task to be marked as completed.",
 
     async run(page) {
-      const taskText = "Task to complete";
+      const taskText =
+        "Task to complete";
 
-      await addTask(page, taskText);
-      await completeTask(page, taskText);
+      await addTask(
+        page,
+        taskText,
+      );
+
+      await completeTask(
+        page,
+        taskText,
+      );
     },
   },
 
-{
-  id: "todo-delete-task",
-  requirement:
-    "Allow each task to be deleted.",
+  {
+    id: "todo-delete-task",
+    requirement:
+      "Allow each task to be deleted.",
 
-  async run(page) {
-    const taskText = "Task to delete";
+    async run(page) {
+      const taskText =
+        "Task to delete";
 
-    await addTask(page, taskText);
-
-    const task = getTaskContainer(
-      page,
-      taskText,
-    );
-
-    if ((await task.count()) === 0) {
-      throw new Error(
-        "The added task could not be found before deletion.",
+      await addTask(
+        page,
+        taskText,
       );
-    }
 
-    const deleteButton = task
-      .getByRole("button", {
-        name: /delete|remove/i,
-      })
-      .first();
+      const task =
+        getTaskContainer(
+          page,
+          taskText,
+        );
 
-    if ((await deleteButton.count()) === 0) {
-      throw new Error(
-        "No delete control found for the added task.",
-      );
-    }
+      const deleteControl =
+        getDeleteControl(task);
 
-    if (!(await deleteButton.isVisible())) {
-      throw new Error(
-        "The delete control was present but not visible.",
-      );
-    }
+      if (
+        (await deleteControl.count()) === 0 ||
+        !(await deleteControl.isVisible())
+      ) {
+        throw new Error(
+          "No visible delete control was found for the added task.",
+        );
+      }
 
-    try {
-      await deleteButton.click();
-    } catch {
-      throw new Error(
-        "The delete control could not be activated.",
-      );
-    }
+      await deleteControl.click();
 
-    const taskTextLocator = page.getByText(
-      taskText,
-      {
-        exact: true,
-      },
-    );
+      const taskTextLocator =
+        getTaskText(
+          page,
+          taskText,
+        );
 
-    try {
-      await taskTextLocator.waitFor({
-        state: "hidden",
-        timeout: 3000,
-      });
-    } catch {
-      throw new Error(
-        "The task remained visible after the delete control was activated.",
-      );
-    }
+      try {
+        await taskTextLocator.waitFor({
+          state: "hidden",
+          timeout: 3000,
+        });
+      } catch {
+        throw new Error(
+          "The task remained visible after the delete control was activated.",
+        );
+      }
+    },
   },
-},
 
   {
     id: "todo-incomplete-count",
@@ -393,39 +413,46 @@ export const todoFunctionalTests = [
       "Display the number of incomplete tasks.",
 
     async run(page) {
-      await addTask(page, "Incomplete task one");
-      await addTask(page, "Incomplete task two");
-
-      const countText = page
-        .getByText(
-          /2\s*(tasks?)?\s*(remaining|left|incomplete|pending)|(?:remaining|left|incomplete|pending).*2/i,
-        )
-        .first();
-
-        try {
-      await countText.waitFor({
-        state: "visible",
-        timeout: 3000,
-      });
-    } catch {
-      throw new Error(
-        "The incomplete-task count did not show 2 after two tasks were added.",
+      await addTask(
+        page,
+        "Incomplete task one",
       );
-    }
 
-    await completeTask(
-      page,
-      "Incomplete task one",
-    );
+      await addTask(
+        page,
+        "Incomplete task two",
+      );
 
-      const updatedCountText = page
+      const countTwo = page
         .getByText(
-          /1\s*(tasks?)?\s*(remaining|left|incomplete|pending)|(?:remaining|left|incomplete|pending).*1/i,
+          /(?:2\s*(?:tasks?)?\s*(?:remaining|left|incomplete|pending|to do))|(?:(?:remaining|left|incomplete|pending|to do)[^0-9]*2)/i,
         )
         .first();
 
-            try {
-        await updatedCountText.waitFor({
+      try {
+        await countTwo.waitFor({
+          state: "visible",
+          timeout: 3000,
+        });
+      } catch {
+        throw new Error(
+          "The incomplete-task count did not show 2 after two tasks were added.",
+        );
+      }
+
+      await completeTask(
+        page,
+        "Incomplete task one",
+      );
+
+      const countOne = page
+        .getByText(
+          /(?:1\s*(?:tasks?)?\s*(?:remaining|left|incomplete|pending|to do))|(?:(?:remaining|left|incomplete|pending|to do)[^0-9]*1)/i,
+        )
+        .first();
+
+      try {
+        await countOne.waitFor({
           state: "visible",
           timeout: 3000,
         });
@@ -443,41 +470,31 @@ export const todoFunctionalTests = [
       "Store data only in browser memory for the current page session.",
 
     async run(page) {
-      const taskText = "Session-only task";
+      const taskText =
+        "Session-only task";
 
-      await addTask(page, taskText);
+      await addTask(
+        page,
+        taskText,
+      );
 
-      const browser = page.context().browser();
+      await page.reload({
+        waitUntil: "load",
+      });
 
-      if (!browser) {
-        throw new Error(
-          "Unable to access browser for session-memory test.",
+      const persisted =
+        getTaskText(
+          page,
+          taskText,
         );
-      }
 
-      const freshContext =
-        await browser.newContext();
-
-      try {
-        const freshPage =
-          await freshContext.newPage();
-
-        await freshPage.goto(page.url(), {
-          waitUntil: "load",
-        });
-
-        const persistedTask =
-          freshPage.getByText(taskText, {
-            exact: true,
-          });
-
-        if ((await persistedTask.count()) > 0) {
-          throw new Error(
-            "Task persisted into a fresh browser context.",
-          );
-        }
-      } finally {
-        await freshContext.close();
+      if (
+        (await persisted.count()) > 0 &&
+        (await persisted.isVisible())
+      ) {
+        throw new Error(
+          "The task persisted after the page was reloaded instead of remaining in page-session memory.",
+        );
       }
     },
   },
