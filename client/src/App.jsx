@@ -43,6 +43,7 @@ function App() {
   const [runtimeReport, setRuntimeReport] = useState(null);
   const [accessibilityReport, setAccessibilityReport] = useState(null);
   const [functionalReport, setFunctionalReport] = useState(null);
+  const [generationMetrics, setGenerationMetrics] = useState(null);
   const [refinementIterations, setRefinementIterations] = useState([]);
   const [selectedIteration, setSelectedIteration] = useState(null);
 
@@ -104,6 +105,7 @@ function App() {
     setRuntimeReport(null);
     setAccessibilityReport(null);
     setFunctionalReport(null);
+    setGenerationMetrics(null);
     setRefinementIterations([]);
     setSelectedIteration(null);
 
@@ -130,6 +132,10 @@ function App() {
 
           setRun(data.run);
 
+          setGenerationMetrics(
+          data.run?.generationMetrics ?? null,
+        );
+
       if (workflow === "automated-refinement") {
         const completedRefinements =
           data.refinement?.iterations ?? [];
@@ -147,6 +153,9 @@ function App() {
         setSelectedIteration(finalIteration.iteration);
 
         setApplication(finalIteration.application);
+        setGenerationMetrics(
+          finalIteration.generationMetrics ?? null,
+        );
         setQualityReport(finalIteration.qualityReport);
         setRuntimeReport(finalIteration.runtimeReport);
         setAccessibilityReport(
@@ -281,8 +290,7 @@ function App() {
 
           {isGenerating && (
             <p className="information-message" role="status">
-              Ollama is generating the application. Local model
-              generation may take several minutes.
+              The AI is generating the application. This may take several minutes.
             </p>
           )}
 
@@ -331,6 +339,9 @@ function App() {
 
                       setSelectedIteration(iterationNumber);
                       setApplication(selected.application);
+                      setGenerationMetrics(
+                        selected.generationMetrics ?? null,
+                      );
                       setQualityReport(selected.qualityReport);
                       setRuntimeReport(selected.runtimeReport);
                       setAccessibilityReport(
@@ -413,7 +424,7 @@ function App() {
           {activeResultView === "quality" && ( 
             <>
             <QualityReport report={qualityReport} />
-            <RuntimeReport report={runtimeReport} />
+            <RuntimeReport report={runtimeReport}  generationMetrics={generationMetrics} />
             <AccessibilityReport
               report={accessibilityReport}
             />

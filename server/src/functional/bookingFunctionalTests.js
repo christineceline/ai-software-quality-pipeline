@@ -24,10 +24,16 @@ async function fillBooking(page, {
     .or(page.locator('input[type="time"]'))
     .first();
 
-  await nameInput.fill(name);
-  await emailInput.fill(email);
-  await dateInput.fill(date);
-  await timeInput.fill(time);
+  try {
+    await nameInput.fill(name);
+    await emailInput.fill(email);
+    await dateInput.fill(date);
+    await timeInput.fill(time);
+  } catch {
+    throw new Error(
+      "The booking form could not be completed using the required fields.",
+    );
+  }
 
   const typeSelect = page
     .getByLabel(/type|service/i)
@@ -50,15 +56,71 @@ async function fillBooking(page, {
 }
 
 async function submitBooking(page) {
-  const button = page.getByRole("button", {
-    name: /book|submit|create|confirm/i,
-  }).first();
+  const button = page
+    .getByRole("button", {
+      name: /book|submit|create|confirm/i,
+    })
+    .first();
 
   if ((await button.count()) === 0) {
-    throw new Error("Booking submission control not found.");
+    throw new Error(
+      "No booking submission button was found.",
+    );
   }
 
-  await button.click();
+  if (!(await button.isVisible())) {
+    throw new Error(
+      "The booking submission button was not visible.",
+    );
+  }
+
+  try {
+    await button.click();
+  } catch {
+    throw new Error(
+      "The booking submission button could not be activated.",
+    );
+  }
+}
+
+function getBooking(page, name) {
+  return page
+    .locator("li, [class*='booking'], [class*='appointment']")
+    .filter({
+      hasText: name,
+    })
+    .first();
+}
+
+async function createBooking(page, {
+  name = "Test User",
+  email = "test@example.com",
+  date = "2030-06-15",
+  time = "12:00",
+} = {}) {
+  await fillBooking(page, {
+    name,
+    email,
+    date,
+    time,
+  });
+
+  await submitBooking(page);
+
+  const booking = getBooking(page, name);
+
+  try {
+    await booking.waitFor({
+      state: "visible",
+      timeout: 3000,
+    });
+  } catch {
+    throw new Error(
+      "The booking was not displayed after the form was submitted.",
+    );
+  }
+
+  return booking;
 }
 
 export const bookingFunctionalTests = [
@@ -68,39 +130,86 @@ export const bookingFunctionalTests = [
       "Allow the user to create a booking and display it.",
 
     async run(page) {
-      await fillBooking(page);
-      await submitBooking(page);
-
-      await page
-        .getByText("Test User", { exact: false })
-        .first()
-        .waitFor({
-          state: "visible",
-          timeout: 3000,
-        });
+      await createBooking(page);
     },
   },
 
-  {
-    id: "booking-required-fields",
-    requirement:
-      "Prevent a booking from being created when required fields are empty.",
+{
+  id: "booking-required-fields",
+  requirement:
+    "Prevent a booking from being created when required fields are empty.",
 
-    async run(page) {
-      await submitBooking(page);
-      await page.waitForTimeout(200);
+  async run(page) {
+    const form = page.locator("form").first();
 
-      const booking = page.getByText("Test User", {
-        exact: false,
-      });
+    if ((await form.count()) === 0) {
+      throw new Error(
+        "No booking form was found.",
+      );
+    }
 
-      if ((await booking.count()) > 0) {
-        throw new Error(
-          "Booking was created with empty required fields.",
-        );
-      }
-    },
+    const requiredFields = form.locator(
+      "input[required], select[required], textarea[required]",
+    );
+
+
+    const hasNativeRequiredFields =
+      (await requiredFields.count()) > 0;
+
+    let browserRejectsForm = false;
+
+    if (hasNativeRequiredFields) {
+      browserRejectsForm = await form.evaluate(
+        (element) => !element.checkValidity(),
+      );
+    }
+
+
+    const testName =
+      "Empty Fields Test User";
+
+    const nameInput = page
+      .getByLabel(/name/i)
+      .or(page.locator('input[name*="name" i]'))
+      .first();
+
+    if ((await nameInput.count()) > 0) {
+      await nameInput.fill(testName);
+    }
+
+
+    if (hasNativeRequiredFields) {
+      browserRejectsForm = await form.evaluate(
+        (element) => !element.checkValidity(),
+      );
+    }
+
+    await submitBooking(page);
+    await page.waitForTimeout(200);
+
+
+    const createdBooking = getBooking(
+      page,
+      testName,
+    );
+
+    if (
+      (await createdBooking.count()) > 0 &&
+      (await createdBooking.isVisible())
+    ) {
+      throw new Error(
+        "A booking was created even though required fields were empty.",
+      );
+    }
+
+  
+    if (browserRejectsForm) {
+      return;
+    }
+
+    return;
   },
+},
 
   {
     id: "booking-email-validation",
@@ -109,27 +218,44 @@ export const bookingFunctionalTests = [
 
     async run(page) {
       await fillBooking(page, {
+        name: "Invalid Email User",
         email: "invalid-email",
       });
+
+      const emailInput = page
+        .getByLabel(/email/i)
+        .or(page.locator('input[type="email"]'))
+        .first();
+
+      const browserRejectsEmail =
+        await emailInput.evaluate(
+          (element) => !element.validity.valid,
+        );
 
       await submitBooking(page);
       await page.waitForTimeout(200);
 
-      const invalidEmail = await page
-        .locator('input[type="email"]')
-        .first()
-        .evaluate((element) => !element.validity.valid);
+      const invalidBooking = getBooking(
+        page,
+        "Invalid Email User",
+      );
+
+      if ((await invalidBooking.count()) > 0) {
+        throw new Error(
+          "A booking was created using an invalid email address.",
+        );
+      }
 
       const validationMessage = page.getByText(
         /invalid|valid email|email address/i,
       );
 
       if (
-        !invalidEmail &&
+        !browserRejectsEmail &&
         (await validationMessage.count()) === 0
       ) {
         throw new Error(
-          "Invalid email address was not rejected.",
+          "The invalid email address was not rejected or identified as invalid.",
         );
       }
     },
@@ -141,6 +267,15 @@ export const bookingFunctionalTests = [
       "Prevent bookings from being created for dates in the past.",
 
     async run(page) {
+      // Prove normal booking creation works first.
+      await createBooking(page, {
+        name: "Valid Date User",
+      });
+
+      await page.goto(page.url(), {
+        waitUntil: "load",
+      });
+
       await fillBooking(page, {
         name: "Past Date User",
         date: "2020-01-01",
@@ -149,14 +284,14 @@ export const bookingFunctionalTests = [
       await submitBooking(page);
       await page.waitForTimeout(200);
 
-      const booking = page.getByText(
+      const booking = getBooking(
+        page,
         "Past Date User",
-        { exact: false },
       );
 
       if ((await booking.count()) > 0) {
         throw new Error(
-          "Booking was created for a past date.",
+          "A booking was created for a date in the past.",
         );
       }
     },
@@ -168,76 +303,174 @@ export const bookingFunctionalTests = [
       "Display a confirmation after a booking is successfully created.",
 
     async run(page) {
-      await fillBooking(page);
+      await fillBooking(page, {
+        name: "Confirmation Test User",
+      });
+
       await submitBooking(page);
 
-      const confirmation = page.getByText(
-        /confirmed|confirmation|success|booked successfully|booking created/i,
+      const booking = getBooking(
+        page,
+        "Confirmation Test User",
       );
 
       try {
         await booking.waitFor({
-            state: "visible",
-            timeout: 3000,
+          state: "visible",
+          timeout: 3000,
         });
-        } catch {
+      } catch {
         throw new Error(
-            "The created booking was not displayed on the page.",
-        );
-        }
-    },
-  },
-
-  {
-    id: "booking-cancel",
-    requirement:
-      "Allow each booking to be cancelled.",
-
-    async run(page) {
-      await fillBooking(page, {
-        name: "Cancel Test User",
-      });
-
-      await submitBooking(page);
-
-      const booking = page
-        .locator("li, [class*='booking']")
-        .filter({
-          hasText: "Cancel Test User",
-        })
-        .first();
-
-      try {
-            await booking.waitFor({
-                state: "visible",
-                timeout: 3000,
-            });
-            } catch {
-            throw new Error(
-                "The created booking could not be cancelled.",
-            );
-            }
-
-      const cancelButton = booking
-        .getByRole("button", {
-          name: /cancel|delete|remove/i,
-        })
-        .first();
-
-      if ((await cancelButton.count()) === 0) {
-        throw new Error(
-          "No cancellation control found for booking.",
+          "The booking was not successfully created, so confirmation could not be verified.",
         );
       }
 
-      await cancelButton.click();
+      const confirmation = page
+        .getByText(
+          /confirmed|confirmation|success|booked successfully|booking created/i,
+        )
+        .first();
 
-      await booking.waitFor({
-        state: "detached",
-        timeout: 3000,
-      });
+      try {
+        await confirmation.waitFor({
+          state: "visible",
+          timeout: 3000,
+        });
+      } catch {
+        throw new Error(
+          "No confirmation was displayed after the booking was successfully created.",
+        );
+      }
     },
   },
+
+{
+  id: "booking-cancel",
+  requirement:
+    "Allow each booking to be cancelled.",
+
+  async run(page) {
+    const bookingName = "Cancel Test User";
+
+    await createBooking(page, {
+      name: bookingName,
+    });
+
+    const booking = getBooking(
+      page,
+      bookingName,
+    );
+
+    if (
+      (await booking.count()) === 0 ||
+      !(await booking.isVisible())
+    ) {
+      throw new Error(
+        "The created booking could not be found before cancellation.",
+      );
+    }
+
+    const cancelControl = booking
+      .getByRole("button", {
+        name: /cancel|delete|remove/i,
+      })
+      .or(
+        booking.getByRole("link", {
+          name: /cancel|delete|remove/i,
+        }),
+      )
+      .or(
+        booking.locator(
+          [
+            '[role="button"][aria-label*="cancel" i]',
+            '[role="button"][aria-label*="delete" i]',
+            '[role="button"][aria-label*="remove" i]',
+            '[title*="cancel" i]',
+            '[title*="delete" i]',
+            '[title*="remove" i]',
+            'input[type="button"][value*="cancel" i]',
+            'input[type="button"][value*="delete" i]',
+            'input[type="button"][value*="remove" i]',
+          ].join(", "),
+        ),
+      )
+      .first();
+
+    if ((await cancelControl.count()) === 0) {
+      throw new Error(
+        "No cancellation control was found for the created booking.",
+      );
+    }
+
+    if (!(await cancelControl.isVisible())) {
+      throw new Error(
+        "The cancellation control was present but not visible.",
+      );
+    }
+
+    try {
+      await cancelControl.click();
+    } catch {
+      throw new Error(
+        "The booking cancellation control could not be activated.",
+      );
+    }
+
+    await page.waitForTimeout(200);
+
+    const bookingStillVisible =
+      (await booking.count()) > 0 &&
+      (await booking.isVisible());
+
+    if (!bookingStillVisible) {
+      return;
+    }
+
+    const markedCancelled =
+      await booking.evaluate(
+        (element) => {
+          const text =
+            element.textContent
+              ?.toLowerCase()
+              .trim() ?? "";
+
+          const className =
+            typeof element.className === "string"
+              ? element.className.toLowerCase()
+              : "";
+
+          const status =
+            element
+              .getAttribute("data-status")
+              ?.toLowerCase() ?? "";
+
+          const ariaLabel =
+            element
+              .getAttribute("aria-label")
+              ?.toLowerCase() ?? "";
+
+          return (
+            text.includes("cancelled") ||
+            text.includes("canceled") ||
+            className.includes("cancelled") ||
+            className.includes("canceled") ||
+            status === "cancelled" ||
+            status === "canceled" ||
+            ariaLabel.includes("cancelled") ||
+            ariaLabel.includes("canceled")
+          );
+        },
+      );
+
+    if (markedCancelled) {
+      return;
+    }
+
+    throw new Error(
+      "The booking was neither removed nor marked as cancelled after cancellation was attempted.",
+    );
+  },
+},
 
   {
     id: "booking-session-memory",
@@ -247,39 +480,35 @@ export const bookingFunctionalTests = [
     async run(page) {
       const name = "Session Test User";
 
-      await fillBooking(page, { name });
-      await submitBooking(page);
-
-      await page
-        .getByText(name, { exact: false })
-        .first()
-        .waitFor({
-          state: "visible",
-          timeout: 3000,
-        });
+      await createBooking(page, { name });
 
       const browser = page.context().browser();
 
       if (!browser) {
-        throw new Error("Unable to access browser.");
+        throw new Error(
+          "Unable to open a fresh browser session for the storage test.",
+        );
       }
 
-      const freshContext = await browser.newContext();
+      const freshContext =
+        await browser.newContext();
 
       try {
-        const freshPage = await freshContext.newPage();
+        const freshPage =
+          await freshContext.newPage();
 
         await freshPage.goto(page.url(), {
           waitUntil: "load",
         });
 
-        const persisted = freshPage.getByText(name, {
-          exact: false,
-        });
+        const persisted =
+          freshPage.getByText(name, {
+            exact: false,
+          });
 
         if ((await persisted.count()) > 0) {
           throw new Error(
-            "Booking persisted into a fresh browser context.",
+            "The booking persisted into a fresh browser session instead of remaining session-only.",
           );
         }
       } finally {

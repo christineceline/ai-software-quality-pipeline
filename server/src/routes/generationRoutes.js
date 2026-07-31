@@ -1,6 +1,6 @@
 import express from "express";
 import { buildPrompt } from "../prompts/buildPrompt.js";
-import { generateWithOllama } from "../services/ollamaService.js";
+import { generateApplication } from "../services/generationService.js";
 import {
   saveGeneratedRun,
   saveRefinementRun,
@@ -67,13 +67,13 @@ router.post("/", async (request, response) => {
       specification,
     });
 
-    const ollamaResult = await generateWithOllama({
+    const generationResult = await generateApplication({
       prompt,
       temperature,
     });
 
     const application = parseGeneratedApplication(
-      ollamaResult.rawResponse,
+      generationResult.rawResponse,
     );
 
     const qualityReport = await analyseApplication(application);
@@ -83,11 +83,11 @@ if (workflow === "automated-refinement") {
     application,
     specification,
     workflow,
-    model: ollamaResult.model,
+    model: generationResult.model,
     temperature: Number(temperature),
     prompt,
-    rawResponse: ollamaResult.rawResponse,
-    generationMetrics: ollamaResult.generationMetrics,
+    rawResponse: generationResult.rawResponse,
+    generationMetrics: generationResult.generationMetrics,
     qualityReport,
     maxRefinementIterations:
       MAX_REFINEMENT_ITERATIONS,
@@ -161,6 +161,8 @@ if (workflow === "automated-refinement") {
       accessibilityReport:
         initialRuntimeReport.accessibility,
       functionalReport: initialFunctionalReport,
+      generationMetrics:
+        generationResult.generationMetrics,
     },
 
     refinement: refinementResult,
@@ -171,11 +173,11 @@ const runMetadata = await saveGeneratedRun({
   application,
   specification,
   workflow,
-  model: ollamaResult.model,
+  model: generationResult.model,
   temperature: Number(temperature),
   prompt,
-  rawResponse: ollamaResult.rawResponse,
-  generationMetrics: ollamaResult.generationMetrics,
+  rawResponse: generationResult.rawResponse,
+  generationMetrics: generationResult.generationMetrics,
   qualityReport,
 });
 
