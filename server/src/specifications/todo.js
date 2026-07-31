@@ -21,6 +21,63 @@ const todoSpecification = {
     "Do not send task data to an external service.",
   ],
 
+  testabilityContract: {
+    description:
+      "The following data-testid attributes are required only to support consistent automated experimental evaluation. They must not affect application behaviour or visual presentation.",
+
+    hooks: [
+      {
+        testId: "task-input",
+        requirement:
+          "Apply to the control used to enter a new task.",
+      },
+      {
+        testId: "task-add",
+        requirement:
+          "Apply to the control used to add the entered task.",
+      },
+      {
+        testId: "task-list",
+        requirement:
+          "Apply to the container that displays the current tasks.",
+      },
+      {
+        testId: "task",
+        requirement:
+          "Apply to each individual task container. This test ID may appear multiple times.",
+      },
+      {
+        testId: "task-text",
+        requirement:
+          "Apply to the element displaying the text of each task.",
+      },
+      {
+        testId: "task-complete",
+        requirement:
+          "Apply to the control used to toggle the completed state of each task.",
+      },
+      {
+        testId: "task-delete",
+        requirement:
+          "Apply to the control used to delete each task.",
+      },
+      {
+        testId: "incomplete-count",
+        requirement:
+          "Apply to the element displaying the current number of incomplete tasks.",
+      },
+    ],
+
+    stateAttributes: [
+      {
+        attribute: "data-completed",
+        appliesTo: "task",
+        requirement:
+          'Each element with data-testid="task" must expose data-completed="true" when completed and data-completed="false" when incomplete.',
+      },
+    ],
+  },
+
   qualityRequirements: [
     "Apply CSS to provide a clear, consistent and usable visual presentation.",
   ],

@@ -31,10 +31,60 @@ All newline characters and quotation marks inside JSON strings must be
 properly escaped so that the response can be parsed using JSON.parse().
 `.trim();
 
-function formatSpecification(specification) {
-  const requirements = specification.functionalRequirements
-    .map((requirement, index) => `${index + 1}. ${requirement}`)
+function formatTestabilityContract(specification) {
+  const contract = specification.testabilityContract;
+
+  if (!contract) {
+    return "";
+  }
+
+  const hooks = contract.hooks
+    .map(
+      ({ testId, requirement }) =>
+        `- data-testid="${testId}": ${requirement}`,
+    )
     .join("\n");
+
+  const stateAttributes =
+    contract.stateAttributes
+      ?.map(
+        ({ attribute, appliesTo, requirement }) =>
+          `- ${attribute} on data-testid="${appliesTo}": ${requirement}`,
+      )
+      .join("\n") ?? "";
+
+  return `
+Automated evaluation contract:
+${contract.description}
+
+Required test hooks:
+${hooks}
+
+${
+  stateAttributes
+    ? `Required state attributes:\n${stateAttributes}`
+    : ""
+}
+
+These hooks and state attributes are required for automated evaluation.
+Do not remove or rename them.
+They must not affect the application's visible presentation or behaviour.
+`.trim();
+}
+
+function formatSpecification(specification) {
+  const requirements =
+    specification.functionalRequirements
+      .map(
+        (requirement, index) =>
+          `${index + 1}. ${requirement}`,
+      )
+      .join("\n");
+
+  const testabilityContract =
+    formatTestabilityContract(
+      specification,
+    );
 
   return `
 Application name: ${specification.name}
@@ -44,6 +94,8 @@ ${specification.description}
 
 Functional requirements:
 ${requirements}
+
+${testabilityContract}
 `.trim();
 }
 

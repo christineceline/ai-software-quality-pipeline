@@ -79,6 +79,8 @@ IMPORTANT:
 - Reference styles.css from the HTML.
 - Reference script.js using defer.
 - Do not include CSS or JavaScript inline.
+- Preserve every test hook and state attribute defined in the original specification's testabilityContract.
+- Do not remove, rename or repurpose required data-testid attributes during refinement.
 
 Return valid JSON only.
 Do not use Markdown code fences.
