@@ -1,11 +1,6 @@
 function AccessibilityReport({ report }) {
   if (!report) {
-    return (
-      <section className="quality-section">
-        <h3>Accessibility analysis</h3>
-        <p>No accessibility report is available.</p>
-      </section>
-    );
+    return null;
   }
 
   if (!report.successful) {

@@ -72,11 +72,7 @@ function ResultCard({
 
 function QualityReport({ report }) {
   if (!report) {
-    return (
-      <div className="empty-state">
-        Generate an application to display its quality report.
-      </div>
-    );
+    return null;
   }
 
   return (

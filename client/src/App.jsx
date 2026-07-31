@@ -421,18 +421,32 @@ function App() {
             <CodeViewer application={application} />
           )}
 
-          {activeResultView === "quality" && ( 
-            <>
-            <QualityReport report={qualityReport} />
-            <RuntimeReport report={runtimeReport}  generationMetrics={generationMetrics} />
-            <AccessibilityReport
-              report={accessibilityReport}
-            />
-            <FunctionalReport
-              report={functionalReport}
-            />
-            </>
-          )}
+          {activeResultView === "quality" && (
+  <>
+            {!application ? (
+              <div className="empty-state">
+                Generate an application to display its quality report.
+              </div>
+            ) : (
+              <>
+                <QualityReport report={qualityReport} />
+
+                <RuntimeReport
+                  report={runtimeReport}
+                  generationMetrics={generationMetrics}
+                />
+
+                <AccessibilityReport
+                  report={accessibilityReport}
+                />
+
+                <FunctionalReport
+                  report={functionalReport}
+                />
+              </>
+            )}
+          </>
+        )}
         </section>
       </main>
     </div>
