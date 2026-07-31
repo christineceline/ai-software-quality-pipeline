@@ -59,7 +59,7 @@ router.post("/", async (request, response) => {
 
     const initialPromptWorkflow =
       workflow === "automated-refinement"
-        ? "quality-focused"
+        ? "one-shot"
         : workflow;
 
     const prompt = buildPrompt({
