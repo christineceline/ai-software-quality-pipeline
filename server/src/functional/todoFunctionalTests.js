@@ -9,7 +9,7 @@ async function getTaskInput(page) {
     .first();
 }
 
-async function getAddButton(page) {
+async function getAddControl(page) {
   return page
     .getByRole("button", {
       name: /add|create|submit|new task/i,
@@ -30,24 +30,45 @@ function getTaskText(page, taskText) {
     .first();
 }
 
-function getTaskContainer(page, taskText) {
+async function getTaskContainer(
+  page,
+  taskText,
+) {
   const text = getTaskText(
     page,
     taskText,
   );
 
-  return text
+  if ((await text.count()) === 0) {
+    return null;
+  }
+
+  /*
+   * Prefer common structural containers without
+   * depending on arbitrary AI-generated class names.
+   */
+  const structuralContainer = text
     .locator(
-      "xpath=ancestor-or-self::*[" +
+      "xpath=ancestor::*[" +
         "self::li or " +
         "@role='listitem' or " +
         "self::article or " +
-        "self::tr or " +
-        "contains(translate(@class,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'task') or " +
-        "contains(translate(@class,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'todo')" +
+        "self::tr" +
       "][1]",
-    )
-    .or(text.locator("xpath=parent::*"))
+    );
+
+  if (
+    (await structuralContainer.count()) > 0
+  ) {
+    return structuralContainer;
+  }
+
+  /*
+   * If semantic structure was not used, fall back to
+   * the nearest parent containing the task text.
+   */
+  return text
+    .locator("xpath=parent::*")
     .first();
 }
 
@@ -55,26 +76,50 @@ async function addTask(page, taskText) {
   const input =
     await getTaskInput(page);
 
-  const addButton =
-    await getAddButton(page);
+  const addControl =
+    await getAddControl(page);
 
-  if (
-    (await input.count()) === 0 ||
-    (await addButton.count()) === 0
-  ) {
+  if ((await input.count()) === 0) {
     throw new Error(
-      "The task input or submission control was not found.",
+      "No task input was found.",
     );
   }
 
-  await input.fill(taskText);
-  await addButton.click();
+  if ((await addControl.count()) === 0) {
+    throw new Error(
+      "No task submission control was found.",
+    );
+  }
 
-  const taskTextLocator =
-    getTaskText(page, taskText);
+  if (!(await input.isVisible())) {
+    throw new Error(
+      "The task input was not visible.",
+    );
+  }
+
+  if (!(await addControl.isVisible())) {
+    throw new Error(
+      "The task submission control was not visible.",
+    );
+  }
 
   try {
-    await taskTextLocator.waitFor({
+    await input.fill(taskText);
+    await addControl.click();
+  } catch {
+    throw new Error(
+      "The task could not be submitted.",
+    );
+  }
+
+  const task =
+    getTaskText(
+      page,
+      taskText,
+    );
+
+  try {
+    await task.waitFor({
       state: "visible",
       timeout: 3000,
     });
@@ -87,92 +132,152 @@ async function addTask(page, taskText) {
 
 async function isTaskCompleted(task) {
   return task.evaluate((element) => {
-    const elements = [
+    const candidates = [
       element,
       ...element.querySelectorAll("*"),
     ];
 
-    return elements.some((candidate) => {
-      const classes =
-        typeof candidate.className === "string"
-          ? candidate.className
-              .toLowerCase()
-              .split(/\s+/)
-          : [];
+    return candidates.some(
+      (candidate) => {
+        const classes =
+          typeof candidate.className ===
+          "string"
+            ? candidate.className
+                .toLowerCase()
+                .split(/\s+/)
+            : [];
 
-      const completedClass =
-        classes.some((className) =>
-          [
-            "completed",
-            "done",
-            "is-complete",
-            "is-completed",
-            "task-completed",
-            "todo-completed",
-          ].includes(className),
+        /*
+         * Match state classes only.
+         *
+         * Do not use substring checks such as
+         * className.includes("complete"), because
+         * "complete-button" would cause a false pass.
+         */
+        const completedClass =
+          classes.some((className) =>
+            [
+              "completed",
+              "done",
+              "is-complete",
+              "is-completed",
+              "task-completed",
+              "todo-completed",
+              "checked",
+            ].includes(className),
+          );
+
+        const ariaChecked =
+          candidate.getAttribute(
+            "aria-checked",
+          );
+
+        const ariaPressed =
+          candidate.getAttribute(
+            "aria-pressed",
+          );
+
+        const dataStatus =
+          candidate
+            .getAttribute("data-status")
+            ?.toLowerCase();
+
+        const checkedCheckbox =
+          candidate instanceof
+            HTMLInputElement &&
+          candidate.type === "checkbox" &&
+          candidate.checked;
+
+        const textDecoration =
+          window.getComputedStyle(
+            candidate,
+          ).textDecorationLine;
+
+        return (
+          checkedCheckbox ||
+          completedClass ||
+          ariaChecked === "true" ||
+          ariaPressed === "true" ||
+          dataStatus === "complete" ||
+          dataStatus === "completed" ||
+          dataStatus === "done" ||
+          textDecoration.includes(
+            "line-through",
+          )
         );
-
-      const ariaChecked =
-        candidate.getAttribute(
-          "aria-checked",
-        );
-
-      const ariaPressed =
-        candidate.getAttribute(
-          "aria-pressed",
-        );
-
-      const dataStatus =
-        candidate.getAttribute(
-          "data-status",
-        )?.toLowerCase();
-
-      const textDecoration =
-        window.getComputedStyle(candidate)
-          .textDecorationLine;
-
-      const checkedCheckbox =
-        candidate instanceof HTMLInputElement &&
-        candidate.type === "checkbox" &&
-        candidate.checked;
-
-      return (
-        checkedCheckbox ||
-        completedClass ||
-        ariaChecked === "true" ||
-        ariaPressed === "true" ||
-        dataStatus === "complete" ||
-        dataStatus === "completed" ||
-        dataStatus === "done" ||
-        textDecoration.includes(
-          "line-through",
-        )
-      );
-    });
+      },
+    );
   });
 }
 
-async function completeTask(page, taskText) {
-  const task =
-    getTaskContainer(
+async function activateHiddenCheckbox(
+  page,
+  checkbox,
+) {
+  if (await checkbox.isVisible()) {
+    await checkbox.click();
+    return true;
+  }
+
+  const checkboxId =
+    await checkbox.getAttribute("id");
+
+  if (checkboxId) {
+    const label = page
+      .locator(
+        `label[for="${checkboxId}"]`,
+      )
+      .first();
+
+    if (
+      (await label.count()) > 0 &&
+      (await label.isVisible())
+    ) {
+      await label.click();
+      return true;
+    }
+  }
+
+  const wrappingLabel = checkbox
+    .locator(
+      "xpath=ancestor::label[1]",
+    )
+    .first();
+
+  if (
+    (await wrappingLabel.count()) > 0 &&
+    (await wrappingLabel.isVisible())
+  ) {
+    await wrappingLabel.click();
+    return true;
+  }
+
+  return false;
+}
+
+async function completeTask(
+  page,
+  taskText,
+) {
+  let task =
+    await getTaskContainer(
       page,
       taskText,
     );
 
-  if ((await task.count()) === 0) {
+  if (!task) {
     throw new Error(
       "The task could not be located before completion.",
     );
   }
 
-  const wasCompleted =
-    await isTaskCompleted(task);
-
-  if (wasCompleted) {
+  if (await isTaskCompleted(task)) {
     throw new Error(
-      "The newly created task was already marked as completed.",
+      "The newly added task was already marked as completed.",
     );
   }
+
+  let attempted = false;
 
   const checkbox = task
     .locator(
@@ -180,50 +285,53 @@ async function completeTask(page, taskText) {
     )
     .first();
 
-  let attempted = false;
-
   if ((await checkbox.count()) > 0) {
-    if (await checkbox.isVisible()) {
-      await checkbox.click();
-      attempted = true;
-    } else {
-      const id =
-        await checkbox.getAttribute("id");
-
-      if (id) {
-        const label = page
-          .locator(`label[for="${id}"]`)
-          .first();
-
-        if (
-          (await label.count()) > 0 &&
-          (await label.isVisible())
-        ) {
-          await label.click();
-          attempted = true;
-        }
-      }
+    try {
+      attempted =
+        await activateHiddenCheckbox(
+          page,
+          checkbox,
+        );
+    } catch {
+      attempted = false;
     }
   }
 
   if (!attempted) {
-    const control = task
+    const completionControl = task
       .getByRole("button", {
-        name: /complete|done|finish|mark/i,
+        name:
+          /complete|done|finish|mark.*complete/i,
       })
       .or(
         task.getByRole("link", {
-          name: /complete|done|finish|mark/i,
+          name:
+            /complete|done|finish|mark.*complete/i,
         }),
+      )
+      .or(
+        task.locator(
+          [
+            '[aria-label*="complete" i]',
+            '[aria-label*="done" i]',
+            '[title*="complete" i]',
+            '[title*="done" i]',
+          ].join(", "),
+        ),
       )
       .first();
 
     if (
-      (await control.count()) > 0 &&
-      (await control.isVisible())
+      (await completionControl.count()) >
+        0 &&
+      (await completionControl.isVisible())
     ) {
-      await control.click();
-      attempted = true;
+      try {
+        await completionControl.click();
+        attempted = true;
+      } catch {
+        attempted = false;
+      }
     }
   }
 
@@ -235,9 +343,25 @@ async function completeTask(page, taskText) {
 
   await page.waitForTimeout(200);
 
+  /*
+   * Re-locate the task because many applications
+   * rebuild the task list after state changes.
+   */
+  task =
+    await getTaskContainer(
+      page,
+      taskText,
+    );
+
+  if (!task) {
+    throw new Error(
+      "The task disappeared when it was marked as completed.",
+    );
+  }
+
   if (!(await isTaskCompleted(task))) {
     throw new Error(
-      "The completion control was activated, but the task did not change to a completed state.",
+      "The completion control was activated, but the task did not visibly change to a completed state.",
     );
   }
 }
@@ -255,15 +379,67 @@ function getDeleteControl(task) {
     .or(
       task.locator(
         [
-          '[title*="delete" i]',
-          '[title*="remove" i]',
           '[aria-label*="delete" i]',
           '[aria-label*="remove" i]',
-          "button",
+          '[aria-label*="trash" i]',
+          '[title*="delete" i]',
+          '[title*="remove" i]',
+          '[title*="trash" i]',
+          'input[type="button"][value*="delete" i]',
+          'input[type="button"][value*="remove" i]',
         ].join(", "),
-      ).filter({
-        hasText: /^(×|x|✕)$/i,
+      ),
+    )
+    .first();
+}
+
+async function acceptHtmlConfirmation(
+  page,
+) {
+  const dialog = page
+    .getByRole("dialog")
+    .filter({
+      hasText:
+        /delete|remove|are you sure|confirm/i,
+    })
+    .first();
+
+  if (
+    (await dialog.count()) === 0 ||
+    !(await dialog.isVisible())
+  ) {
+    return;
+  }
+
+  const confirmControl = dialog
+    .getByRole("button", {
+      name:
+        /confirm|yes|delete|remove/i,
+    })
+    .or(
+      dialog.getByRole("link", {
+        name:
+          /confirm|yes|delete|remove/i,
       }),
+    )
+    .first();
+
+  if (
+    (await confirmControl.count()) > 0 &&
+    (await confirmControl.isVisible())
+  ) {
+    await confirmControl.click();
+  }
+}
+
+function findIncompleteCount(page, value) {
+  return page
+    .getByText(
+      new RegExp(
+        `(?:${value}\\s*(?:tasks?)?\\s*(?:remaining|left|incomplete|pending|to do))|` +
+        `(?:(?:remaining|left|incomplete|pending|to do)[^0-9]*${value})`,
+        "i",
+      ),
     )
     .first();
 }
@@ -271,8 +447,9 @@ function getDeleteControl(task) {
 export const todoFunctionalTests = [
   {
     id: "todo-add-task",
+
     requirement:
-      "Allow the user to add a task using a text input and submit button, and display the added task in a visible list.",
+      "Allow the user to enter and add a non-empty task, and display the added task in a visible task list.",
 
     async run(page) {
       await addTask(
@@ -284,59 +461,86 @@ export const todoFunctionalTests = [
 
   {
     id: "todo-reject-empty-task",
+
     requirement:
-      "Prevent empty tasks from being added.",
+      "Whitespace-only or empty input must not create a task.",
 
     async run(page) {
-      const validTask =
+      const validTaskText =
         "Valid task before empty test";
 
       await addTask(
         page,
-        validTask,
+        validTaskText,
       );
 
-      const input =
-        await getTaskInput(page);
+      const taskContainer =
+        await getTaskContainer(
+          page,
+          validTaskText,
+        );
 
-      const addButton =
-        await getAddButton(page);
-
-      const knownTask =
-        getTaskText(page, validTask);
-
-      await input.fill("   ");
-
-      try {
-        await addButton.click();
-      } catch {
-        // Native validation may block submission.
-      }
-
-      await page.waitForTimeout(200);
-
-      if (!(await knownTask.isVisible())) {
+      if (!taskContainer) {
         throw new Error(
-          "The existing task disappeared after the empty submission attempt.",
+          "A known valid task could not be located before testing empty input.",
         );
       }
 
       /*
-       * There is no reliable implementation-neutral
-       * representation of an empty task to locate.
-       * Native validation or simply creating no new
-       * visible content both satisfy this requirement.
-       *
-       * The valid-task check above ensures the app
-       * itself was functional before the attempt.
+       * Derive the task-list container from a task
+       * known to have been successfully created.
+       * This avoids assuming <ul>, <li>, or specific
+       * class names.
        */
+      const listContainer =
+        taskContainer.locator(
+          "xpath=parent::*",
+        );
+
+      const childrenBefore =
+        await listContainer
+          .locator(":scope > *")
+          .count();
+
+      const input =
+        await getTaskInput(page);
+
+      const addControl =
+        await getAddControl(page);
+
+      await input.fill("   ");
+
+      try {
+        await addControl.click();
+      } catch {
+        /*
+         * Native browser constraint validation may
+         * legitimately prevent the click/submission.
+         */
+      }
+
+      await page.waitForTimeout(200);
+
+      const childrenAfter =
+        await listContainer
+          .locator(":scope > *")
+          .count();
+
+      if (
+        childrenAfter > childrenBefore
+      ) {
+        throw new Error(
+          "Whitespace-only input created an additional visible task.",
+        );
+      }
     },
   },
 
   {
     id: "todo-complete-task",
+
     requirement:
-      "Allow each task to be marked as completed.",
+      "Allow each task to be marked as completed, with its completed state visibly reflected in the interface.",
 
     async run(page) {
       const taskText =
@@ -356,8 +560,9 @@ export const todoFunctionalTests = [
 
   {
     id: "todo-delete-task",
+
     requirement:
-      "Allow each task to be deleted.",
+      "Allow each task to be deleted. After deletion, the deleted task must no longer be displayed in the task list.",
 
     async run(page) {
       const taskText =
@@ -369,16 +574,23 @@ export const todoFunctionalTests = [
       );
 
       const task =
-        getTaskContainer(
+        await getTaskContainer(
           page,
           taskText,
         );
+
+      if (!task) {
+        throw new Error(
+          "The added task could not be located before deletion.",
+        );
+      }
 
       const deleteControl =
         getDeleteControl(task);
 
       if (
-        (await deleteControl.count()) === 0 ||
+        (await deleteControl.count()) ===
+          0 ||
         !(await deleteControl.isVisible())
       ) {
         throw new Error(
@@ -386,22 +598,65 @@ export const todoFunctionalTests = [
         );
       }
 
-      await deleteControl.click();
+      /*
+       * Automatically accept native confirm()
+       * dialogs if the application uses one.
+       */
+      const dialogHandler = async (
+        dialog,
+      ) => {
+        try {
+          await dialog.accept();
+        } catch {
+          // Dialog was already handled.
+        }
+      };
 
-      const taskTextLocator =
+      page.on(
+        "dialog",
+        dialogHandler,
+      );
+
+      try {
+        await deleteControl.click();
+
+        await page.waitForTimeout(100);
+
+        /*
+         * Also support an application-rendered
+         * confirmation dialog.
+         */
+        if (
+          (await getTaskText(
+            page,
+            taskText,
+          ).count()) > 0
+        ) {
+          await acceptHtmlConfirmation(
+            page,
+          );
+        }
+      } finally {
+        page.off(
+          "dialog",
+          dialogHandler,
+        );
+      }
+
+      const deletedTask =
         getTaskText(
           page,
           taskText,
         );
 
       try {
-        await taskTextLocator.waitFor({
+        await deletedTask.waitFor({
           state: "hidden",
           timeout: 3000,
         });
       } catch {
         throw new Error(
-          "The task remained visible after the delete control was activated.",
+          "The deleted task remained visible in the task list.",
         );
       }
     },
@@ -409,8 +664,9 @@ export const todoFunctionalTests = [
 
   {
     id: "todo-incomplete-count",
+
     requirement:
-      "Display the number of incomplete tasks.",
+      "Display the current number of incomplete tasks and update the count when tasks are added, completed or deleted.",
 
     async run(page) {
       await addTask(
@@ -423,11 +679,11 @@ export const todoFunctionalTests = [
         "Incomplete task two",
       );
 
-      const countTwo = page
-        .getByText(
-          /(?:2\s*(?:tasks?)?\s*(?:remaining|left|incomplete|pending|to do))|(?:(?:remaining|left|incomplete|pending|to do)[^0-9]*2)/i,
-        )
-        .first();
+      const countTwo =
+        findIncompleteCount(
+          page,
+          2,
+        );
 
       try {
         await countTwo.waitFor({
@@ -436,7 +692,7 @@ export const todoFunctionalTests = [
         });
       } catch {
         throw new Error(
-          "The incomplete-task count did not show 2 after two tasks were added.",
+          "The incomplete-task count did not show 2 after two incomplete tasks were added.",
         );
       }
 
@@ -445,11 +701,11 @@ export const todoFunctionalTests = [
         "Incomplete task one",
       );
 
-      const countOne = page
-        .getByText(
-          /(?:1\s*(?:tasks?)?\s*(?:remaining|left|incomplete|pending|to do))|(?:(?:remaining|left|incomplete|pending|to do)[^0-9]*1)/i,
-        )
-        .first();
+      const countOne =
+        findIncompleteCount(
+          page,
+          1,
+        );
 
       try {
         await countOne.waitFor({
@@ -458,7 +714,80 @@ export const todoFunctionalTests = [
         });
       } catch {
         throw new Error(
-          "The incomplete-task count did not update to 1 after a task was completed.",
+          "The incomplete-task count did not update to 1 after one task was completed.",
+        );
+      }
+
+      const secondTask =
+        await getTaskContainer(
+          page,
+          "Incomplete task two",
+        );
+
+      if (!secondTask) {
+        throw new Error(
+          "The second task could not be found before testing the count after deletion.",
+        );
+      }
+
+      const deleteControl =
+        getDeleteControl(
+          secondTask,
+        );
+
+      if (
+        (await deleteControl.count()) ===
+          0 ||
+        !(await deleteControl.isVisible())
+      ) {
+        throw new Error(
+          "The second task had no usable delete control.",
+        );
+      }
+
+      const dialogHandler = async (
+        dialog,
+      ) => {
+        try {
+          await dialog.accept();
+        } catch {
+          // Already handled.
+        }
+      };
+
+      page.on(
+        "dialog",
+        dialogHandler,
+      );
+
+      try {
+        await deleteControl.click();
+        await page.waitForTimeout(100);
+
+        await acceptHtmlConfirmation(
+          page,
+        );
+      } finally {
+        page.off(
+          "dialog",
+          dialogHandler,
+        );
+      }
+
+      const countZero =
+        findIncompleteCount(
+          page,
+          0,
+        );
+
+      try {
+        await countZero.waitFor({
+          state: "visible",
+          timeout: 3000,
+        });
+      } catch {
+        throw new Error(
+          "The incomplete-task count did not update to 0 after the remaining incomplete task was deleted.",
         );
       }
     },
@@ -466,8 +795,9 @@ export const todoFunctionalTests = [
 
   {
     id: "todo-session-memory",
+
     requirement:
-      "Store data only in browser memory for the current page session.",
+      "Keep task data in page memory only. Refreshing or reopening the page must reset the task list.",
 
     async run(page) {
       const taskText =
@@ -493,7 +823,7 @@ export const todoFunctionalTests = [
         (await persisted.isVisible())
       ) {
         throw new Error(
-          "The task persisted after the page was reloaded instead of remaining in page-session memory.",
+          "The task persisted after the page was refreshed instead of being kept only in page memory.",
         );
       }
     },

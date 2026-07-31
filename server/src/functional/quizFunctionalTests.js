@@ -29,28 +29,42 @@ async function getVisibleOptionControl(
   page,
   option,
 ) {
+  /*
+   * Directly visible radio input.
+   */
   if (await option.isVisible()) {
     return option;
   }
 
+  /*
+   * Visually hidden radio controlled by
+   * label[for="..."].
+   */
   const optionId =
     await option.getAttribute("id");
 
   if (optionId) {
-    const label = page
-      .locator(`label[for="${optionId}"]`)
+    const associatedLabel = page
+      .locator(
+        `label[for="${optionId}"]`,
+      )
       .first();
 
     if (
-      (await label.count()) > 0 &&
-      (await label.isVisible())
+      (await associatedLabel.count()) > 0 &&
+      (await associatedLabel.isVisible())
     ) {
-      return label;
+      return associatedLabel;
     }
   }
 
+  /*
+   * Radio nested inside a visible label.
+   */
   const wrappingLabel = option
-    .locator("xpath=ancestor::label[1]")
+    .locator(
+      "xpath=ancestor::label[1]",
+    )
     .first();
 
   if (
@@ -63,14 +77,17 @@ async function getVisibleOptionControl(
   return null;
 }
 
-async function selectAnswer(page, name) {
+async function selectAnswer(
+  page,
+  name,
+) {
   const options = page.locator(
     `input[type="radio"][name="${name}"]`,
   );
 
-  if ((await options.count()) === 0) {
+  if ((await options.count()) < 2) {
     throw new Error(
-      `No selectable answers were found for question "${name}".`,
+      `Question "${name}" does not contain at least two selectable answer options.`,
     );
   }
 
@@ -105,6 +122,21 @@ async function selectAnswer(page, name) {
       `Selecting an answer for question "${name}" did not update its selected state.`,
     );
   }
+
+  /*
+   * Verify that selecting one answer does not
+   * result in multiple answers being selected
+   * within the same question.
+   */
+  const checkedOptions = page.locator(
+    `input[type="radio"][name="${name}"]:checked`,
+  );
+
+  if ((await checkedOptions.count()) !== 1) {
+    throw new Error(
+      `Question "${name}" did not maintain exactly one selected answer.`,
+    );
+  }
 }
 
 async function answerAllQuestions(page) {
@@ -112,14 +144,18 @@ async function answerAllQuestions(page) {
     await getThreeQuestions(page);
 
   for (const name of questionNames) {
-    await selectAnswer(page, name);
+    await selectAnswer(
+      page,
+      name,
+    );
   }
 }
 
-function getSubmitButton(page) {
+function getSubmitControl(page) {
   return page
     .getByRole("button", {
-      name: /submit|finish|complete|check answers|check|score/i,
+      name:
+        /submit|finish|complete|check answers|check|score|show result/i,
     })
     .or(
       page.locator(
@@ -137,29 +173,54 @@ function extractScore(text) {
   const patterns = [
     /(\d+)\s*\/\s*3/i,
     /(\d+)\s*out of\s*3/i,
-    /(?:score|scored|result|correct)[^\d]*(\d+)/i,
+
+    /(?:score|scored|result)[^\d]*(\d+)/i,
+
     /(\d+)[^\d]*(?:correct)/i,
+
+    /(?:correct)[^\d]*(\d+)/i,
   ];
 
   for (const pattern of patterns) {
-    const match = text.match(pattern);
+    const match =
+      text.match(pattern);
 
-    if (match) {
-      return Number(match[1]);
+    if (!match) {
+      continue;
+    }
+
+    const score =
+      Number(match[1]);
+
+    if (
+      Number.isInteger(score) &&
+      score >= 0 &&
+      score <= 3
+    ) {
+      return score;
     }
   }
 
   return null;
 }
 
-async function findScore(page) {
-  const candidates = page.getByText(
-    /score|scored|result|correct|\d+\s*\/\s*3|\d+\s*out of\s*3/i,
+async function findDisplayedScore(page) {
+  /*
+   * Search visible page content rather than requiring
+   * a particular result element/class/id.
+   */
+  const candidates = page.locator(
+    "body *",
   );
 
-  const count = await candidates.count();
+  const count =
+    await candidates.count();
 
-  for (let index = 0; index < count; index++) {
+  for (
+    let index = 0;
+    index < count;
+    index++
+  ) {
     const candidate =
       candidates.nth(index);
 
@@ -167,19 +228,30 @@ async function findScore(page) {
       continue;
     }
 
-    const text =
-      await candidate.textContent();
-
-    const score = extractScore(text);
-
+    /*
+     * Only inspect leaf-ish elements to avoid
+     * repeatedly matching the whole page/container.
+     */
     if (
-      score !== null &&
-      score >= 0 &&
-      score <= 3
+      (await candidate.locator(
+        ":scope > *",
+      ).count()) > 0
     ) {
+      continue;
+    }
+
+    const text =
+      (await candidate.textContent())
+        ?.trim();
+
+    const score =
+      extractScore(text);
+
+    if (score !== null) {
       return {
         locator: candidate,
         score,
+        text,
       };
     }
   }
@@ -190,21 +262,27 @@ async function findScore(page) {
 export const quizFunctionalTests = [
   {
     id: "quiz-question-count",
+
     requirement:
-      "Include three multiple-choice questions.",
+      "Include exactly three multiple-choice questions, with at least two answer options for each question.",
 
     async run(page) {
       const questionNames =
         await getThreeQuestions(page);
 
-      for (const name of questionNames) {
+      for (
+        const name of questionNames
+      ) {
         const options = page.locator(
           `input[type="radio"][name="${name}"]`,
         );
 
-        if ((await options.count()) < 2) {
+        const optionCount =
+          await options.count();
+
+        if (optionCount < 2) {
           throw new Error(
-            `Question "${name}" does not contain at least two answer options.`,
+            `Question "${name}" contains ${optionCount} answer option(s); at least 2 are required.`,
           );
         }
       }
@@ -213,19 +291,22 @@ export const quizFunctionalTests = [
 
   {
     id: "quiz-single-page",
+
     requirement:
-      "Display all questions on a single page.",
+      "Display all three questions and their answer options on a single page without requiring navigation between questions.",
 
     async run(page) {
       const questionNames =
         await getThreeQuestions(page);
 
-      for (const name of questionNames) {
+      for (
+        const name of questionNames
+      ) {
         const options = page.locator(
           `input[type="radio"][name="${name}"]`,
         );
 
-        let hasVisibleOption = false;
+        let visibleOptionCount = 0;
 
         for (
           let index = 0;
@@ -239,14 +320,13 @@ export const quizFunctionalTests = [
             );
 
           if (control) {
-            hasVisibleOption = true;
-            break;
+            visibleOptionCount += 1;
           }
         }
 
-        if (!hasVisibleOption) {
+        if (visibleOptionCount < 2) {
           throw new Error(
-            `Question "${name}" did not have a visible answer option on the page.`,
+            `Question "${name}" did not display at least two visible answer options on the page.`,
           );
         }
       }
@@ -255,31 +335,52 @@ export const quizFunctionalTests = [
 
   {
     id: "quiz-select-answers",
+
     requirement:
-      "Allow the user to select one answer for each question.",
+      "Allow the user to select exactly one answer for each question.",
 
     async run(page) {
       const questionNames =
         await getThreeQuestions(page);
 
-      for (const name of questionNames) {
-        await selectAnswer(page, name);
+      for (
+        const name of questionNames
+      ) {
+        await selectAnswer(
+          page,
+          name,
+        );
+      }
+
+      const totalChecked =
+        await page
+          .locator(
+            'input[type="radio"]:checked',
+          )
+          .count();
+
+      if (totalChecked !== 3) {
+        throw new Error(
+          `Expected one selected answer for each of 3 questions, but ${totalChecked} selected answers were found.`,
+        );
       }
     },
   },
 
   {
     id: "quiz-submit",
+
     requirement:
-      "Provide a button to submit the answers.",
+      "Provide a visible control for submitting the completed quiz.",
 
     async run(page) {
-      const submitButton =
-        getSubmitButton(page);
+      const submitControl =
+        getSubmitControl(page);
 
       if (
-        (await submitButton.count()) === 0 ||
-        !(await submitButton.isVisible())
+        (await submitControl.count()) ===
+          0 ||
+        !(await submitControl.isVisible())
       ) {
         throw new Error(
           "No visible quiz submission control was found.",
@@ -290,56 +391,136 @@ export const quizFunctionalTests = [
 
   {
     id: "quiz-final-score",
+
     requirement:
-      "Display the final score on the page when the quiz is completed and submitted.",
+      "After the quiz is submitted, display a final numeric score between 0 and 3.",
 
     async run(page) {
       await answerAllQuestions(page);
 
-      const submitButton =
-        getSubmitButton(page);
+      const submitControl =
+        getSubmitControl(page);
 
       if (
-        (await submitButton.count()) === 0 ||
-        !(await submitButton.isEnabled())
+        (await submitControl.count()) ===
+        0
       ) {
+        throw new Error(
+          "No quiz submission control was found.",
+        );
+      }
+
+      if (
+        !(await submitControl.isVisible())
+      ) {
+        throw new Error(
+          "The quiz submission control was not visible.",
+        );
+      }
+
+      if (
+        !(await submitControl.isEnabled())
+      ) {
+        throw new Error(
+          "The quiz submission control remained disabled after all questions were answered.",
+        );
+      }
+
+      try {
+        await submitControl.click();
+      } catch {
         throw new Error(
           "The completed quiz could not be submitted.",
         );
       }
 
-      await submitButton.click();
+      await page.waitForTimeout(200);
+
+      const firstResult =
+        await findDisplayedScore(page);
+
+      if (!firstResult) {
+        throw new Error(
+          "A valid final score between 0 and 3 was not displayed after the completed quiz was submitted.",
+        );
+      }
+    },
+  },
+
+  {
+    id: "quiz-score-stability",
+
+    requirement:
+      "Repeated submission, if the application still permits it, must not accumulate or otherwise change the score unless the selected answers change.",
+
+    async run(page) {
+      await answerAllQuestions(page);
+
+      const submitControl =
+        getSubmitControl(page);
+
+      if (
+        (await submitControl.count()) ===
+          0 ||
+        !(await submitControl.isVisible()) ||
+        !(await submitControl.isEnabled())
+      ) {
+        throw new Error(
+          "The completed quiz could not be submitted for the score-stability test.",
+        );
+      }
+
+      await submitControl.click();
 
       await page.waitForTimeout(200);
 
       const firstResult =
-        await findScore(page);
+        await findDisplayedScore(page);
 
       if (!firstResult) {
         throw new Error(
-          "A valid final score between 0 and 3 was not displayed after submission.",
+          "No valid score was displayed after the first submission.",
         );
       }
 
-      const submitStillAvailable =
-        (await submitButton.count()) > 0 &&
-        await submitButton
+      /*
+       * Re-query because the application may replace
+       * or remove the original submission control.
+       */
+      const secondSubmitControl =
+        getSubmitControl(page);
+
+      const canSubmitAgain =
+        (await secondSubmitControl.count()) >
+          0 &&
+        await secondSubmitControl
           .isVisible()
           .catch(() => false) &&
-        await submitButton
+        await secondSubmitControl
           .isEnabled()
           .catch(() => false);
 
-      if (!submitStillAvailable) {
+      /*
+       * Removing, hiding or disabling the submission
+       * control is a valid way to prevent accidental
+       * repeated submission.
+       */
+      if (!canSubmitAgain) {
         return;
       }
 
-      await submitButton.click();
+      try {
+        await secondSubmitControl.click();
+      } catch {
+        throw new Error(
+          "The submission control remained visible and enabled but could not be activated a second time.",
+        );
+      }
 
       await page.waitForTimeout(200);
 
       const secondResult =
-        await findScore(page);
+        await findDisplayedScore(page);
 
       if (!secondResult) {
         throw new Error(
@@ -352,7 +533,7 @@ export const quizFunctionalTests = [
         firstResult.score
       ) {
         throw new Error(
-          `The score changed from ${firstResult.score}/3 to ${secondResult.score}/3 when the quiz was submitted again.`,
+          `The score changed from ${firstResult.score}/3 to ${secondResult.score}/3 even though the selected answers did not change.`,
         );
       }
     },
@@ -360,8 +541,9 @@ export const quizFunctionalTests = [
 
   {
     id: "quiz-session-memory",
+
     requirement:
-      "Store data only in browser memory for the current page session.",
+      "Keep quiz selections and results in page memory only. Refreshing or reopening the page must reset the quiz state.",
 
     async run(page) {
       const questionNames =
@@ -372,6 +554,12 @@ export const quizFunctionalTests = [
         questionNames[0],
       );
 
+      /*
+       * Reload in the same browser context so
+       * localStorage/sessionStorage persistence is
+       * detected rather than hidden by creating an
+       * entirely new context.
+       */
       await page.reload({
         waitUntil: "load",
       });
@@ -385,7 +573,20 @@ export const quizFunctionalTests = [
         (await checkedAnswers.count()) > 0
       ) {
         throw new Error(
-          "Selected answers persisted after the page was reloaded.",
+          "Selected quiz answers persisted after the page was refreshed instead of being kept only in page memory.",
+        );
+      }
+
+      /*
+       * A previous final result should not remain
+       * visible after reload either.
+       */
+      const resultAfterReload =
+        await findDisplayedScore(page);
+
+      if (resultAfterReload) {
+        throw new Error(
+          "A quiz result remained visible after the page was refreshed instead of resetting.",
         );
       }
     },
