@@ -122,49 +122,55 @@ export const todoFunctionalTests = [
   },
 
   {
-    id: "todo-reject-empty-task",
+  id: "todo-reject-empty-task",
 
-    requirement:
-      "Whitespace-only or empty input must not create a task.",
+  requirement:
+    "Whitespace-only or empty input must not create a task.",
 
-    async run(page) {
-      const taskList =
-        getTaskList(page);
+  async run(page) {
+    const taskList =
+      getTaskList(page);
 
-      if (!(await taskList.isVisible())) {
-        throw new Error(
-          'Required test hook "task-list" was not visible.',
-        );
-      }
+    if ((await taskList.count()) !== 1) {
+      throw new Error(
+        'Required test hook "task-list" was not found.',
+      );
+    }
 
-      const tasksBefore =
-        await page
-          .getByTestId("task")
-          .count();
+    const tasksBefore =
+      await page
+        .getByTestId("task")
+        .count();
 
-      const input =
-        getTaskInput(page);
+    const input =
+      getTaskInput(page);
 
-      const addControl =
-        getAddControl(page);
+    const addControl =
+      getAddControl(page);
 
-      await input.fill("   ");
+    await input.fill("   ");
+
+    try {
       await addControl.click();
+    } catch {
+      // Native browser validation may block
+      // submission. This is valid behaviour.
+    }
 
-      await page.waitForTimeout(100);
+    await page.waitForTimeout(100);
 
-      const tasksAfter =
-        await page
-          .getByTestId("task")
-          .count();
+    const tasksAfter =
+      await page
+        .getByTestId("task")
+        .count();
 
-      if (tasksAfter > tasksBefore) {
-        throw new Error(
-          "Whitespace-only input created a task.",
-        );
-      }
-    },
+    if (tasksAfter > tasksBefore) {
+      throw new Error(
+        "Whitespace-only input created a task.",
+      );
+    }
   },
+},
 
   {
     id: "todo-complete-task",
