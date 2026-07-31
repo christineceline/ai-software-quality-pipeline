@@ -23,6 +23,43 @@ const quizSpecification = {
     "Do not send quiz data to an external service.",
   ],
 
+  testabilityContract: {
+    description:
+      "The following data-testid attributes are required only to support consistent automated experimental evaluation. They must not affect application behaviour or visual presentation.",
+
+    hooks: [
+      {
+        testId: "quiz-question",
+        requirement:
+          "Apply to each individual question container. This test ID must appear exactly three times.",
+      },
+      {
+        testId: "quiz-option",
+        requirement:
+          "Apply to each selectable answer control. Each question must contain at least two.",
+      },
+      {
+        testId: "quiz-submit",
+        requirement:
+          "Apply to the control used to submit the completed quiz.",
+      },
+      {
+        testId: "quiz-score",
+        requirement:
+          "Apply to the element displaying the final numeric score after submission.",
+      },
+    ],
+
+    stateAttributes: [
+      {
+        attribute: "data-score",
+        appliesTo: "quiz-score",
+        requirement:
+          'After submission, the element with data-testid="quiz-score" must expose the numeric score using data-score="0", "1", "2" or "3".',
+      },
+    ],
+  },
+
   qualityRequirements: [
     "Apply CSS to provide a clear, consistent and usable visual presentation.",
   ],

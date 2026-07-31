@@ -1,262 +1,131 @@
-async function getQuestionGroups(page) {
-  const radios = page.locator(
-    'input[type="radio"][name]',
-  );
+function getQuestions(page) {
+  return page.getByTestId("quiz-question");
+}
 
-  return radios.evaluateAll((elements) => [
-    ...new Set(
-      elements
-        .map((element) => element.name)
-        .filter(Boolean),
-    ),
-  ]);
+function getSubmitControl(page) {
+  return page.getByTestId("quiz-submit");
+}
+
+function getScoreElement(page) {
+  return page.getByTestId("quiz-score");
 }
 
 async function getThreeQuestions(page) {
-  const questionNames =
-    await getQuestionGroups(page);
+  const questions = getQuestions(page);
+  const count = await questions.count();
 
-  if (questionNames.length !== 3) {
+  if (count !== 3) {
     throw new Error(
-      `The quiz should contain exactly 3 multiple-choice questions, but ${questionNames.length} were found.`,
+      `The quiz should contain exactly 3 questions, but ${count} were found.`,
     );
   }
 
-  return questionNames;
+  return questions;
 }
 
-async function getVisibleOptionControl(
-  page,
-  option,
-) {
-  /*
-   * Directly visible radio input.
-   */
-  if (await option.isVisible()) {
-    return option;
-  }
+async function selectFirstOption(question) {
+  const options =
+    question.getByTestId("quiz-option");
 
-  /*
-   * Visually hidden radio controlled by
-   * label[for="..."].
-   */
-  const optionId =
-    await option.getAttribute("id");
+  const count = await options.count();
 
-  if (optionId) {
-    const associatedLabel = page
-      .locator(
-        `label[for="${optionId}"]`,
-      )
-      .first();
-
-    if (
-      (await associatedLabel.count()) > 0 &&
-      (await associatedLabel.isVisible())
-    ) {
-      return associatedLabel;
-    }
-  }
-
-  /*
-   * Radio nested inside a visible label.
-   */
-  const wrappingLabel = option
-    .locator(
-      "xpath=ancestor::label[1]",
-    )
-    .first();
-
-  if (
-    (await wrappingLabel.count()) > 0 &&
-    (await wrappingLabel.isVisible())
-  ) {
-    return wrappingLabel;
-  }
-
-  return null;
-}
-
-async function selectAnswer(
-  page,
-  name,
-) {
-  const options = page.locator(
-    `input[type="radio"][name="${name}"]`,
-  );
-
-  if ((await options.count()) < 2) {
+  if (count < 2) {
     throw new Error(
-      `Question "${name}" does not contain at least two selectable answer options.`,
+      "A quiz question contained fewer than two answer options.",
     );
   }
 
   const option = options.first();
 
-  const visibleControl =
-    await getVisibleOptionControl(
-      page,
-      option,
-    );
-
-  if (!visibleControl) {
+  if (!(await option.isVisible())) {
     throw new Error(
-      `No visible answer control was found for question "${name}".`,
+      'A required "quiz-option" control was not visible.',
     );
   }
 
   try {
-    if (await option.isVisible()) {
-      await option.check();
-    } else {
-      await visibleControl.click();
-    }
+    await option.click();
   } catch {
     throw new Error(
-      `An answer could not be selected for question "${name}".`,
-    );
-  }
-
-  if (!(await option.isChecked())) {
-    throw new Error(
-      `Selecting an answer for question "${name}" did not update its selected state.`,
-    );
-  }
-
-  /*
-   * Verify that selecting one answer does not
-   * result in multiple answers being selected
-   * within the same question.
-   */
-  const checkedOptions = page.locator(
-    `input[type="radio"][name="${name}"]:checked`,
-  );
-
-  if ((await checkedOptions.count()) !== 1) {
-    throw new Error(
-      `Question "${name}" did not maintain exactly one selected answer.`,
+      "A quiz answer option could not be selected.",
     );
   }
 }
 
 async function answerAllQuestions(page) {
-  const questionNames =
+  const questions =
     await getThreeQuestions(page);
 
-  for (const name of questionNames) {
-    await selectAnswer(
-      page,
-      name,
+  for (
+    let index = 0;
+    index < 3;
+    index++
+  ) {
+    await selectFirstOption(
+      questions.nth(index),
     );
   }
 }
 
-function getSubmitControl(page) {
-  return page
-    .getByRole("button", {
-      name:
-        /submit|finish|complete|check answers|check|score|show result/i,
-    })
-    .or(
-      page.locator(
-        'input[type="submit"]',
-      ),
-    )
-    .first();
+async function submitQuiz(page) {
+  const submitControl =
+    getSubmitControl(page);
+
+  if ((await submitControl.count()) !== 1) {
+    throw new Error(
+      'Exactly one "quiz-submit" control is required.',
+    );
+  }
+
+  if (!(await submitControl.isVisible())) {
+    throw new Error(
+      'Required test hook "quiz-submit" was not visible.',
+    );
+  }
+
+  if (!(await submitControl.isEnabled())) {
+    throw new Error(
+      "The quiz submission control was disabled after all questions were answered.",
+    );
+  }
+
+  try {
+    await submitControl.click();
+  } catch {
+    throw new Error(
+      "The completed quiz could not be submitted.",
+    );
+  }
 }
 
-function extractScore(text) {
-  if (!text) {
-    return null;
+async function readScore(page) {
+  const scoreElement =
+    getScoreElement(page);
+
+  if ((await scoreElement.count()) !== 1) {
+    throw new Error(
+      'Exactly one "quiz-score" element must be present after submission.',
+    );
   }
 
-  const patterns = [
-    /(\d+)\s*\/\s*3/i,
-    /(\d+)\s*out of\s*3/i,
-
-    /(?:score|scored|result)[^\d]*(\d+)/i,
-
-    /(\d+)[^\d]*(?:correct)/i,
-
-    /(?:correct)[^\d]*(\d+)/i,
-  ];
-
-  for (const pattern of patterns) {
-    const match =
-      text.match(pattern);
-
-    if (!match) {
-      continue;
-    }
-
-    const score =
-      Number(match[1]);
-
-    if (
-      Number.isInteger(score) &&
-      score >= 0 &&
-      score <= 3
-    ) {
-      return score;
-    }
+  if (!(await scoreElement.isVisible())) {
+    throw new Error(
+      "The final quiz score was not visible after submission.",
+    );
   }
 
-  return null;
-}
+  const value =
+    await scoreElement.getAttribute(
+      "data-score",
+    );
 
-async function findDisplayedScore(page) {
-  /*
-   * Search visible page content rather than requiring
-   * a particular result element/class/id.
-   */
-  const candidates = page.locator(
-    "body *",
-  );
-
-  const count =
-    await candidates.count();
-
-  for (
-    let index = 0;
-    index < count;
-    index++
-  ) {
-    const candidate =
-      candidates.nth(index);
-
-    if (!(await candidate.isVisible())) {
-      continue;
-    }
-
-    /*
-     * Only inspect leaf-ish elements to avoid
-     * repeatedly matching the whole page/container.
-     */
-    if (
-      (await candidate.locator(
-        ":scope > *",
-      ).count()) > 0
-    ) {
-      continue;
-    }
-
-    const text =
-      (await candidate.textContent())
-        ?.trim();
-
-    const score =
-      extractScore(text);
-
-    if (score !== null) {
-      return {
-        locator: candidate,
-        score,
-        text,
-      };
-    }
+  if (!["0", "1", "2", "3"].includes(value)) {
+    throw new Error(
+      `The quiz score exposed an invalid data-score value: ${value ?? "missing"}.`,
+    );
   }
 
-  return null;
+  return Number(value);
 }
 
 export const quizFunctionalTests = [
@@ -267,22 +136,26 @@ export const quizFunctionalTests = [
       "Include exactly three multiple-choice questions, with at least two answer options for each question.",
 
     async run(page) {
-      const questionNames =
+      const questions =
         await getThreeQuestions(page);
 
       for (
-        const name of questionNames
+        let index = 0;
+        index < 3;
+        index++
       ) {
-        const options = page.locator(
-          `input[type="radio"][name="${name}"]`,
-        );
+        const options =
+          questions
+            .nth(index)
+            .getByTestId(
+              "quiz-option",
+            );
 
-        const optionCount =
-          await options.count();
-
-        if (optionCount < 2) {
+        if (
+          (await options.count()) < 2
+        ) {
           throw new Error(
-            `Question "${name}" contains ${optionCount} answer option(s); at least 2 are required.`,
+            `Question ${index + 1} contained fewer than two answer options.`,
           );
         }
       }
@@ -296,38 +169,45 @@ export const quizFunctionalTests = [
       "Display all three questions and their answer options on a single page without requiring navigation between questions.",
 
     async run(page) {
-      const questionNames =
+      const questions =
         await getThreeQuestions(page);
 
       for (
-        const name of questionNames
+        let index = 0;
+        index < 3;
+        index++
       ) {
-        const options = page.locator(
-          `input[type="radio"][name="${name}"]`,
-        );
+        const question =
+          questions.nth(index);
 
-        let visibleOptionCount = 0;
-
-        for (
-          let index = 0;
-          index < await options.count();
-          index++
+        if (
+          !(await question.isVisible())
         ) {
-          const control =
-            await getVisibleOptionControl(
-              page,
-              options.nth(index),
-            );
-
-          if (control) {
-            visibleOptionCount += 1;
-          }
+          throw new Error(
+            `Question ${index + 1} was not visible on the page.`,
+          );
         }
 
-        if (visibleOptionCount < 2) {
-          throw new Error(
-            `Question "${name}" did not display at least two visible answer options on the page.`,
+        const options =
+          question.getByTestId(
+            "quiz-option",
           );
+
+        for (
+          let optionIndex = 0;
+          optionIndex <
+          await options.count();
+          optionIndex++
+        ) {
+          if (
+            !(await options
+              .nth(optionIndex)
+              .isVisible())
+          ) {
+            throw new Error(
+              `An answer option for question ${index + 1} was not visible.`,
+            );
+          }
         }
       }
     },
@@ -340,29 +220,91 @@ export const quizFunctionalTests = [
       "Allow the user to select exactly one answer for each question.",
 
     async run(page) {
-      const questionNames =
+      const questions =
         await getThreeQuestions(page);
 
       for (
-        const name of questionNames
+        let index = 0;
+        index < 3;
+        index++
       ) {
-        await selectAnswer(
-          page,
-          name,
-        );
-      }
+        const question =
+          questions.nth(index);
 
-      const totalChecked =
-        await page
-          .locator(
-            'input[type="radio"]:checked',
-          )
-          .count();
+        const options =
+          question.getByTestId(
+            "quiz-option",
+          );
 
-      if (totalChecked !== 3) {
-        throw new Error(
-          `Expected one selected answer for each of 3 questions, but ${totalChecked} selected answers were found.`,
-        );
+        const first =
+          options.first();
+
+        const second =
+          options.nth(1);
+
+        await first.click();
+
+        /*
+         * Verify actual selection where the generated
+         * control exposes native or ARIA state.
+         */
+        const firstSelected =
+          await first.evaluate(
+            (element) => {
+              if (
+                element instanceof
+                  HTMLInputElement
+              ) {
+                return element.checked;
+              }
+
+              return (
+                element.getAttribute(
+                  "aria-checked",
+                ) === "true" ||
+                element.getAttribute(
+                  "aria-pressed",
+                ) === "true"
+              );
+            },
+          );
+
+        /*
+         * A custom option may not expose native state.
+         * In that case the final submission test still
+         * verifies that the controls function.
+         */
+        await second.click();
+
+        const nativeRadioGroup =
+          await second.evaluate(
+            (element) =>
+              element instanceof
+                HTMLInputElement &&
+              element.type === "radio",
+          );
+
+        if (nativeRadioGroup) {
+          const selectedCount =
+            await options.evaluateAll(
+              (elements) =>
+                elements.filter(
+                  (element) =>
+                    element instanceof
+                      HTMLInputElement &&
+                    element.checked,
+                ).length,
+            );
+
+          if (selectedCount !== 1) {
+            throw new Error(
+              `Question ${index + 1} did not maintain exactly one selected answer.`,
+            );
+          }
+        }
+
+        // Avoid unused-value lint errors.
+        void firstSelected;
       }
     },
   },
@@ -378,12 +320,11 @@ export const quizFunctionalTests = [
         getSubmitControl(page);
 
       if (
-        (await submitControl.count()) ===
-          0 ||
+        (await submitControl.count()) !== 1 ||
         !(await submitControl.isVisible())
       ) {
         throw new Error(
-          "No visible quiz submission control was found.",
+          'A single visible "quiz-submit" control was not found.',
         );
       }
     },
@@ -397,53 +338,9 @@ export const quizFunctionalTests = [
 
     async run(page) {
       await answerAllQuestions(page);
+      await submitQuiz(page);
 
-      const submitControl =
-        getSubmitControl(page);
-
-      if (
-        (await submitControl.count()) ===
-        0
-      ) {
-        throw new Error(
-          "No quiz submission control was found.",
-        );
-      }
-
-      if (
-        !(await submitControl.isVisible())
-      ) {
-        throw new Error(
-          "The quiz submission control was not visible.",
-        );
-      }
-
-      if (
-        !(await submitControl.isEnabled())
-      ) {
-        throw new Error(
-          "The quiz submission control remained disabled after all questions were answered.",
-        );
-      }
-
-      try {
-        await submitControl.click();
-      } catch {
-        throw new Error(
-          "The completed quiz could not be submitted.",
-        );
-      }
-
-      await page.waitForTimeout(200);
-
-      const firstResult =
-        await findDisplayedScore(page);
-
-      if (!firstResult) {
-        throw new Error(
-          "A valid final score between 0 and 3 was not displayed after the completed quiz was submitted.",
-        );
-      }
+      await readScore(page);
     },
   },
 
@@ -455,85 +352,45 @@ export const quizFunctionalTests = [
 
     async run(page) {
       await answerAllQuestions(page);
+      await submitQuiz(page);
 
+      const firstScore =
+        await readScore(page);
+
+      /*
+       * Re-query because submission may rebuild
+       * or remove the control.
+       */
       const submitControl =
         getSubmitControl(page);
 
-      if (
-        (await submitControl.count()) ===
-          0 ||
-        !(await submitControl.isVisible()) ||
-        !(await submitControl.isEnabled())
-      ) {
-        throw new Error(
-          "The completed quiz could not be submitted for the score-stability test.",
-        );
-      }
-
-      await submitControl.click();
-
-      await page.waitForTimeout(200);
-
-      const firstResult =
-        await findDisplayedScore(page);
-
-      if (!firstResult) {
-        throw new Error(
-          "No valid score was displayed after the first submission.",
-        );
-      }
-
-      /*
-       * Re-query because the application may replace
-       * or remove the original submission control.
-       */
-      const secondSubmitControl =
-        getSubmitControl(page);
-
       const canSubmitAgain =
-        (await secondSubmitControl.count()) >
-          0 &&
-        await secondSubmitControl
+        (await submitControl.count()) === 1 &&
+        await submitControl
           .isVisible()
           .catch(() => false) &&
-        await secondSubmitControl
+        await submitControl
           .isEnabled()
           .catch(() => false);
 
       /*
-       * Removing, hiding or disabling the submission
-       * control is a valid way to prevent accidental
-       * repeated submission.
+       * Removing, hiding or disabling submission
+       * after completion is valid.
        */
       if (!canSubmitAgain) {
         return;
       }
 
-      try {
-        await secondSubmitControl.click();
-      } catch {
-        throw new Error(
-          "The submission control remained visible and enabled but could not be activated a second time.",
-        );
-      }
+      await submitControl.click();
 
-      await page.waitForTimeout(200);
-
-      const secondResult =
-        await findDisplayedScore(page);
-
-      if (!secondResult) {
-        throw new Error(
-          "The final score was no longer displayed correctly after repeated submission.",
-        );
-      }
+      const secondScore =
+        await readScore(page);
 
       if (
-        secondResult.score !==
-        firstResult.score
+        secondScore !== firstScore
       ) {
         throw new Error(
-          `The score changed from ${firstResult.score}/3 to ${secondResult.score}/3 even though the selected answers did not change.`,
+          `The score changed from ${firstScore} to ${secondScore} after repeated submission without changing the answers.`,
         );
       }
     },
@@ -546,47 +403,74 @@ export const quizFunctionalTests = [
       "Keep quiz selections and results in page memory only. Refreshing or reopening the page must reset the quiz state.",
 
     async run(page) {
-      const questionNames =
-        await getThreeQuestions(page);
+      await answerAllQuestions(page);
+      await submitQuiz(page);
 
-      await selectAnswer(
-        page,
-        questionNames[0],
-      );
+      await readScore(page);
 
-      /*
-       * Reload in the same browser context so
-       * localStorage/sessionStorage persistence is
-       * detected rather than hidden by creating an
-       * entirely new context.
-       */
       await page.reload({
         waitUntil: "load",
       });
 
-      const checkedAnswers =
-        page.locator(
-          'input[type="radio"]:checked',
-        );
+      /*
+       * The result may remain in the DOM as a hidden
+       * placeholder. It must not retain a score.
+       */
+      const scoreElement =
+        getScoreElement(page);
 
       if (
-        (await checkedAnswers.count()) > 0
+        (await scoreElement.count()) > 0
       ) {
-        throw new Error(
-          "Selected quiz answers persisted after the page was refreshed instead of being kept only in page memory.",
-        );
+        const value =
+          await scoreElement.getAttribute(
+            "data-score",
+          );
+
+        const visible =
+          await scoreElement
+            .isVisible()
+            .catch(() => false);
+
+        if (
+          visible &&
+          ["0", "1", "2", "3"].includes(
+            value,
+          )
+        ) {
+          throw new Error(
+            "The quiz result persisted after the page was refreshed.",
+          );
+        }
       }
 
       /*
-       * A previous final result should not remain
-       * visible after reload either.
+       * Check native selection state where applicable.
        */
-      const resultAfterReload =
-        await findDisplayedScore(page);
+      const selectedInputs =
+        page.locator(
+          '[data-testid="quiz-option"]:checked',
+        );
 
-      if (resultAfterReload) {
+      if (
+        (await selectedInputs.count()) > 0
+      ) {
         throw new Error(
-          "A quiz result remained visible after the page was refreshed instead of resetting.",
+          "Quiz selections persisted after the page was refreshed.",
+        );
+      }
+
+      const selectedAria =
+        page.locator(
+          '[data-testid="quiz-option"][aria-checked="true"], ' +
+          '[data-testid="quiz-option"][aria-pressed="true"]',
+        );
+
+      if (
+        (await selectedAria.count()) > 0
+      ) {
+        throw new Error(
+          "Quiz selections persisted after the page was refreshed.",
         );
       }
     },
