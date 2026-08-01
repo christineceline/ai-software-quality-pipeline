@@ -26,6 +26,9 @@ const supportedWorkflows = [
 
 router.post("/", async (request, response) => {
   try {
+
+    const workflowStartedAt = Date.now();
+
     const {
       specificationId,
       workflow,
@@ -147,10 +150,14 @@ if (workflow === "automated-refinement") {
         refinementResult,
       });
 
+      const workflowDurationMs =
+      Date.now() - workflowStartedAt;
+
   return response.status(201).json({
     run: {
       ...completedRunMetadata,
       runDirectory,
+      workflowDurationMs,
 },
 
     initial: {
@@ -212,8 +219,12 @@ const runtimeReport =
     specificationId: specification.id,
   });
 
+  const workflowDurationMs =
+  Date.now() - workflowStartedAt;
+
 return response.status(201).json({
   run: runMetadata,
+  workflowDurationMs,
   application,
   qualityReport,
   runtimeReport,
