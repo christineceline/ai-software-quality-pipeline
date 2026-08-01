@@ -53,7 +53,6 @@ export async function saveGeneratedRun({
   rawResponse,
   generationMetrics,
   qualityReport,
-  experimentMetrics = null,
 }) {
   const runId = createRunId();
   const runDirectory = path.join(getRunsDirectory(), runId);
@@ -72,7 +71,6 @@ export async function saveGeneratedRun({
     temperature,
     promptVersion: "1.0.0",
     generationMetrics,
-    experimentMetrics,
     generatedApplication: application.metadata,
     qualitySummary: qualityReport.summary,
   };
@@ -118,28 +116,6 @@ export async function saveGeneratedRun({
   };
 }
 
-export async function completeGeneratedRun({
-  runDirectory,
-  experimentMetrics,
-}) {
-  const metadataPath = path.join(
-    runDirectory,
-    "metadata.json",
-  );
-
-  const metadata = await readJson(metadataPath);
-
-  metadata.experimentMetrics = experimentMetrics;
-  metadata.completedAt = new Date().toISOString();
-
-  await writeJson(metadataPath, metadata);
-
-  return {
-    ...metadata,
-    runDirectory,
-  };
-}
-
 export async function saveRefinementRun({
   application,
   specification,
@@ -151,7 +127,6 @@ export async function saveRefinementRun({
   generationMetrics,
   qualityReport,
   maxRefinementIterations,
-  experimentMetrics = null,
 }) {
   const runId = createRunId();
 
@@ -197,7 +172,6 @@ export async function saveRefinementRun({
     promptVersion: "1.0.0",
     maxRefinementIterations,
     generatedApplication: application.metadata,
-    experimentMetrics,
     iterations: [
       iterationMetadata,
     ],
@@ -346,7 +320,6 @@ export async function saveRefinementIteration({
 export async function completeRefinementRun({
   runDirectory,
   refinementResult,
-  experimentMetrics,
 }) {
   const metadataPath = path.join(
     runDirectory,
@@ -385,9 +358,6 @@ export async function completeRefinementRun({
     completedAt:
       new Date().toISOString(),
   };
-
-  metadata.experimentMetrics =
-  experimentMetrics;
 
   await writeJson(metadataPath, metadata);
 
