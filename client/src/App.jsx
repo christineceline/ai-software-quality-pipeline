@@ -6,6 +6,7 @@ import QualityReport from "./components/QualityReport";
 import RuntimeReport from "./components/RuntimeReport";
 import AccessibilityReport from "./components/AccessibilityReport";
 import FunctionalReport from "./components/FunctionalReport";
+import ExperimentMetrics from "./components/ExperimentMetrics";
 
 const workflows = [
   {
@@ -429,11 +430,15 @@ function App() {
               </div>
             ) : (
               <>
+                <ExperimentMetrics
+                 metrics={run?.experimentMetrics}
+                 workflow={run?.workflow}
+                />
+
                 <QualityReport report={qualityReport} />
 
                 <RuntimeReport
                   report={runtimeReport}
-                  generationMetrics={generationMetrics}
                 />
 
                 <AccessibilityReport

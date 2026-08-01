@@ -1,8 +1,14 @@
-function StatusBadge({ passed, passText = "Pass", failText = "Fail" }) {
+function StatusBadge({
+  passed,
+  passText = "Pass",
+  failText = "Fail",
+}) {
   return (
     <span
       className={`report-status ${
-        passed ? "report-status--pass" : "report-status--fail"
+        passed
+          ? "report-status--pass"
+          : "report-status--fail"
       }`}
     >
       {passed ? passText : failText}
@@ -10,7 +16,7 @@ function StatusBadge({ passed, passText = "Pass", failText = "Fail" }) {
   );
 }
 
-function RuntimeReport({ report, generationMetrics }) {
+function RuntimeReport({ report }) {
   if (!report) {
     return null;
   }
@@ -29,6 +35,7 @@ function RuntimeReport({ report, generationMetrics }) {
     <section className="quality-report runtime-report">
       <div className="quality-report__heading">
         <h2>Runtime validation</h2>
+
         <StatusBadge
           passed={summary.runtimePassed}
           passText="Passed"
@@ -38,7 +45,9 @@ function RuntimeReport({ report, generationMetrics }) {
 
       {analysisError && (
         <div className="report-error">
-          <strong>Runtime analysis failed:</strong>{" "}
+          <strong>
+            Runtime analysis failed:
+          </strong>{" "}
           {analysisError.message}
         </div>
       )}
@@ -47,34 +56,37 @@ function RuntimeReport({ report, generationMetrics }) {
         <div>
           <dt>Application opened</dt>
           <dd>
-            <StatusBadge passed={summary.navigationSuccessful} />
-          </dd>
-        </div>
-
-        <div>
-          <dt>Generation duration</dt>
-          <dd>
-            {generationMetrics?.totalDurationMs != null
-              ? `${(generationMetrics.totalDurationMs / 1000).toFixed(1)} s`
-              : "Unavailable"}
+            <StatusBadge
+              passed={
+                summary.navigationSuccessful
+              }
+            />
           </dd>
         </div>
 
         <div>
           <dt>Visible body content</dt>
           <dd>
-            <StatusBadge passed={summary.hasVisibleBodyContent} />
+            <StatusBadge
+              passed={
+                summary.hasVisibleBodyContent
+              }
+            />
           </dd>
         </div>
 
         <div>
           <dt>Console errors</dt>
-          <dd>{summary.consoleErrorCount}</dd>
+          <dd>
+            {summary.consoleErrorCount}
+          </dd>
         </div>
 
         <div>
           <dt>Uncaught exceptions</dt>
-          <dd>{summary.uncaughtExceptionCount}</dd>
+          <dd>
+            {summary.uncaughtExceptionCount}
+          </dd>
         </div>
 
         <div>
@@ -87,43 +99,59 @@ function RuntimeReport({ report, generationMetrics }) {
 
         <div>
           <dt>HTTP status</dt>
-          <dd>{navigation.status ?? "Unavailable"}</dd>
+          <dd>
+            {navigation.status ??
+              "Unavailable"}
+          </dd>
         </div>
       </dl>
 
       <h3>Required controls</h3>
 
       {requiredControls.controls.length === 0 ? (
-        <p>No runtime requirements were configured.</p>
+        <p>
+          No runtime requirements were configured.
+        </p>
       ) : (
         <ul className="report-list">
-          {requiredControls.controls.map((control) => (
-            <li key={control.id}>
-              <StatusBadge passed={control.present} />{" "}
-              {control.label}
-            </li>
-          ))}
+          {requiredControls.controls.map(
+            (control) => (
+              <li key={control.id}>
+                <StatusBadge
+                  passed={control.present}
+                />{" "}
+                {control.label}
+              </li>
+            ),
+          )}
         </ul>
       )}
 
       {consoleErrors.length > 0 && (
         <>
           <h3>Console errors</h3>
+
           <ul className="report-list report-list--errors">
-            {consoleErrors.map((error, index) => (
-              <li key={`${error.text}-${index}`}>
-                <code>{error.text}</code>
-                {error.location?.url && (
-                  <small>
-                    {" "}
-                    {error.location.url}
-                    {error.location.lineNumber !== null
-                      ? `:${error.location.lineNumber}`
-                      : ""}
-                  </small>
-                )}
-              </li>
-            ))}
+            {consoleErrors.map(
+              (error, index) => (
+                <li
+                  key={`${error.text}-${index}`}
+                >
+                  <code>{error.text}</code>
+
+                  {error.location?.url && (
+                    <small>
+                      {" "}
+                      {error.location.url}
+                      {error.location
+                        .lineNumber !== null
+                        ? `:${error.location.lineNumber}`
+                        : ""}
+                    </small>
+                  )}
+                </li>
+              ),
+            )}
           </ul>
         </>
       )}
@@ -131,20 +159,28 @@ function RuntimeReport({ report, generationMetrics }) {
       {uncaughtExceptions.length > 0 && (
         <>
           <h3>Uncaught exceptions</h3>
+
           <ul className="report-list report-list--errors">
-            {uncaughtExceptions.map((error, index) => (
-              <li key={`${error.message}-${index}`}>
-                <strong>{error.name}:</strong>{" "}
-                <code>{error.message}</code>
-              </li>
-            ))}
+            {uncaughtExceptions.map(
+              (error, index) => (
+                <li
+                  key={`${error.message}-${index}`}
+                >
+                  <strong>
+                    {error.name}:
+                  </strong>{" "}
+                  <code>{error.message}</code>
+                </li>
+              ),
+            )}
           </ul>
         </>
       )}
 
       {!body.hasVisibleContent && (
         <p className="report-warning">
-          The page did not contain visible body text.
+          The page did not contain visible body
+          text.
         </p>
       )}
     </section>
