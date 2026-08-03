@@ -10,21 +10,12 @@ export const EXPERIMENT_WORKFLOWS = [
 function parsePositiveInteger(value, name) {
   const parsed = Number(value);
 
-  if (!Number.isInteger(parsed) || parsed < 1) {
+  if (
+    !Number.isInteger(parsed) ||
+    parsed < 1
+  ) {
     throw new Error(
       `${name} must be an integer greater than or equal to 1.`,
-    );
-  }
-
-  return parsed;
-}
-
-function parseNonNegativeInteger(value, name) {
-  const parsed = Number(value);
-
-  if (!Number.isInteger(parsed) || parsed < 0) {
-    throw new Error(
-      `${name} must be a non-negative integer.`,
     );
   }
 
@@ -45,10 +36,12 @@ function parseTemperature(value) {
 
 function getArgumentValue(args, ...names) {
   for (const name of names) {
-    const exactIndex = args.indexOf(name);
+    const exactIndex =
+      args.indexOf(name);
 
     if (exactIndex !== -1) {
-      const value = args[exactIndex + 1];
+      const value =
+        args[exactIndex + 1];
 
       if (
         value === undefined ||
@@ -62,7 +55,9 @@ function getArgumentValue(args, ...names) {
       return value;
     }
 
-    const prefix = `${name}=`;
+    const prefix =
+      `${name}=`;
+
     const inlineArgument =
       args.find((argument) =>
         argument.startsWith(prefix),
@@ -79,70 +74,13 @@ function getArgumentValue(args, ...names) {
 }
 
 function getPositionalRepetitions(args) {
-  return (
+  const positionalArgument =
     args.find(
       (argument) =>
         !argument.startsWith("-"),
-    ) ?? null
-  );
-}
+    );
 
-function createSeededRandom(seed) {
-  let state = seed >>> 0;
-
-  return () => {
-    state += 0x6d2b79f5;
-
-    let value = state;
-
-    value =
-      Math.imul(
-        value ^ (value >>> 15),
-        value | 1,
-      );
-
-    value ^=
-      value +
-      Math.imul(
-        value ^ (value >>> 7),
-        value | 61,
-      );
-
-    return (
-      (value ^ (value >>> 14)) >>> 0
-    ) / 4294967296;
-  };
-}
-
-function shuffleRuns(runs, seed) {
-  const random = createSeededRandom(seed);
-  const shuffled = [...runs];
-
-  for (
-    let index = shuffled.length - 1;
-    index > 0;
-    index -= 1
-  ) {
-    const replacementIndex =
-      Math.floor(
-        random() * (index + 1),
-      );
-
-    [
-      shuffled[index],
-      shuffled[replacementIndex],
-    ] = [
-      shuffled[replacementIndex],
-      shuffled[index],
-    ];
-  }
-
-  return shuffled.map(
-    (run, index) => ({
-      ...run,
-      sequence: index + 1,
-    }),
-  );
+  return positionalArgument ?? null;
 }
 
 export function createExperimentId() {
@@ -190,18 +128,17 @@ export function parseExperimentArguments(
     ) ??
     "0";
 
-  const seedValue =
-    getArgumentValue(
-      args,
-      "--seed",
-    ) ??
-    process.env.EXPERIMENT_SEED ??
-    "77077";
+  const retryFailed =
+    args.includes(
+      "--retry-failed",
+    );
+
+  const help =
+    args.includes("--help") ||
+    args.includes("-h");
 
   return {
-    help:
-      args.includes("--help") ||
-      args.includes("-h"),
+    help,
 
     repetitions:
       repetitionsValue === null
@@ -221,16 +158,7 @@ export function parseExperimentArguments(
         temperatureValue,
       ),
 
-    seed:
-      parseNonNegativeInteger(
-        seedValue,
-        "seed",
-      ),
-
-    retryFailed:
-      args.includes(
-        "--retry-failed",
-      ),
+    retryFailed,
   };
 }
 
@@ -240,6 +168,8 @@ export function buildExperimentConfiguration({
   baseUrl,
   temperature,
   seed,
+  reproducibility,
+  preflightCheckedAt,
 }) {
   if (specifications.length !== 3) {
     throw new Error(
@@ -255,8 +185,6 @@ export function buildExperimentConfiguration({
       new Date().toISOString(),
     repetitions,
     sequential: true,
-    runOrder: "seeded-random",
-    randomSeed: seed,
     baseUrl,
     temperature,
 
@@ -272,6 +200,8 @@ export function buildExperimentConfiguration({
 
     promptVersion: "1.0.0",
     maxRefinementIterations: 3,
+    preflightCheckedAt,
+    reproducibility,
 
     specifications:
       specifications.map(
@@ -291,6 +221,7 @@ export function buildRunPlan(
   configuration,
 ) {
   const runs = [];
+  let sequence = 1;
 
   for (
     let repetition = 1;
@@ -312,31 +243,35 @@ export function buildRunPlan(
             `${workflow}__` +
             `${repetition}`,
 
-          sequence: null,
+          sequence,
           specification,
           workflow,
           repetition,
 
           status: "pending",
           attemptCount: 0,
+
           startedAt: null,
           completedAt: null,
+
           runId: null,
+
           resultClassification:
             null,
+
           failureType: null,
           failureStage: null,
           error: null,
+
           responseFile: null,
         });
+
+        sequence += 1;
       }
     }
   }
 
-  return shuffleRuns(
-    runs,
-    configuration.randomSeed,
-  );
+  return runs;
 }
 
 export function printExperimentHelp() {
@@ -344,17 +279,12 @@ export function printExperimentHelp() {
 Usage:
   npm run experiment -- 1
   npm run experiment -- --repetitions=1
-  npm run experiment -- --repetitions=10 --seed=77077
   npm run experiment -- --experiment-id=EXISTING_ID
   npm run experiment -- --experiment-id=EXISTING_ID --retry-failed
 
 Options:
   --repetitions, -n
       Number of repetitions for each specification/workflow combination.
-
-  --seed
-      Integer seed used to randomise run order reproducibly.
-      Default: 77077
 
   --experiment-id
       Resume an existing experiment.

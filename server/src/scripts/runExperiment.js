@@ -16,6 +16,10 @@ import {
   classifySuccessfulRun,
   exportExperimentDatasets,
 } from "../experiments/experimentDataset.js";
+import {
+  printPreflightReport,
+  runExperimentPreflight,
+} from "../experiments/experimentPreflight.js";
 
 function findNextRunnableRun(
   manifest,
@@ -263,6 +267,25 @@ async function loadOrCreateExperiment(
     );
   }
 
+  const preflight =
+    await runExperimentPreflight({
+      baseUrl:
+        options.baseUrl,
+      temperature:
+        options.temperature,
+      requireOpenAI: true,
+    });
+
+  printPreflightReport(
+    preflight,
+  );
+
+  if (!preflight.passed) {
+    throw new Error(
+      "Experiment preflight failed. Resolve all blocking checks before creating a new experiment.",
+    );
+  }
+
   const experimentId =
     createExperimentId();
 
@@ -275,8 +298,6 @@ async function loadOrCreateExperiment(
         options.baseUrl,
       temperature:
         options.temperature,
-      seed:
-        options.seed,
     });
 
   const runs =

@@ -1,29 +1,53 @@
-# Pilot validation fixes
+# Formal experiment preflight and reproducibility freeze
 
-Extract this archive into the repository root.
+Extract into the repository root and replace the included files.
 
-## Regenerate the existing pilot without new AI calls
+## Run preflight
+
+Start the server first:
 
 ```powershell
-cd server
-npm run experiment:export -- experiment-2026-08-03T09-36-29-927Z-a9300bbd
+npm run dev
 ```
 
-## Run a new one-repetition pilot
-
-Keep the server running in the first terminal, then:
+In a second terminal:
 
 ```powershell
 cd server
+npm run experiment:preflight
+```
+
+The preflight blocks a new experiment unless:
+
+- `AI_PROVIDER=openai`
+- a model is configured
+- all three specifications and workflows are present
+- required pipeline files exist
+- the server health endpoint is reachable
+- a reproducibility fingerprint can be generated
+
+## Reproducibility fingerprint
+
+Every new experiment manifest records:
+
+- SHA-256 for the complete prompt directory
+- SHA-256 for specifications
+- SHA-256 for quality and validation pipeline files
+- a combined SHA-256 fingerprint
+- the preflight timestamp
+
+This allows you to show that prompts, tests and pipeline code remained fixed during the formal experiment.
+
+## Pilot
+
+After preflight passes:
+
+```powershell
 npm run experiment -- 1
 ```
 
-New experiments use reproducible seeded random ordering. The default seed is `77077`.
-
-## Formal experiment example
+## Formal run example
 
 ```powershell
 npm run experiment -- --repetitions=10 --seed=77077
 ```
-
-The formal experiment configuration records the seed and run-order method.
