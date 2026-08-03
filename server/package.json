@@ -8,8 +8,9 @@
     "start": "node src/index.js",
     "validate:run": "node src/scripts/validateExistingRun.js",
     "experiment": "node src/scripts/runExperiment.js",
+    "experiment:export": "node src/scripts/exportExperiment.js",
     "experiment:preflight": "node src/scripts/preflightExperiment.js",
-    "experiment:export": "node src/scripts/exportExperiment.js"
+    "experiment:validate": "node src/scripts/validateExperiment.js"
   },
   "keywords": [],
   "author": "",

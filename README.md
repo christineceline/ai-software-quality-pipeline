@@ -1,53 +1,33 @@
-# Formal experiment preflight and reproducibility freeze
+# Final experiment safeguards
 
-Extract into the repository root and replace the included files.
+Extract into the repository root.
 
-## Run preflight
+## Final pilot
 
-Start the server first:
-
-```powershell
-npm run dev
-```
-
-In a second terminal:
+Start the server, then:
 
 ```powershell
 cd server
-npm run experiment:preflight
+npm run experiment -- --repetitions=1 --seed=77077
 ```
 
-The preflight blocks a new experiment unless:
+The new manifest must include:
 
-- `AI_PROVIDER=openai`
-- a model is configured
-- all three specifications and workflows are present
-- required pipeline files exist
-- the server health endpoint is reachable
-- a reproducibility fingerprint can be generated
+- `runOrder: "seeded-random"`
+- `randomSeed: 77077`
+- `preflightCheckedAt`
+- `reproducibility.combinedSha256`
 
-## Reproducibility fingerprint
-
-Every new experiment manifest records:
-
-- SHA-256 for the complete prompt directory
-- SHA-256 for specifications
-- SHA-256 for quality and validation pipeline files
-- a combined SHA-256 fingerprint
-- the preflight timestamp
-
-This allows you to show that prompts, tests and pipeline code remained fixed during the formal experiment.
-
-## Pilot
-
-After preflight passes:
+## Validate the completed pilot
 
 ```powershell
-npm run experiment -- 1
+npm run experiment:validate -- experiment-...
 ```
 
-## Formal run example
+## Resume
 
 ```powershell
-npm run experiment -- --repetitions=10 --seed=77077
+npm run experiment -- --experiment-id=experiment-...
 ```
+
+Resume is blocked if the provider, model, refinement limit, or reproducibility fingerprint differs from the original manifest.

@@ -18,7 +18,9 @@ import {
 } from "../experiments/experimentDataset.js";
 import {
   printPreflightReport,
+  printResumeVerification,
   runExperimentPreflight,
+  verifyExperimentResume,
 } from "../experiments/experimentPreflight.js";
 
 function findNextRunnableRun(
@@ -246,6 +248,21 @@ async function loadOrCreateExperiment(
         options.experimentId,
       );
 
+    const verification =
+      await verifyExperimentResume(
+        manifest,
+      );
+
+    printResumeVerification(
+      verification,
+    );
+
+    if (!verification.passed) {
+      throw new Error(
+        "Experiment resume blocked because the stored configuration or reproducibility fingerprint no longer matches.",
+      );
+    }
+
     resetInterruptedRuns(
       manifest,
     );
@@ -253,6 +270,14 @@ async function loadOrCreateExperiment(
     if (options.retryFailed) {
       resetFailedRuns(manifest);
     }
+
+    manifest.lastResumeVerification = {
+      checkedAt:
+        verification.checkedAt,
+      fingerprint:
+        verification.currentFingerprint
+          .combinedSha256,
+    };
 
     await saveManifest(manifest);
 
@@ -298,6 +323,12 @@ async function loadOrCreateExperiment(
         options.baseUrl,
       temperature:
         options.temperature,
+      seed:
+        options.seed,
+      reproducibility:
+        preflight.fingerprint,
+      preflightCheckedAt:
+        preflight.checkedAt,
     });
 
   const runs =

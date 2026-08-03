@@ -152,7 +152,7 @@ async function hashFile(
     .digest("hex");
 }
 
-async function buildFingerprint() {
+export async function buildFingerprint() {
   const collectedFiles = [];
 
   for (
@@ -449,5 +449,141 @@ export function printPreflightReport(
 
   console.log(
     `Fingerprint: ${report.fingerprint.combinedSha256}`,
+  );
+}
+
+
+function currentModel() {
+  return (
+    process.env.OPENAI_MODEL ??
+    process.env.GEMINI_MODEL ??
+    process.env.OLLAMA_MODEL ??
+    null
+  );
+}
+
+export async function verifyExperimentResume(
+  manifest,
+) {
+  const configuration =
+    manifest?.configuration;
+
+  if (!configuration) {
+    throw new Error(
+      "Manifest configuration is missing.",
+    );
+  }
+
+  const mismatches = [];
+
+  if (
+    process.env.AI_PROVIDER !==
+    configuration.provider
+  ) {
+    mismatches.push(
+      `Provider changed from ${configuration.provider} to ${process.env.AI_PROVIDER ?? "<unset>"}.`,
+    );
+  }
+
+  if (
+    currentModel() !==
+    configuration.model
+  ) {
+    mismatches.push(
+      `Model changed from ${configuration.model} to ${currentModel() ?? "<unset>"}.`,
+    );
+  }
+
+  const storedTemperature =
+    Number(
+      configuration.temperature,
+    );
+
+  if (
+    !Number.isFinite(
+      storedTemperature,
+    )
+  ) {
+    mismatches.push(
+      "Stored experiment temperature is invalid.",
+    );
+  }
+
+  if (
+    configuration.maxRefinementIterations !==
+    3
+  ) {
+    mismatches.push(
+      `Stored refinement limit is ${configuration.maxRefinementIterations}; expected 3.`,
+    );
+  }
+
+  if (
+    !configuration.reproducibility
+      ?.combinedSha256
+  ) {
+    mismatches.push(
+      "Stored reproducibility fingerprint is missing.",
+    );
+  }
+
+  const currentFingerprint =
+    await buildFingerprint();
+
+  if (
+    configuration.reproducibility
+      ?.combinedSha256 &&
+    currentFingerprint.combinedSha256 !==
+      configuration.reproducibility
+        .combinedSha256
+  ) {
+    mismatches.push(
+      "Prompt, specification, test, or pipeline files changed after the experiment was created.",
+    );
+  }
+
+  return {
+    checkedAt:
+      new Date().toISOString(),
+    passed:
+      mismatches.length === 0,
+    mismatches,
+    storedFingerprint:
+      configuration.reproducibility ??
+      null,
+    currentFingerprint,
+  };
+}
+
+export function printResumeVerification(
+  verification,
+) {
+  console.log(
+    `Resume verification: ${
+      verification.passed
+        ? "PASSED"
+        : "FAILED"
+    }`,
+  );
+
+  for (
+    const mismatch of
+    verification.mismatches
+  ) {
+    console.log(
+      `FAIL  ${mismatch}`,
+    );
+  }
+
+  console.log(
+    `Stored fingerprint: ${
+      verification.storedFingerprint
+        ?.combinedSha256 ??
+      "<missing>"
+    }`,
+  );
+
+  console.log(
+    `Current fingerprint: ${verification.currentFingerprint.combinedSha256}`,
   );
 }
