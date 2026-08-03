@@ -1,0 +1,290 @@
+{
+  "capturedAt": "2026-08-03T14:21:40.266Z",
+  "httpStatus": 201,
+  "ok": true,
+  "body": {
+    "run": {
+      "runId": "2026-08-03T14-21-38-116Z-664df035",
+      "createdAt": "2026-08-03T14:21:38.117Z",
+      "specification": {
+        "id": "quiz",
+        "name": "Multiple-choice Quiz"
+      },
+      "workflow": "quality-focused",
+      "model": "gpt-5.6-luna",
+      "temperature": 0,
+      "promptVersion": "1.0.0",
+      "generationMetrics": {
+        "totalDurationMs": 15776,
+        "promptTokens": 906,
+        "outputTokens": 2517,
+        "totalTokens": 3423,
+        "finishReason": null
+      },
+      "generatedApplication": {
+        "applicationName": "Multiple-choice Quiz",
+        "summary": "A responsive three-question quiz that lets users select answers and calculate a score in the browser."
+      },
+      "qualitySummary": {
+        "totalIssues": 0,
+        "totalErrors": 0,
+        "totalWarnings": 0,
+        "passed": true
+      },
+      "experimentMetrics": {
+        "workflowDurationMs": 17945,
+        "aiGenerationDurationMs": 15776,
+        "refinementIterations": 0,
+        "converged": null,
+        "stopReason": "not-applicable",
+        "totalPromptTokens": 906,
+        "totalOutputTokens": 2517,
+        "totalTokens": 3423,
+        "iterations": [
+          {
+            "iteration": 0,
+            "generationDurationMs": 15776,
+            "promptTokens": 906,
+            "outputTokens": 2517,
+            "totalTokens": 3423
+          }
+        ]
+      },
+      "completedAt": "2026-08-03T14:21:40.265Z",
+      "runDirectory": "C:\\Users\\Administrator\\Documents\\Development\\ai-software-quality-pipeline\\generated-apps\\runs\\2026-08-03T14-21-38-116Z-664df035"
+    },
+    "application": {
+      "html": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  <title>Multiple-choice Quiz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n  <script src=\"script.js\" defer></script>\n</head>\n<body>\n  <main class=\"quiz-shell\">\n    <header class=\"page-header\">\n      <p class=\"eyebrow\">Knowledge check</p>\n      <h1>Multiple-choice Quiz</h1>\n      <p>Choose one answer for each question, then submit your answers to see your score.</p>\n    </header>\n\n    <form id=\"quiz-form\" novalidate>\n      <section class=\"question\" data-testid=\"quiz-question\" aria-labelledby=\"question-1-title\">\n        <h2 id=\"question-1-title\">1. Which planet is known as the Red Planet?</h2>\n        <fieldset>\n          <legend class=\"sr-only\">Answers for question 1</legend>\n          <label class=\"option\" data-testid=\"quiz-option\">\n            <input type=\"radio\" name=\"question-1\" value=\"mars\">\n            <span>Mars</span>\n          </label>\n          <label class=\"option\" data-testid=\"quiz-option\">\n            <input type=\"radio\" name=\"question-1\" value=\"venus\">\n            <span>Venus</span>\n          </label>\n          <label class=\"option\" data-testid=\"quiz-option\">\n            <input type=\"radio\" name=\"question-1\" value=\"jupiter\">\n            <span>Jupiter</span>\n          </label>\n        </fieldset>\n        <p class=\"error\" id=\"question-1-error\" hidden>Please choose an answer.</p>\n      </section>\n\n      <section class=\"question\" data-testid=\"quiz-question\" aria-labelledby=\"question-2-title\">\n        <h2 id=\"question-2-title\">2. What is the largest ocean on Earth?</h2>\n        <fieldset>\n          <legend class=\"sr-only\">Answers for question 2</legend>\n          <label class=\"option\" data-testid=\"quiz-option\">\n            <input type=\"radio\" name=\"question-2\" value=\"atlantic\">\n            <span>Atlantic Ocean</span>\n          </label>\n          <label class=\"option\" data-testid=\"quiz-option\">\n            <input type=\"radio\" name=\"question-2\" value=\"pacific\">\n            <span>Pacific Ocean</span>\n          </label>\n          <label class=\"option\" data-testid=\"quiz-option\">\n            <input type=\"radio\" name=\"question-2\" value=\"indian\">\n            <span>Indian Ocean</span>\n          </label>\n        </fieldset>\n        <p class=\"error\" id=\"question-2-error\" hidden>Please choose an answer.</p>\n      </section>\n\n      <section class=\"question\" data-testid=\"quiz-question\" aria-labelledby=\"question-3-title\">\n        <h2 id=\"question-3-title\">3. How many sides does a hexagon have?</h2>\n        <fieldset>\n          <legend class=\"sr-only\">Answers for question 3</legend>\n          <label class=\"option\" data-testid=\"quiz-option\">\n            <input type=\"radio\" name=\"question-3\" value=\"five\">\n            <span>Five</span>\n          </label>\n          <label class=\"option\" data-testid=\"quiz-option\">\n            <input type=\"radio\" name=\"question-3\" value=\"six\">\n            <span>Six</span>\n          </label>\n          <label class=\"option\" data-testid=\"quiz-option\">\n            <input type=\"radio\" name=\"question-3\" value=\"eight\">\n            <span>Eight</span>\n          </label>\n        </fieldset>\n        <p class=\"error\" id=\"question-3-error\" hidden>Please choose an answer.</p>\n      </section>\n\n      <div class=\"actions\">\n        <button type=\"submit\" data-testid=\"quiz-submit\">Submit quiz</button>\n        <p class=\"status\" id=\"form-message\" role=\"status\" aria-live=\"polite\"></p>\n      </div>\n    </form>\n\n    <section class=\"result\" aria-labelledby=\"result-title\">\n      <h2 id=\"result-title\">Your result</h2>\n      <p class=\"score\" data-testid=\"quiz-score\" hidden aria-live=\"polite\">Score: <strong id=\"score-value\">0</strong> / 3</p>\n    </section>\n  </main>\n</body>\n</html>",
+      "css": "* { box-sizing: border-box; }\n\n:root {\n  color: #172033;\n  background: #eef2f7;\n  font-family: system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif;\n  line-height: 1.5;\n}\n\nbody { margin: 0; }\n\n.quiz-shell {\n  width: min(100% - 2rem,  Fiftyrem);\n  max-width: 50rem;\n  margin: 0 auto;\n  padding: 2.5rem 0;\n}\n\n.page-header, .result, .question {\n  background: #fff;\n  border: 1px solid #cbd5e1;\n  border-radius: .75rem;\n  padding: 1.5rem;\n}\n\n.page-header { margin-bottom: 1rem; }\n.eyebrow { color: #155e75; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin: 0 0 .25rem; font-size: .8rem; }\nh1, h2 { line-height: 1.2; }\nh1 { margin: 0 0 .75rem; font-size: clamp(1.8rem, 5vw, 2.6rem); }\nh2 { font-size: 1.15rem; margin: 0 0 1rem; }\n.page-header p:last-child { margin-bottom: 0; }\n\n.question { margin-bottom: 1rem; }\nfieldset { border: 0; margin: 0; padding: 0; }\n.option {\n  display: flex;\n  align-items: center;\n  gap: .7rem;\n  border: 1px solid #94a3b8;\n  border-radius: .5rem;\n  margin-top: .65rem;\n  padding: .8rem;\n  cursor: pointer;\n}\n.option:hover { background: #f0f9ff; border-color: #0369a1; }\n.option:has(input:checked) { background: #e0f2fe; border-color: #0369a1; }\ninput { accent-color: #0369a1; width: 1.1rem; height: 1.1rem; }\n\nbutton {\n  background: #075985;\n  border: 0;\n  border-radius: .5rem;\n  color: #fff;\n  cursor: pointer;\n  font: inherit;\n  font-weight: 700;\n  padding: .8rem 1.2rem;\n}\nbutton:hover { background: #0c4a6e; }\nbutton:focus-visible, input:focus-visible, .option:has(input:focus-visible) { outline: 3px solid #f59e0b; outline-offset: 3px; }\n.actions { margin: 1.25rem 0; }\n.status, .error { color: #b42318; font-weight: 600; }\n.status { min-height: 1.5em; margin: .75rem 0 0; }\n.error { margin: .65rem 0 0; font-size: .95rem; }\n.result { margin-top: 1rem; }\n.result h2 { margin-bottom: .5rem; }\n.score { color: #155e75; font-size: 1.25rem; font-weight: 700; margin: 0; }\n.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }\n\n@media (max-width: 40rem) {\n  .quiz-shell { width: min(100% - 1rem, 50rem); padding: 1rem 0; }\n  .page-header, .result, .question { padding: 1.1rem; }\n}",
+      "javascript": "const form = document.querySelector('#quiz-form');\nconst questions = [...document.querySelectorAll('[data-testid=\"quiz-question\"]')];\nconst scoreElement = document.querySelector('[data-testid=\"quiz-score\"]');\nconst scoreValue = document.querySelector('#score-value');\nconst formMessage = document.querySelector('#form-message');\n\nconst correctAnswers = ['mars', 'pacific', 'six'];\n\nfunction getSelectedValue(questionIndex) {\n  const selected = document.querySelector(`input[name=\"question-${questionIndex + 1}\"]:checked`);\n  return selected ? selected.value : null;\n}\n\nfunction validateAnswers() {\n  let isValid = true;\n  questions.forEach((question, index) => {\n    const error = question.querySelector('.error');\n    const hasAnswer = Boolean(getSelectedValue(index));\n    error.hidden = hasAnswer;\n    if (!hasAnswer) isValid = false;\n  });\n  return isValid;\n}\n\nfunction calculateScore() {\n  return correctAnswers.reduce((score, answer, index) => {\n    return score + (getSelectedValue(index) === answer ? 1 : 0);\n  }, 0);\n}\n\nfunction showScore(score) {\n  scoreValue.textContent = String(score);\n  scoreElement.dataset.score = String(score);\n  scoreElement.hidden = false;\n}\n\nfunction handleSubmit(event) {\n  event.preventDefault();\n  formMessage.textContent = '';\n  if (!validateAnswers()) {\n    formMessage.textContent = 'Please answer all three questions.';\n    const firstError = questions.find((question, index) => !getSelectedValue(index));\n    if (firstError) firstError.querySelector('input').focus();\n    return;\n  }\n  showScore(calculateScore());\n  formMessage.textContent = 'Quiz submitted.';\n}\n\nform.addEventListener('submit', handleSubmit);",
+      "metadata": {
+        "applicationName": "Multiple-choice Quiz",
+        "summary": "A responsive three-question quiz that lets users select answers and calculate a score in the browser."
+      }
+    },
+    "qualityReport": {
+      "analysedAt": "2026-08-03T14:21:38.116Z",
+      "analyzers": {
+        "html": {
+          "tool": "HTMLHint",
+          "issueCount": 0,
+          "errorCount": 0,
+          "warningCount": 0,
+          "passed": true,
+          "messages": []
+        },
+        "css": {
+          "tool": "Stylelint",
+          "issueCount": 0,
+          "errorCount": 0,
+          "warningCount": 0,
+          "passed": true,
+          "messages": []
+        },
+        "javascript": {
+          "tool": "ESLint",
+          "issueCount": 0,
+          "errorCount": 0,
+          "warningCount": 0,
+          "passed": true,
+          "messages": []
+        }
+      },
+      "summary": {
+        "totalIssues": 0,
+        "totalErrors": 0,
+        "totalWarnings": 0,
+        "passed": true
+      }
+    },
+    "runtimeReport": {
+      "reportVersion": "1.1",
+      "runId": "2026-08-03T14-21-38-116Z-664df035",
+      "specificationId": "quiz",
+      "applicationUrl": "http://localhost:3001/generated-apps/runs/2026-08-03T14-21-38-116Z-664df035/index.html",
+      "browser": {
+        "engine": "chromium",
+        "headless": true,
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        }
+      },
+      "startedAt": "2026-08-03T14:21:38.126Z",
+      "completedAt": "2026-08-03T14:21:39.151Z",
+      "durationMs": 1025,
+      "navigation": {
+        "successful": true,
+        "status": 200,
+        "finalUrl": "http://localhost:3001/generated-apps/runs/2026-08-03T14-21-38-116Z-664df035/index.html",
+        "error": null
+      },
+      "body": {
+        "exists": true,
+        "visible": true,
+        "textLength": 412,
+        "textPreview": "KNOWLEDGE CHECK\n\nMultiple-choice Quiz\n\nChoose one answer for each question, then submit your answers to see your score.\n\n1. Which planet is known as the Red Planet?\nAnswers for question 1\nMars\nVenus\nJ",
+        "hasVisibleContent": true
+      },
+      "consoleErrors": [],
+      "uncaughtExceptions": [],
+      "requiredControls": {
+        "expected": 2,
+        "present": 2,
+        "allPresent": true,
+        "controls": [
+          {
+            "id": "answer-control",
+            "label": "Answer control",
+            "present": true,
+            "candidates": [
+              {
+                "type": "css",
+                "selector": "input[type=\"radio\"], input[type=\"checkbox\"], select, button",
+                "found": true
+              }
+            ]
+          },
+          {
+            "id": "quiz-action-control",
+            "label": "Submit or next control",
+            "present": true,
+            "candidates": [
+              {
+                "type": "role",
+                "role": "button",
+                "name": "submit|next|check|answer|finish|start",
+                "found": true
+              },
+              {
+                "type": "css",
+                "selector": "button[type=\"submit\"], input[type=\"submit\"]",
+                "found": true
+              }
+            ]
+          }
+        ]
+      },
+      "accessibility": {
+        "successful": true,
+        "standard": "WCAG 2.0 and 2.1 Level A and AA",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa"
+        ],
+        "violationCount": 0,
+        "violatingNodeCount": 0,
+        "violationsByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0,
+          "unknown": 0
+        },
+        "violations": [],
+        "incompleteCount": 0,
+        "inapplicableCount": 43,
+        "passCount": 19,
+        "error": null
+      },
+      "summary": {
+        "runtimePassed": true,
+        "accessibilityPassed": true,
+        "navigationSuccessful": true,
+        "hasVisibleBodyContent": true,
+        "consoleErrorCount": 0,
+        "uncaughtExceptionCount": 0,
+        "requiredControlsPresent": 2,
+        "requiredControlsExpected": 2,
+        "accessibilityAnalysisSuccessful": true,
+        "accessibilityViolationCount": 0,
+        "accessibilityViolatingNodeCount": 0
+      }
+    },
+    "accessibilityReport": {
+      "successful": true,
+      "standard": "WCAG 2.0 and 2.1 Level A and AA",
+      "tags": [
+        "wcag2a",
+        "wcag2aa",
+        "wcag21a",
+        "wcag21aa"
+      ],
+      "violationCount": 0,
+      "violatingNodeCount": 0,
+      "violationsByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0,
+        "unknown": 0
+      },
+      "violations": [],
+      "incompleteCount": 0,
+      "inapplicableCount": 43,
+      "passCount": 19,
+      "error": null
+    },
+    "functionalReport": {
+      "reportVersion": "1.0",
+      "runId": "2026-08-03T14-21-38-116Z-664df035",
+      "specificationId": "quiz",
+      "applicationUrl": "http://localhost:3001/generated-apps/runs/2026-08-03T14-21-38-116Z-664df035/index.html",
+      "startedAt": "2026-08-03T14:21:39.195Z",
+      "completedAt": "2026-08-03T14:21:40.228Z",
+      "durationMs": 1033,
+      "tests": [
+        {
+          "id": "quiz-question-count",
+          "requirement": "Include exactly three multiple-choice questions, with at least two answer options for each question.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "quiz-single-page",
+          "requirement": "Display all three questions and their answer options on a single page without requiring navigation between questions.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "quiz-select-answers",
+          "requirement": "Allow the user to select exactly one answer for each question.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "quiz-submit",
+          "requirement": "Provide a visible control for submitting the completed quiz.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "quiz-final-score",
+          "requirement": "After the quiz is submitted, display a final numeric score between 0 and 3.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "quiz-score-stability",
+          "requirement": "Repeated submission, if the application still permits it, must not accumulate or otherwise change the score unless the selected answers change.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "quiz-session-memory",
+          "requirement": "Keep quiz selections and results in page memory only. Refreshing or reopening the page must reset the quiz state.",
+          "passed": true,
+          "error": null
+        }
+      ],
+      "summary": {
+        "passed": true,
+        "passedCount": 7,
+        "failedCount": 0,
+        "totalCount": 7
+      }
+    }
+  }
+}

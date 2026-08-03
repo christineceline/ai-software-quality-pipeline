@@ -1,0 +1,340 @@
+{
+  "capturedAt": "2026-08-03T14:26:02.037Z",
+  "httpStatus": 201,
+  "ok": true,
+  "body": {
+    "run": {
+      "runId": "2026-08-03T14-25-58-425Z-1cd2a767",
+      "createdAt": "2026-08-03T14:25:58.426Z",
+      "specification": {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      "workflow": "one-shot",
+      "model": "gpt-5.6-luna",
+      "temperature": 0,
+      "promptVersion": "1.0.0",
+      "generationMetrics": {
+        "totalDurationMs": 29723,
+        "promptTokens": 734,
+        "outputTokens": 2640,
+        "totalTokens": 3374,
+        "finishReason": null
+      },
+      "generatedApplication": {
+        "applicationName": "To-do List",
+        "summary": "A polished, browser-only to-do list for adding, completing, deleting, and tracking tasks."
+      },
+      "qualitySummary": {
+        "totalIssues": 0,
+        "totalErrors": 0,
+        "totalWarnings": 0,
+        "passed": true
+      },
+      "experimentMetrics": {
+        "workflowDurationMs": 33359,
+        "aiGenerationDurationMs": 29723,
+        "refinementIterations": 0,
+        "converged": null,
+        "stopReason": "not-applicable",
+        "totalPromptTokens": 734,
+        "totalOutputTokens": 2640,
+        "totalTokens": 3374,
+        "iterations": [
+          {
+            "iteration": 0,
+            "generationDurationMs": 29723,
+            "promptTokens": 734,
+            "outputTokens": 2640,
+            "totalTokens": 3374
+          }
+        ]
+      },
+      "completedAt": "2026-08-03T14:26:02.040Z",
+      "runDirectory": "C:\\Users\\Administrator\\Documents\\Development\\ai-software-quality-pipeline\\generated-apps\\runs\\2026-08-03T14-25-58-425Z-1cd2a767"
+    },
+    "application": {
+      "html": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <meta name=\"description\" content=\"A simple, focused to-do list.\">\n  <title>To-do List</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n  <script src=\"script.js\" defer></script>\n</head>\n<body>\n  <main class=\"app-shell\">\n    <section class=\"todo-card\" aria-labelledby=\"page-title\">\n      <header class=\"app-header\">\n        <div>\n          <p class=\"eyebrow\">My day</p>\n          <h1 id=\"page-title\">To-do List</h1>\n          <p class=\"subtitle\">A clear mind starts with a clear list.</p>\n        </div>\n        <div class=\"header-mark\" aria-hidden=\"true\">✓</div>\n      </header>\n\n      <form class=\"task-form\" id=\"task-form\">\n        <label class=\"sr-only\" for=\"task-input\">Add a task</label>\n        <input data-testid=\"task-input\" id=\"task-input\" type=\"text\" placeholder=\"What needs to be done?\" autocomplete=\"off\" maxlength=\"200\">\n        <button data-testid=\"task-add\" type=\"submit\">Add task</button>\n      </form>\n\n      <div class=\"list-heading\">\n        <h2>Your tasks</h2>\n        <span class=\"count\" aria-live=\"polite\"><strong data-testid=\"incomplete-count\">0</strong> remaining</span>\n      </div>\n\n      <div data-testid=\"task-list\" class=\"task-list\" aria-live=\"polite\" aria-label=\"Task list\"></div>\n      <div class=\"empty-state\" id=\"empty-state\">\n        <div class=\"empty-icon\" aria-hidden=\"true\">✦</div>\n        <p>Your list is clear</p>\n        <span>Add something you'd like to accomplish.</span>\n      </div>\n    </section>\n    <p class=\"page-note\">Tasks stay in this browser tab and reset when you refresh.</p>\n  </main>\n</body>\n</html>",
+      "css": "* { box-sizing: border-box; }\n\n:root {\n  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif;\n  color: #202538;\n  background: #f4f6fb;\n}\n\nbody {\n  margin: 0;\n  min-height: 100vh;\n  background: radial-gradient(circle at 15% 5%, #e7edff 0, transparent 32%), #f4f6fb;\n}\n\n.app-shell {\n  width: min(100% - 32px, 680px);\n  margin: 0 auto;\n  padding: 7vh 0 30px;\n}\n\n.todo-card {\n  background: rgba(255, 255, 255, .94);\n  border: 1px solid #e7eaf2;\n  border-radius: 24px;\n  padding: clamp(24px, 5vw, 42px);\n  box-shadow: 0 18px 55px rgba(48, 57, 88, .1);\n}\n\n.app-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 30px; }\n.eyebrow { margin: 0 0 7px; color: #6874cf; font-size: .74rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }\nh1 { margin: 0; font-size: clamp(2rem, 6vw, 2.8rem); letter-spacing: -.055em; line-height: 1; }\n.subtitle { color: #8990a5; margin: 12px 0 0; font-size: .95rem; }\n.header-mark { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 15px; color: #fff; background: linear-gradient(135deg, #7885df, #5665c8); font-size: 1.5rem; box-shadow: 0 9px 20px rgba(94, 108, 207, .27); }\n\n.task-form { display: flex; gap: 10px; margin-bottom: 34px; }\n.task-form input { min-width: 0; flex: 1; border: 1px solid #e1e4ee; border-radius: 12px; padding: 14px 16px; color: #252a3b; background: #fafbfe; font: inherit; outline: none; transition: .2s; }\n.task-form input:focus { border-color: #7784dc; box-shadow: 0 0 0 4px rgba(119, 132, 220, .13); background: #fff; }\n.task-form button { border: 0; border-radius: 12px; padding: 0 20px; color: #fff; background: #5968ca; font: inherit; font-weight: 700; cursor: pointer; transition: .2s; }\n.task-form button:hover { background: #4656b8; transform: translateY(-1px); }\n.task-form button:active { transform: translateY(0); }\n\n.list-heading { display: flex; align-items: center; justify-content: space-between; padding-bottom: 12px; border-bottom: 1px solid #edf0f5; }\n.list-heading h2 { margin: 0; font-size: 1rem; }\n.count { color: #969caf; font-size: .82rem; }\n.count strong { color: #5968ca; }\n.task-list { display: flex; flex-direction: column; }\n.task-item { display: flex; align-items: center; gap: 13px; min-height: 65px; border-bottom: 1px solid #edf0f5; animation: appear .2s ease-out; }\n.task-item:last-child { border-bottom: 0; }\n.complete-control { appearance: none; width: 21px; height: 21px; flex: 0 0 21px; border: 2px solid #cbd0df; border-radius: 50%; cursor: pointer; position: relative; transition: .2s; }\n.complete-control:hover { border-color: #6977d2; }\n.complete-control:checked { border-color: #6876d2; background: #6876d2; }\n.complete-control:checked::after { content: \"✓\"; position: absolute; color: white; font-size: 13px; font-weight: 800; left: 3px; top: -1px; }\n.task-text { flex: 1; overflow-wrap: anywhere; font-size: .96rem; }\n.task-item[data-completed=\"true\"] .task-text { color: #a1a6b5; text-decoration: line-through; }\n.delete-button { border: 0; color: #b3b8c6; background: transparent; font-size: 1.25rem; line-height: 1; padding: 8px; cursor: pointer; }\n.delete-button:hover { color: #e06b7a; }\n.empty-state { padding: 42px 0 18px; text-align: center; color: #969caf; }\n.empty-icon { display: grid; place-items: center; width: 42px; height: 42px; margin: 0 auto 14px; border-radius: 14px; color: #7885d5; background: #eef0ff; }\n.empty-state p { margin: 0 0 5px; color: #626a80; font-weight: 700; }\n.empty-state span { font-size: .85rem; }\n.page-note { margin: 18px 0 0; color: #9ba1b3; text-align: center; font-size: .75rem; }\n.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }\n@keyframes appear { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }\n@media (max-width: 460px) { .task-form { flex-direction: column; } .task-form button { min-height: 46px; } }",
+      "javascript": "const form = document.getElementById('task-form');\nconst input = document.querySelector('[data-testid=\"task-input\"]');\nconst list = document.querySelector('[data-testid=\"task-list\"]');\nconst count = document.querySelector('[data-testid=\"incomplete-count\"]');\nconst emptyState = document.getElementById('empty-state');\n\nlet tasks = [];\n\nfunction render() {\n  list.replaceChildren();\n  tasks.forEach((task) => {\n    const item = document.createElement('div');\n    item.className = 'task-item';\n    item.dataset.testid = 'task';\n    item.dataset.completed = String(task.completed);\n\n    const checkbox = document.createElement('input');\n    checkbox.type = 'checkbox';\n    checkbox.className = 'complete-control';\n    checkbox.dataset.testid = 'task-complete';\n    checkbox.checked = task.completed;\n    checkbox.setAttribute('aria-label', `Mark ${task.text} as ${task.completed ? 'incomplete' : 'complete'}`);\n    checkbox.addEventListener('change', () => {\n      task.completed = checkbox.checked;\n      render();\n    });\n\n    const text = document.createElement('span');\n    text.className = 'task-text';\n    text.dataset.testid = 'task-text';\n    text.textContent = task.text;\n\n    const remove = document.createElement('button');\n    remove.type = 'button';\n    remove.className = 'delete-button';\n    remove.dataset.testid = 'task-delete';\n    remove.setAttribute('aria-label', `Delete ${task.text}`);\n    remove.innerHTML = '&times;';\n    remove.addEventListener('click', () => {\n      tasks = tasks.filter((entry) => entry.id !== task.id);\n      render();\n    });\n\n    item.append(checkbox, text, remove);\n    list.append(item);\n  });\n  count.textContent = tasks.filter((task) => !task.completed).length;\n  emptyState.hidden = tasks.length > 0;\n}\n\nform.addEventListener('submit', (event) => {\n  event.preventDefault();\n  const text = input.value.trim();\n  if (!text) {\n    input.focus();\n    return;\n  }\n  tasks.push({ id: Date.now() + Math.random(), text, completed: false });\n  input.value = '';\n  render();\n  input.focus();\n});\n\nrender();",
+      "metadata": {
+        "applicationName": "To-do List",
+        "summary": "A polished, browser-only to-do list for adding, completing, deleting, and tracking tasks."
+      }
+    },
+    "qualityReport": {
+      "analysedAt": "2026-08-03T14:25:58.425Z",
+      "analyzers": {
+        "html": {
+          "tool": "HTMLHint",
+          "issueCount": 0,
+          "errorCount": 0,
+          "warningCount": 0,
+          "passed": true,
+          "messages": []
+        },
+        "css": {
+          "tool": "Stylelint",
+          "issueCount": 0,
+          "errorCount": 0,
+          "warningCount": 0,
+          "passed": true,
+          "messages": []
+        },
+        "javascript": {
+          "tool": "ESLint",
+          "issueCount": 0,
+          "errorCount": 0,
+          "warningCount": 0,
+          "passed": true,
+          "messages": []
+        }
+      },
+      "summary": {
+        "totalIssues": 0,
+        "totalErrors": 0,
+        "totalWarnings": 0,
+        "passed": true
+      }
+    },
+    "runtimeReport": {
+      "reportVersion": "1.1",
+      "runId": "2026-08-03T14-25-58-425Z-1cd2a767",
+      "specificationId": "todo",
+      "applicationUrl": "http://localhost:3001/generated-apps/runs/2026-08-03T14-25-58-425Z-1cd2a767/index.html",
+      "browser": {
+        "engine": "chromium",
+        "headless": true,
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        }
+      },
+      "startedAt": "2026-08-03T14:25:58.436Z",
+      "completedAt": "2026-08-03T14:25:59.477Z",
+      "durationMs": 1041,
+      "navigation": {
+        "successful": true,
+        "status": 200,
+        "finalUrl": "http://localhost:3001/generated-apps/runs/2026-08-03T14-25-58-425Z-1cd2a767/index.html",
+        "error": null
+      },
+      "body": {
+        "exists": true,
+        "visible": true,
+        "textLength": 227,
+        "textPreview": "MY DAY\n\nTo-do List\n\nA clear mind starts with a clear list.\n\n✓\nAdd a task\nAdd task\nYour tasks\n0 remaining\n✦\n\nYour list is clear\n\nAdd something you'd like to accomplish.\n\nTasks stay in this browser tab ",
+        "hasVisibleContent": true
+      },
+      "consoleErrors": [],
+      "uncaughtExceptions": [],
+      "requiredControls": {
+        "expected": 2,
+        "present": 2,
+        "allPresent": true,
+        "controls": [
+          {
+            "id": "task-input",
+            "label": "Task input",
+            "present": true,
+            "candidates": [
+              {
+                "type": "css",
+                "selector": "input[type=\"text\"], input:not([type]), textarea",
+                "found": true
+              }
+            ]
+          },
+          {
+            "id": "add-task-control",
+            "label": "Add-task control",
+            "present": true,
+            "candidates": [
+              {
+                "type": "role",
+                "role": "button",
+                "name": "add|create|save|submit",
+                "found": true
+              },
+              {
+                "type": "css",
+                "selector": "button[type=\"submit\"], input[type=\"submit\"]",
+                "found": true
+              }
+            ]
+          }
+        ]
+      },
+      "accessibility": {
+        "successful": true,
+        "standard": "WCAG 2.0 and 2.1 Level A and AA",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa"
+        ],
+        "violationCount": 1,
+        "violatingNodeCount": 1,
+        "violationsByImpact": {
+          "critical": 0,
+          "serious": 1,
+          "moderate": 0,
+          "minor": 0,
+          "unknown": 0
+        },
+        "violations": [
+          {
+            "id": "aria-prohibited-attr",
+            "impact": "serious",
+            "tags": [
+              "cat.aria",
+              "wcag2a",
+              "wcag412",
+              "EN-301-549",
+              "EN-9.4.1.2",
+              "RGAAv4",
+              "RGAA-7.1.1"
+            ],
+            "description": "Ensure ARIA attributes are not prohibited for an element's role",
+            "help": "Elements must only use permitted ARIA attributes",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.12/aria-prohibited-attr?application=playwright",
+            "nodeCount": 1,
+            "nodes": [
+              {
+                "html": "<div data-testid=\"task-list\" class=\"task-list\" aria-live=\"polite\" aria-label=\"Task list\"></div>",
+                "target": [
+                  ".task-list"
+                ],
+                "failureSummary": "Fix all of the following:\n  aria-label attribute cannot be used on a div with no valid role attribute.",
+                "impact": "serious"
+              }
+            ]
+          }
+        ],
+        "incompleteCount": 1,
+        "inapplicableCount": 44,
+        "passCount": 18,
+        "error": null
+      },
+      "summary": {
+        "runtimePassed": true,
+        "accessibilityPassed": false,
+        "navigationSuccessful": true,
+        "hasVisibleBodyContent": true,
+        "consoleErrorCount": 0,
+        "uncaughtExceptionCount": 0,
+        "requiredControlsPresent": 2,
+        "requiredControlsExpected": 2,
+        "accessibilityAnalysisSuccessful": true,
+        "accessibilityViolationCount": 1,
+        "accessibilityViolatingNodeCount": 1
+      }
+    },
+    "accessibilityReport": {
+      "successful": true,
+      "standard": "WCAG 2.0 and 2.1 Level A and AA",
+      "tags": [
+        "wcag2a",
+        "wcag2aa",
+        "wcag21a",
+        "wcag21aa"
+      ],
+      "violationCount": 1,
+      "violatingNodeCount": 1,
+      "violationsByImpact": {
+        "critical": 0,
+        "serious": 1,
+        "moderate": 0,
+        "minor": 0,
+        "unknown": 0
+      },
+      "violations": [
+        {
+          "id": "aria-prohibited-attr",
+          "impact": "serious",
+          "tags": [
+            "cat.aria",
+            "wcag2a",
+            "wcag412",
+            "EN-301-549",
+            "EN-9.4.1.2",
+            "RGAAv4",
+            "RGAA-7.1.1"
+          ],
+          "description": "Ensure ARIA attributes are not prohibited for an element's role",
+          "help": "Elements must only use permitted ARIA attributes",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.12/aria-prohibited-attr?application=playwright",
+          "nodeCount": 1,
+          "nodes": [
+            {
+              "html": "<div data-testid=\"task-list\" class=\"task-list\" aria-live=\"polite\" aria-label=\"Task list\"></div>",
+              "target": [
+                ".task-list"
+              ],
+              "failureSummary": "Fix all of the following:\n  aria-label attribute cannot be used on a div with no valid role attribute.",
+              "impact": "serious"
+            }
+          ]
+        }
+      ],
+      "incompleteCount": 1,
+      "inapplicableCount": 44,
+      "passCount": 18,
+      "error": null
+    },
+    "functionalReport": {
+      "reportVersion": "1.0",
+      "runId": "2026-08-03T14-25-58-425Z-1cd2a767",
+      "specificationId": "todo",
+      "applicationUrl": "http://localhost:3001/generated-apps/runs/2026-08-03T14-25-58-425Z-1cd2a767/index.html",
+      "startedAt": "2026-08-03T14:25:59.520Z",
+      "completedAt": "2026-08-03T14:26:02.002Z",
+      "durationMs": 2482,
+      "tests": [
+        {
+          "id": "todo-add-task",
+          "requirement": "Allow the user to enter and add a non-empty task, and display the added task in a visible task list.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "todo-reject-empty-task",
+          "requirement": "Whitespace-only or empty input must not create a task.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "todo-complete-task",
+          "requirement": "Allow each task to be marked as completed, with its completed state visibly reflected in the interface.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "todo-delete-task",
+          "requirement": "Allow each task to be deleted. After deletion, the deleted task must no longer be displayed in the task list.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "todo-incomplete-count",
+          "requirement": "Display the current number of incomplete tasks and update the count when tasks are added, completed or deleted.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "todo-session-memory",
+          "requirement": "Keep task data in page memory only. Refreshing or reopening the page must reset the task list.",
+          "passed": true,
+          "error": null
+        }
+      ],
+      "summary": {
+        "passed": true,
+        "passedCount": 6,
+        "failedCount": 0,
+        "totalCount": 6
+      }
+    }
+  }
+}

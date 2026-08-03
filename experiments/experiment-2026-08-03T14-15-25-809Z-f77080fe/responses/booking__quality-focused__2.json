@@ -1,0 +1,330 @@
+{
+  "capturedAt": "2026-08-03T14:33:15.616Z",
+  "httpStatus": 201,
+  "ok": true,
+  "body": {
+    "run": {
+      "runId": "2026-08-03T14-33-13-231Z-e4c3fde6",
+      "createdAt": "2026-08-03T14:33:13.232Z",
+      "specification": {
+        "id": "booking",
+        "name": "Appointment Booking Form"
+      },
+      "workflow": "quality-focused",
+      "model": "gpt-5.6-luna",
+      "temperature": 0,
+      "promptVersion": "1.0.0",
+      "generationMetrics": {
+        "totalDurationMs": 21119,
+        "promptTokens": 959,
+        "outputTokens": 3102,
+        "totalTokens": 4061,
+        "finishReason": null
+      },
+      "generatedApplication": {
+        "applicationName": "Appointment Booking Form",
+        "summary": "A browser-only appointment manager for creating, viewing, and cancelling mock bookings."
+      },
+      "qualitySummary": {
+        "totalIssues": 3,
+        "totalErrors": 2,
+        "totalWarnings": 1,
+        "passed": false
+      },
+      "experimentMetrics": {
+        "workflowDurationMs": 23541,
+        "aiGenerationDurationMs": 21119,
+        "refinementIterations": 0,
+        "converged": null,
+        "stopReason": "not-applicable",
+        "totalPromptTokens": 959,
+        "totalOutputTokens": 3102,
+        "totalTokens": 4061,
+        "iterations": [
+          {
+            "iteration": 0,
+            "generationDurationMs": 21119,
+            "promptTokens": 959,
+            "outputTokens": 3102,
+            "totalTokens": 4061
+          }
+        ]
+      },
+      "completedAt": "2026-08-03T14:33:15.624Z",
+      "runDirectory": "C:\\Users\\Administrator\\Documents\\Development\\ai-software-quality-pipeline\\generated-apps\\runs\\2026-08-03T14-33-13-231Z-e4c3fde6"
+    },
+    "application": {
+      "html": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  <title>Appointment Booking Form</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n  <script src=\"script.js\" defer></script>\n</head>\n<body>\n  <header class=\"site-header\">\n    <div class=\"container\">\n      <h1>Appointment Booking</h1>\n      <p>Create and manage appointments in this browser session.</p>\n    </div>\n  </header>\n\n  <main class=\"container\">\n    <section class=\"booking-panel\" aria-labelledby=\"form-heading\">\n      <h2 id=\"form-heading\">Create an appointment</h2>\n      <form id=\"booking-form\" novalidate>\n        <div class=\"form-grid\">\n          <div class=\"form-field\">\n            <label for=\"booking-name\">Customer name <span aria-hidden=\"true\">*</span></label>\n            <input id=\"booking-name\" name=\"customerName\" type=\"text\" autocomplete=\"name\" required data-testid=\"booking-name\">\n            <p class=\"field-error\" id=\"name-error\"></p>\n          </div>\n\n          <div class=\"form-field\">\n            <label for=\"booking-email\">Email address <span aria-hidden=\"true\">*</span></label>\n            <input id=\"booking-email\" name=\"email\" type=\"email\" autocomplete=\"email\" required data-testid=\"booking-email\">\n            <p class=\"field-error\" id=\"email-error\"></p>\n          </div>\n\n          <div class=\"form-field\">\n            <label for=\"booking-date\">Appointment date <span aria-hidden=\"true\">*</span></label>\n            <input id=\"booking-date\" name=\"date\" type=\"date\" required data-testid=\"booking-date\">\n            <p class=\"field-error\" id=\"date-error\"></p>\n          </div>\n\n          <div class=\"form-field\">\n            <label for=\"booking-time\">Appointment time <span aria-hidden=\"true\">*</span></label>\n            <input id=\"booking-time\" name=\"time\" type=\"time\" required data-testid=\"booking-time\">\n            <p class=\"field-error\" id=\"time-error\"></p>\n          </div>\n\n          <div class=\"form-field form-field-wide\">\n            <label for=\"booking-type\">Appointment type <span aria-hidden=\"true\">*</span></label>\n            <select id=\"booking-type\" name=\"type\" required data-testid=\"booking-type\">\n              <option value=\"\">Select an appointment type</option>\n              <option value=\"Consultation\">Consultation</option>\n              <option value=\"Follow-up\">Follow-up</option>\n              <option value=\"Routine check-up\">Routine check-up</option>\n              <option value=\"Other\">Other</option>\n            </select>\n            <p class=\"field-error\" id=\"type-error\"></p>\n          </div>\n        </div>\n        <p class=\"required-note\">* Required fields</p>\n        <div id=\"form-error\" class=\"form-error\" role=\"alert\" tabindex=\"-1\"></div>\n        <button class=\"primary-button\" type=\"submit\" data-testid=\"booking-submit\">Create booking</button>\n      </form>\n      <div id=\"confirmation\" class=\"confirmation\" data-testid=\"booking-confirmation\" role=\"status\" aria-live=\"polite\" hidden></div>\n    </section>\n\n    <section class=\"appointments-panel\" aria-labelledby=\"appointments-heading\">\n      <h2 id=\"appointments-heading\">Your bookings</h2>\n      <div id=\"booking-list\" data-testid=\"booking-list\" class=\"booking-list\" aria-live=\"polite\">\n        <p class=\"empty-state\">No bookings yet.</p>\n      </div>\n    </section>\n  </main>\n</body>\n</html>",
+      "css": "* { box-sizing: border-box; }\n\n:root {\n  color: #172033;\n  background: #f4f7fb;\n  font-family: system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif;\n  line-height: 1.5;\n}\n\nbody { margin: 0; }\n.container { width: min(100% - 2rem, 900px); margin: 0 auto; }\n.site-header { background: #173b65; color: #fff; padding: 2.25rem 0; }\nh1, h2 { line-height: 1.2; }\nh1 { margin: 0 0 .5rem; font-size: clamp(1.8rem, 5vw, 2.6rem); }\nh2 { margin-top: 0; color: #173b65; }\nmain { display: grid; gap: 1.5rem; padding: 2rem 0 3rem; }\n.booking-panel, .appointments-panel { background: #fff; border: 1px solid #d5deea; border-radius: .6rem; padding: clamp(1.2rem, 4vw, 2rem); box-shadow: 0 2px 8px #17203312; }\n.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }\n.form-field-wide { grid-column: 1 / -1; }\n.form-field { display: flex; flex-direction: column; gap: .35rem; }\nlabel { font-weight: 650; }\ninput, select { width: 100%; min-height: 2.75rem; border: 1px solid #718096; border-radius: .35rem; padding: .55rem .7rem; color: #172033; background: #fff; font: inherit; }\ninput:focus, select:focus, button:focus, .form-error:focus { outline: 3px solid #f3b63f; outline-offset: 2px; }\n.field-error { min-height: 1.25rem; margin: 0; color: #a12622; font-size: .9rem; }\n.required-note { margin: .5rem 0; font-size: .9rem; color: #46566b; }\n.form-error { color: #a12622; font-weight: 650; margin: .5rem 0 1rem; }\n.primary-button, .cancel-button { border: 0; border-radius: .35rem; padding: .7rem 1rem; font: inherit; font-weight: 700; cursor: pointer; }\n.primary-button { background: #176b4d; color: #fff; }\n.primary-button:hover { background: #12573e; }\n.confirmation { margin-top: 1rem; padding: .85rem 1rem; border-left: 4px solid #176b4d; background: #e4f4ec; color: #124b37; }\n.booking-list { display: grid; gap: 1rem; }\n.empty-state { color: #526176; margin: 0; }\n.booking { border: 1px solid #c9d5e3; border-radius: .45rem; padding: 1rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }\n.booking h3 { margin: 0 0 .35rem; color: #173b65; }\n.booking p { margin: .25rem 0; }\n.booking[data-status=\"cancelled\"] { background: #f1f3f5; color: #596575; }\n.booking[data-status=\"cancelled\"] h3 { color: #596575; text-decoration: line-through; }\n.cancel-button { background: #a12622; color: #fff; white-space: nowrap; }\n.cancel-button:hover { background: #801d1a; }\n@media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } .form-field-wide { grid-column: auto; } .booking { flex-direction: column; } }",
+      "javascript": "const form = document.querySelector('#booking-form');\nconst nameInput = document.querySelector('#booking-name');\nconst emailInput = document.querySelector('#booking-email');\nconst dateInput = document.querySelector('#booking-date');\nconst timeInput = document.querySelector('#booking-time');\nconst typeInput = document.querySelector('#booking-type');\nconst list = document.querySelector('#booking-list');\nconst confirmation = document.querySelector('#confirmation');\nconst formError = document.querySelector('#form-error');\nlet bookings = [];\n\nfunction getToday() {\n  const now = new Date();\n  const month = String(now.getMonth() + 1).padStart(2, '0');\n  const day = String(now.getDate()).padStart(2, '0');\n  return `${now.getFullYear()}-${month}-${day}`;\n}\n\nfunction setDateMinimum() {\n  dateInput.min = getToday();\n}\n\nfunction clearErrors() {\n  document.querySelectorAll('.field-error').forEach((error) => { error.textContent = ''; });\n  formError.textContent = '';\n}\n\nfunction showFieldError(id, message) {\n  document.querySelector(`#${id}-error`).textContent = message;\n}\n\nfunction validateForm() {\n  clearErrors();\n  let valid = true;\n  if (!nameInput.value.trim()) { showFieldError('name', 'Enter the customer name.'); valid = false; }\n  if (!emailInput.value.trim() || !emailInput.validity.valid) { showFieldError('email', 'Enter a valid email address.'); valid = false; }\n  if (!dateInput.value) { showFieldError('date', 'Choose an appointment date.'); valid = false; }\n  else if (dateInput.value < getToday()) { showFieldError('date', 'The appointment date cannot be in the past.'); valid = false; }\n  if (!timeInput.value) { showFieldError('time', 'Choose an appointment time.'); valid = false; }\n  if (!typeInput.value) { showFieldError('type', 'Select an appointment type.'); valid = false; }\n  if (!valid) { formError.textContent = 'Please correct the highlighted fields.'; formError.focus(); }\n  return valid;\n}\n\nfunction formatDate(date) {\n  return new Date(`${date}T00:00:00`).toLocaleDateString(undefined, { dateStyle: 'long' });\n}\n\nfunction renderBookings() {\n  list.replaceChildren();\n  if (!bookings.length) {\n    const empty = document.createElement('p');\n    empty.className = 'empty-state';\n    empty.textContent = 'No bookings yet.';\n    list.append(empty);\n    return;\n  }\n  bookings.forEach((booking) => {\n    const article = document.createElement('article');\n    article.className = 'booking';\n    article.dataset.testid = 'booking';\n    article.dataset.status = booking.cancelled ? 'cancelled' : 'active';\n    const details = document.createElement('div');\n    const heading = document.createElement('h3');\n    heading.dataset.testid = 'booking-name-display';\n    heading.textContent = booking.name;\n    const info = document.createElement('p');\n    info.textContent = `${booking.type} · ${formatDate(booking.date)} at ${booking.time}`;\n    const email = document.createElement('p');\n    email.textContent = booking.email;\n    details.append(heading, info, email);\n    if (booking.cancelled) {\n      const status = document.createElement('p');\n      status.textContent = 'Cancelled';\n      details.append(status);\n    } else {\n      const cancel = document.createElement('button');\n      cancel.type = 'button';\n      cancel.className = 'cancel-button';\n      cancel.dataset.testid = 'booking-cancel';\n      cancel.dataset.id = booking.id;\n      cancel.textContent = 'Cancel booking';\n      cancel.addEventListener('click', cancelBooking);\n      article.append(details, cancel);\n      list.append(article);\n      return;\n    }\n    article.append(details);\n    list.append(article);\n  });\n}\n\nfunction createBooking(event) {\n  event.preventDefault();\n  if (!validateForm()) return;\n  bookings.push({ id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()), name: nameInput.value.trim(), email: emailInput.value.trim(), date: dateInput.value, time: timeInput.value, type: typeInput.value, cancelled: false });\n  renderBookings();\n  confirmation.textContent = 'Booking created successfully.';\n  confirmation.hidden = false;\n  form.reset();\n  setDateMinimum();\n  nameInput.focus();\n}\n\nfunction cancelBooking(event) {\n  const booking = bookings.find((item) => item.id === event.currentTarget.dataset.id);\n  if (booking) { booking.cancelled = true; renderBookings(); }\n}\n\nsetDateMinimum();\nform.addEventListener('submit', createBooking);",
+      "metadata": {
+        "applicationName": "Appointment Booking Form",
+        "summary": "A browser-only appointment manager for creating, viewing, and cancelling mock bookings."
+      }
+    },
+    "qualityReport": {
+      "analysedAt": "2026-08-03T14:33:13.231Z",
+      "analyzers": {
+        "html": {
+          "tool": "HTMLHint",
+          "issueCount": 0,
+          "errorCount": 0,
+          "warningCount": 0,
+          "passed": true,
+          "messages": []
+        },
+        "css": {
+          "tool": "Stylelint",
+          "issueCount": 0,
+          "errorCount": 0,
+          "warningCount": 0,
+          "passed": true,
+          "messages": []
+        },
+        "javascript": {
+          "tool": "ESLint",
+          "issueCount": 3,
+          "errorCount": 2,
+          "warningCount": 1,
+          "passed": false,
+          "messages": [
+            {
+              "line": 10,
+              "column": 5,
+              "endLine": 10,
+              "endColumn": 13,
+              "severity": "warning",
+              "message": "'bookings' is never reassigned. Use 'const' instead.",
+              "ruleId": "prefer-const"
+            },
+            {
+              "line": 96,
+              "column": 23,
+              "endLine": 96,
+              "endColumn": 29,
+              "severity": "error",
+              "message": "'crypto' is not defined.",
+              "ruleId": "no-undef"
+            },
+            {
+              "line": 96,
+              "column": 43,
+              "endLine": 96,
+              "endColumn": 49,
+              "severity": "error",
+              "message": "'crypto' is not defined.",
+              "ruleId": "no-undef"
+            }
+          ]
+        }
+      },
+      "summary": {
+        "totalIssues": 3,
+        "totalErrors": 2,
+        "totalWarnings": 1,
+        "passed": false
+      }
+    },
+    "runtimeReport": {
+      "reportVersion": "1.1",
+      "runId": "2026-08-03T14-33-13-231Z-e4c3fde6",
+      "specificationId": "booking",
+      "applicationUrl": "http://localhost:3001/generated-apps/runs/2026-08-03T14-33-13-231Z-e4c3fde6/index.html",
+      "browser": {
+        "engine": "chromium",
+        "headless": true,
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        }
+      },
+      "startedAt": "2026-08-03T14:33:13.241Z",
+      "completedAt": "2026-08-03T14:33:14.281Z",
+      "durationMs": 1040,
+      "navigation": {
+        "successful": true,
+        "status": 200,
+        "finalUrl": "http://localhost:3001/generated-apps/runs/2026-08-03T14-33-13-231Z-e4c3fde6/index.html",
+        "error": null
+      },
+      "body": {
+        "exists": true,
+        "visible": true,
+        "textLength": 332,
+        "textPreview": "Appointment Booking\n\nCreate and manage appointments in this browser session.\n\nCreate an appointment\nCustomer name *\n\nEmail address *\n\nAppointment date *\n\nAppointment time *\n\nAppointment type *\nSelect ",
+        "hasVisibleContent": true
+      },
+      "consoleErrors": [],
+      "uncaughtExceptions": [],
+      "requiredControls": {
+        "expected": 2,
+        "present": 2,
+        "allPresent": true,
+        "controls": [
+          {
+            "id": "booking-date-control",
+            "label": "Booking date control",
+            "present": true,
+            "candidates": [
+              {
+                "type": "css",
+                "selector": "input[type=\"date\"], input[type=\"datetime-local\"], input[name*=\"date\" i]",
+                "found": true
+              }
+            ]
+          },
+          {
+            "id": "booking-action-control",
+            "label": "Booking submission control",
+            "present": true,
+            "candidates": [
+              {
+                "type": "role",
+                "role": "button",
+                "name": "book|reserve|confirm|submit|save",
+                "found": true
+              },
+              {
+                "type": "css",
+                "selector": "button[type=\"submit\"], input[type=\"submit\"]",
+                "found": true
+              }
+            ]
+          }
+        ]
+      },
+      "accessibility": {
+        "successful": true,
+        "standard": "WCAG 2.0 and 2.1 Level A and AA",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa"
+        ],
+        "violationCount": 0,
+        "violatingNodeCount": 0,
+        "violationsByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0,
+          "unknown": 0
+        },
+        "violations": [],
+        "incompleteCount": 0,
+        "inapplicableCount": 40,
+        "passCount": 22,
+        "error": null
+      },
+      "summary": {
+        "runtimePassed": true,
+        "accessibilityPassed": true,
+        "navigationSuccessful": true,
+        "hasVisibleBodyContent": true,
+        "consoleErrorCount": 0,
+        "uncaughtExceptionCount": 0,
+        "requiredControlsPresent": 2,
+        "requiredControlsExpected": 2,
+        "accessibilityAnalysisSuccessful": true,
+        "accessibilityViolationCount": 0,
+        "accessibilityViolatingNodeCount": 0
+      }
+    },
+    "accessibilityReport": {
+      "successful": true,
+      "standard": "WCAG 2.0 and 2.1 Level A and AA",
+      "tags": [
+        "wcag2a",
+        "wcag2aa",
+        "wcag21a",
+        "wcag21aa"
+      ],
+      "violationCount": 0,
+      "violatingNodeCount": 0,
+      "violationsByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0,
+        "unknown": 0
+      },
+      "violations": [],
+      "incompleteCount": 0,
+      "inapplicableCount": 40,
+      "passCount": 22,
+      "error": null
+    },
+    "functionalReport": {
+      "reportVersion": "1.0",
+      "runId": "2026-08-03T14-33-13-231Z-e4c3fde6",
+      "specificationId": "booking",
+      "applicationUrl": "http://localhost:3001/generated-apps/runs/2026-08-03T14-33-13-231Z-e4c3fde6/index.html",
+      "startedAt": "2026-08-03T14:33:14.324Z",
+      "completedAt": "2026-08-03T14:33:15.585Z",
+      "durationMs": 1261,
+      "tests": [
+        {
+          "id": "booking-fields",
+          "requirement": "Include fields for customer name, email address, appointment date and appointment time.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "booking-type",
+          "requirement": "Include a selectable appointment type.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "booking-required-fields",
+          "requirement": "Prevent a booking from being created when required information is missing.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "booking-email-validation",
+          "requirement": "Reject an email address that is not in a valid email format using browser-side validation.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "booking-past-date",
+          "requirement": "Prevent a booking from being created for a date in the past.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "booking-create",
+          "requirement": "After a valid booking is submitted, display the booking in a visible list or booking area.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "booking-confirmation",
+          "requirement": "Display a visible confirmation after a valid booking is successfully created.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "booking-cancel",
+          "requirement": "Allow each booking to be cancelled. Cancellation may either remove the booking from the active list or clearly mark it as cancelled.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "booking-session-memory",
+          "requirement": "Keep booking data in page memory only. Refreshing or reopening the page must reset the booking data.",
+          "passed": true,
+          "error": null
+        }
+      ],
+      "summary": {
+        "passed": true,
+        "passedCount": 9,
+        "failedCount": 0,
+        "totalCount": 9
+      }
+    }
+  }
+}
