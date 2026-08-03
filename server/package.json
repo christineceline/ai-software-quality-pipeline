@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
-    "validate:run": "node src/scripts/validateExistingRun.js"
+    "validate:run": "node src/scripts/validateExistingRun.js",
+    "experiment": "node src/scripts/runExperiment.js"
   },
   "keywords": [],
   "author": "",

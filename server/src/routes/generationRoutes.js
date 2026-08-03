@@ -42,6 +42,8 @@ function sumMetric(metrics, property) {
 
 router.post("/", async (request, response) => {
   const workflowStartedAt = Date.now();
+  let failureType = "generation-api-failure";
+  let failureStage = "request-validation";
 
   try {
     const {
@@ -56,12 +58,16 @@ router.post("/", async (request, response) => {
     ) {
       return response.status(400).json({
         error: "A specificationId is required.",
+        failureType: "request-failure",
+        failureStage,
       });
     }
 
     if (!supportedWorkflows.includes(workflow)) {
       return response.status(400).json({
         error: `Workflow must be one of: ${supportedWorkflows.join(", ")}.`,
+        failureType: "request-failure",
+        failureStage,
       });
     }
 
@@ -72,6 +78,8 @@ router.post("/", async (request, response) => {
     if (!specification) {
       return response.status(404).json({
         error: `No specification exists with ID "${specificationId}".`,
+        failureType: "request-failure",
+        failureStage,
       });
     }
 
@@ -80,10 +88,14 @@ router.post("/", async (request, response) => {
         ? "one-shot"
         : workflow;
 
+    failureStage = "prompt-construction";
+
     const prompt = buildPrompt({
       workflow: initialPromptWorkflow,
       specification,
     });
+
+    failureStage = "ai-generation";
 
     const generationResult =
       await generateApplication({
@@ -91,15 +103,22 @@ router.post("/", async (request, response) => {
         temperature,
       });
 
+    failureStage = "response-parsing";
+
     const application =
       parseGeneratedApplication(
         generationResult.rawResponse,
       );
 
+    failureType = "pipeline-failure";
+    failureStage = "static-analysis";
+
     const qualityReport =
       await analyseApplication(application);
 
     if (workflow === "automated-refinement") {
+      failureStage = "run-storage";
+
       const runMetadata =
         await saveRefinementRun({
           application,
@@ -131,6 +150,8 @@ router.post("/", async (request, response) => {
         `/generated-apps/runs/${encodedRunId}` +
         `/iterations/0/index.html`;
 
+      failureStage = "runtime-validation";
+
       const initialRuntimeReport =
         await runRuntimeValidation({
           applicationUrl:
@@ -142,6 +163,8 @@ router.post("/", async (request, response) => {
             specification.id,
         });
 
+      failureStage = "functional-validation";
+
       const initialFunctionalReport =
         await runFunctionalValidation({
           applicationUrl:
@@ -152,6 +175,8 @@ router.post("/", async (request, response) => {
           specificationId:
             specification.id,
         });
+
+      failureStage = "automated-refinement";
 
       const refinementResult =
         await runRefinementLoop({
@@ -242,6 +267,8 @@ router.post("/", async (request, response) => {
           ),
       };
 
+      failureStage = "run-finalisation";
+
       const completedRunMetadata =
         await completeRefinementRun({
           runDirectory,
@@ -273,6 +300,8 @@ router.post("/", async (request, response) => {
           refinementResult,
       });
     }
+
+    failureStage = "run-storage";
 
     const runMetadata =
       await saveGeneratedRun({
@@ -307,6 +336,8 @@ router.post("/", async (request, response) => {
       `http://localhost:${process.env.PORT || 3001}` +
       `/generated-apps/runs/${encodedRunId}/index.html`;
 
+    failureStage = "runtime-validation";
+
     const runtimeReport =
       await runRuntimeValidation({
         applicationUrl,
@@ -315,6 +346,8 @@ router.post("/", async (request, response) => {
         specificationId:
           specification.id,
       });
+
+    failureStage = "functional-validation";
 
     const functionalReport =
       await runFunctionalValidation({
@@ -379,6 +412,8 @@ router.post("/", async (request, response) => {
       ],
     };
 
+    failureStage = "run-finalisation";
+
     const completedRunMetadata =
       await completeGeneratedRun({
         runDirectory,
@@ -404,6 +439,8 @@ router.post("/", async (request, response) => {
       error:
         "Application generation failed.",
       details: error.message,
+      failureType,
+      failureStage,
     });
   }
 });
