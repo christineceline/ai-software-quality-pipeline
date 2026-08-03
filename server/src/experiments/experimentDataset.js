@@ -9,47 +9,32 @@ import {
   writeJson,
 } from "./experimentStorage.js";
 
-function getFinalReports(
+function getInitialReports(
   responseBody,
 ) {
-  if (
-    responseBody?.refinement
-  ) {
-    const iterations =
-      responseBody.refinement
-        .iterations ?? [];
-
-    const finalIteration =
-      iterations.length > 0
-        ? iterations[
-            iterations.length - 1
-          ]
-        : responseBody.initial;
-
+  if (responseBody?.initial) {
     return {
       qualityReport:
-        finalIteration?.qualityReport ??
         responseBody.initial
-          ?.qualityReport ??
+          .qualityReport ??
         null,
+
       runtimeReport:
-        finalIteration?.runtimeReport ??
         responseBody.initial
-          ?.runtimeReport ??
+          .runtimeReport ??
         null,
+
       accessibilityReport:
-        finalIteration
-          ?.accessibilityReport ??
-        finalIteration?.runtimeReport
+        responseBody.initial
+          .accessibilityReport ??
+        responseBody.initial
+          .runtimeReport
           ?.accessibility ??
-        responseBody.initial
-          ?.accessibilityReport ??
         null,
+
       functionalReport:
-        finalIteration
-          ?.functionalReport ??
         responseBody.initial
-          ?.functionalReport ??
+          .functionalReport ??
         null,
     };
   }
@@ -58,17 +43,74 @@ function getFinalReports(
     qualityReport:
       responseBody?.qualityReport ??
       null,
+
     runtimeReport:
       responseBody?.runtimeReport ??
       null,
+
     accessibilityReport:
       responseBody
         ?.accessibilityReport ??
       responseBody?.runtimeReport
         ?.accessibility ??
       null,
+
     functionalReport:
       responseBody?.functionalReport ??
+      null,
+  };
+}
+
+function getFinalReports(
+  responseBody,
+) {
+  if (!responseBody?.refinement) {
+    return getInitialReports(
+      responseBody,
+    );
+  }
+
+  const iterations =
+    responseBody.refinement
+      .iterations ?? [];
+
+  const finalIteration =
+    iterations.length > 0
+      ? iterations[
+          iterations.length - 1
+        ]
+      : responseBody.initial;
+
+  return {
+    qualityReport:
+      finalIteration
+        ?.qualityReport ??
+      responseBody.initial
+        ?.qualityReport ??
+      null,
+
+    runtimeReport:
+      finalIteration
+        ?.runtimeReport ??
+      responseBody.initial
+        ?.runtimeReport ??
+      null,
+
+    accessibilityReport:
+      finalIteration
+        ?.accessibilityReport ??
+      finalIteration
+        ?.runtimeReport
+        ?.accessibility ??
+      responseBody.initial
+        ?.accessibilityReport ??
+      null,
+
+    functionalReport:
+      finalIteration
+        ?.functionalReport ??
+      responseBody.initial
+        ?.functionalReport ??
       null,
   };
 }
@@ -76,18 +118,17 @@ function getFinalReports(
 function getBoolean(
   ...values
 ) {
-  return values.find(
-    (value) =>
-      typeof value === "boolean",
-  ) ?? null;
+  return (
+    values.find(
+      (value) =>
+        typeof value === "boolean",
+    ) ?? null
+  );
 }
 
-export function classifySuccessfulRun(
-  responseBody,
+function getPassStatus(
+  reports,
 ) {
-  const reports =
-    getFinalReports(responseBody);
-
   const staticPassed =
     getBoolean(
       reports.qualityReport
@@ -105,7 +146,8 @@ export function classifySuccessfulRun(
   const accessibilityPassed =
     getBoolean(
       reports.runtimeReport
-        ?.summary?.accessibilityPassed,
+        ?.summary
+        ?.accessibilityPassed,
       reports.accessibilityReport
         ?.summary?.passed,
       reports.accessibilityReport
@@ -128,23 +170,51 @@ export function classifySuccessfulRun(
       typeof value === "boolean",
   );
 
-  const allPassed =
-    passValues.length > 0 &&
-    passValues.every(Boolean);
+  return {
+    staticPassed,
+    runtimePassed,
+    accessibilityPassed,
+    functionalPassed,
+
+    allPassed:
+      passValues.length > 0 &&
+      passValues.every(Boolean),
+  };
+}
+
+export function classifySuccessfulRun(
+  responseBody,
+) {
+  const initialReports =
+    getInitialReports(
+      responseBody,
+    );
+
+  const finalReports =
+    getFinalReports(
+      responseBody,
+    );
+
+  const initialPassStatus =
+    getPassStatus(
+      initialReports,
+    );
+
+  const finalPassStatus =
+    getPassStatus(
+      finalReports,
+    );
 
   return {
     resultClassification:
-      allPassed
+      finalPassStatus.allPassed
         ? "valid-passed"
         : "valid-poor-quality",
-    reports,
-    passStatus: {
-      staticPassed,
-      runtimePassed,
-      accessibilityPassed,
-      functionalPassed,
-      allPassed,
-    },
+
+    initialReports,
+    finalReports,
+    initialPassStatus,
+    finalPassStatus,
   };
 }
 
@@ -167,7 +237,10 @@ function csvEscape(value) {
     text.includes("\n") ||
     text.includes("\r")
   ) {
-    return `"${text.replaceAll("\"", "\"\"")}"`;
+    return `"${text.replaceAll(
+      "\"",
+      "\"\"",
+    )}"`;
   }
 
   return text;
@@ -184,9 +257,9 @@ function getReportCounts(
     reports.runtimeReport
       ?.summary ?? {};
 
-  const accessibilitySummary =
-    reports.accessibilityReport
-      ?.summary ?? {};
+  const accessibility =
+    reports.accessibilityReport ??
+    {};
 
   const functionalSummary =
     reports.functionalReport
@@ -196,47 +269,120 @@ function getReportCounts(
     staticTotalIssues:
       qualitySummary.totalIssues ??
       null,
+
     staticErrors:
       qualitySummary.totalErrors ??
       null,
+
     staticWarnings:
       qualitySummary.totalWarnings ??
       null,
+
     runtimeConsoleErrors:
-      runtimeSummary.consoleErrors ??
+      runtimeSummary
+        .consoleErrorCount ??
       reports.runtimeReport
         ?.consoleErrors?.length ??
       null,
-    runtimePageErrors:
-      runtimeSummary.pageErrors ??
+
+    runtimeUncaughtExceptions:
+      runtimeSummary
+        .uncaughtExceptionCount ??
       reports.runtimeReport
-        ?.pageErrors?.length ??
+        ?.uncaughtExceptions
+        ?.length ??
       null,
+
+    requiredControlsPresent:
+      runtimeSummary
+        .requiredControlsPresent ??
+      reports.runtimeReport
+        ?.requiredControls
+        ?.present ??
+      null,
+
+    requiredControlsExpected:
+      runtimeSummary
+        .requiredControlsExpected ??
+      reports.runtimeReport
+        ?.requiredControls
+        ?.expected ??
+      null,
+
     accessibilityViolations:
-      accessibilitySummary
+      runtimeSummary
+        .accessibilityViolationCount ??
+      accessibility
         .violationCount ??
-      reports.accessibilityReport
-        ?.violations?.length ??
+      accessibility
+        .violations?.length ??
       null,
-    accessibilityAffectedNodes:
-      accessibilitySummary
-        .affectedNodes ??
+
+    accessibilityViolatingNodes:
+      runtimeSummary
+        .accessibilityViolatingNodeCount ??
+      accessibility
+        .violatingNodeCount ??
       null,
+
+    accessibilityCritical:
+      accessibility
+        .violationsByImpact
+        ?.critical ??
+      null,
+
+    accessibilitySerious:
+      accessibility
+        .violationsByImpact
+        ?.serious ??
+      null,
+
+    accessibilityModerate:
+      accessibility
+        .violationsByImpact
+        ?.moderate ??
+      null,
+
+    accessibilityMinor:
+      accessibility
+        .violationsByImpact
+        ?.minor ??
+      null,
+
+    accessibilityIncomplete:
+      accessibility
+        .incompleteCount ??
+      null,
+
     functionalPassedTests:
       functionalSummary
-        .passedTests ??
-      functionalSummary.passed ??
+        .passedCount ??
       null,
+
     functionalFailedTests:
       functionalSummary
-        .failedTests ??
-      functionalSummary.failed ??
+        .failedCount ??
       null,
+
     functionalTotalTests:
       functionalSummary
-        .totalTests ??
+        .totalCount ??
       null,
   };
+}
+
+function prefixObject(
+  prefix,
+  value,
+) {
+  return Object.fromEntries(
+    Object.entries(value).map(
+      ([key, item]) => [
+        `${prefix}${key[0].toUpperCase()}${key.slice(1)}`,
+        item,
+      ],
+    ),
+  );
 }
 
 async function loadResponse(
@@ -247,15 +393,12 @@ async function loadResponse(
     return null;
   }
 
-  const responsePath =
-    path.join(
-      experimentDirectory,
-      run.responseFile,
-    );
-
   const contents =
     await readFile(
-      responsePath,
+      path.join(
+        experimentDirectory,
+        run.responseFile,
+      ),
       "utf8",
     );
 
@@ -291,13 +434,16 @@ export async function exportExperimentDatasets(
             responseBody,
           )
         : {
-            reports: {
-              qualityReport: null,
-              runtimeReport: null,
-              accessibilityReport: null,
-              functionalReport: null,
+            initialReports: {},
+            finalReports: {},
+            initialPassStatus: {
+              staticPassed: null,
+              runtimePassed: null,
+              accessibilityPassed: null,
+              functionalPassed: null,
+              allPassed: false,
             },
-            passStatus: {
+            finalPassStatus: {
               staticPassed: null,
               runtimePassed: null,
               accessibilityPassed: null,
@@ -307,129 +453,244 @@ export async function exportExperimentDatasets(
           };
 
     const metadata =
-      responseBody?.run ?? null;
-
-    const metrics =
-      metadata?.experimentMetrics ??
+      responseBody?.run ??
       null;
 
-    const counts =
+    const metrics =
+      metadata
+        ?.experimentMetrics ??
+      null;
+
+    const initialCounts =
       getReportCounts(
-        classification.reports,
+        classification
+          .initialReports,
+      );
+
+    const finalCounts =
+      getReportCounts(
+        classification
+          .finalReports,
       );
 
     fullRuns.push({
       ...run,
       metadata,
-      reports:
-        classification.reports,
-      passStatus:
-        classification.passStatus,
-      response: storedResponse,
+
+      initialReports:
+        classification
+          .initialReports,
+
+      finalReports:
+        classification
+          .finalReports,
+
+      initialPassStatus:
+        classification
+          .initialPassStatus,
+
+      finalPassStatus:
+        classification
+          .finalPassStatus,
+
+      response:
+        storedResponse,
     });
 
     flatRows.push({
       experimentId:
         manifest.experimentId,
+
       experimentRunId:
         run.experimentRunId,
+
       sequence:
         run.sequence,
+
       specificationId:
         run.specification.id,
+
       specificationName:
         run.specification.name,
+
       workflow:
         run.workflow,
+
       repetition:
         run.repetition,
+
       status:
         run.status,
+
       resultClassification:
         run.resultClassification,
+
       failureType:
         run.failureType,
+
       failureStage:
         run.failureStage,
+
       error:
         run.error,
+
       attemptCount:
         run.attemptCount,
+
       startedAt:
         run.startedAt,
+
       completedAt:
         run.completedAt,
+
       runId:
         run.runId,
+
       provider:
         manifest.configuration
           .provider,
+
       model:
         metadata?.model ??
-        manifest.configuration.model,
+        manifest.configuration
+          .model,
+
       temperature:
         metadata?.temperature ??
         manifest.configuration
           .temperature,
+
       promptVersion:
-        metadata?.promptVersion ??
+        metadata
+          ?.promptVersion ??
         manifest.configuration
           .promptVersion,
+
+      runOrder:
+        manifest.configuration
+          .runOrder ??
+        "fixed",
+
+      randomSeed:
+        manifest.configuration
+          .randomSeed ??
+        null,
+
       workflowDurationMs:
         metrics
           ?.workflowDurationMs ??
         null,
+
       aiGenerationDurationMs:
         metrics
           ?.aiGenerationDurationMs ??
         null,
+
       refinementIterations:
         metrics
           ?.refinementIterations ??
         null,
+
       converged:
         metrics?.converged ??
         null,
+
       stopReason:
         metrics?.stopReason ??
         null,
+
       totalPromptTokens:
         metrics
           ?.totalPromptTokens ??
         null,
+
       totalOutputTokens:
         metrics
           ?.totalOutputTokens ??
         null,
+
       totalTokens:
         metrics?.totalTokens ??
         null,
-      staticPassed:
-        classification.passStatus
-          .staticPassed,
-      runtimePassed:
-        classification.passStatus
-          .runtimePassed,
-      accessibilityPassed:
-        classification.passStatus
-          .accessibilityPassed,
-      functionalPassed:
-        classification.passStatus
-          .functionalPassed,
-      allQualityChecksPassed:
-        classification.passStatus
-          .allPassed,
-      ...counts,
+
+      ...prefixObject(
+        "initial",
+        classification
+          .initialPassStatus,
+      ),
+
+      ...prefixObject(
+        "initial",
+        initialCounts,
+      ),
+
+      ...prefixObject(
+        "final",
+        classification
+          .finalPassStatus,
+      ),
+
+      ...prefixObject(
+        "final",
+        finalCounts,
+      ),
+
+      staticIssueChange:
+        Number.isFinite(
+          initialCounts
+            .staticTotalIssues,
+        ) &&
+        Number.isFinite(
+          finalCounts
+            .staticTotalIssues,
+        )
+          ? finalCounts
+              .staticTotalIssues -
+            initialCounts
+              .staticTotalIssues
+          : null,
+
+      accessibilityViolationChange:
+        Number.isFinite(
+          initialCounts
+            .accessibilityViolations,
+        ) &&
+        Number.isFinite(
+          finalCounts
+            .accessibilityViolations,
+        )
+          ? finalCounts
+              .accessibilityViolations -
+            initialCounts
+              .accessibilityViolations
+          : null,
+
+      functionalFailedTestChange:
+        Number.isFinite(
+          initialCounts
+            .functionalFailedTests,
+        ) &&
+        Number.isFinite(
+          finalCounts
+            .functionalFailedTests,
+        )
+          ? finalCounts
+              .functionalFailedTests -
+            initialCounts
+              .functionalFailedTests
+          : null,
+
       iterationMetrics:
         metrics?.iterations ??
         null,
+
       responseFile:
         run.responseFile,
     });
   }
 
   const fullDataset = {
-    schemaVersion: "1.0.0",
+    schemaVersion: "1.1.0",
     exportedAt:
       new Date().toISOString(),
     experimentId:
@@ -438,7 +699,8 @@ export async function exportExperimentDatasets(
       manifest.configuration,
     summary:
       manifest.summary,
-    runs: fullRuns,
+    runs:
+      fullRuns,
   };
 
   const jsonPath =
@@ -460,13 +722,16 @@ export async function exportExperimentDatasets(
 
   const headers =
     flatRows.length > 0
-      ? Object.keys(flatRows[0])
+      ? Object.keys(
+          flatRows[0],
+        )
       : [];
 
   const csvLines = [
     headers
       .map(csvEscape)
       .join(","),
+
     ...flatRows.map(
       (row) =>
         headers
@@ -489,6 +754,7 @@ export async function exportExperimentDatasets(
   manifest.exports = {
     generatedAt:
       new Date().toISOString(),
+    schemaVersion: "1.1.0",
     json: "dataset.json",
     csv: "dataset.csv",
   };

@@ -275,6 +275,8 @@ async function loadOrCreateExperiment(
         options.baseUrl,
       temperature:
         options.temperature,
+      seed:
+        options.seed,
     });
 
   const runs =
