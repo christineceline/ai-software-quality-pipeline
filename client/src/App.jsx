@@ -25,7 +25,7 @@ const workflows = [
     id: "automated-refinement",
     name: "Automated quality-guided refinement",
     description:
-      "Will use automated quality reports to improve the generated application.",
+      "Uses automated quality reports to identify defects and refine the generated application.",
   },
 ];
 
@@ -42,10 +42,12 @@ function App() {
   const [error, setError] = useState("");
   const [qualityReport, setQualityReport] = useState(null);
   const [runtimeReport, setRuntimeReport] = useState(null);
-  const [accessibilityReport, setAccessibilityReport] = useState(null);
+  const [accessibilityReport, setAccessibilityReport] =
+    useState(null);
   const [functionalReport, setFunctionalReport] = useState(null);
   const [generationMetrics, setGenerationMetrics] = useState(null);
-  const [refinementIterations, setRefinementIterations] = useState([]);
+  const [refinementIterations, setRefinementIterations] =
+    useState([]);
   const [selectedIteration, setSelectedIteration] = useState(null);
 
   useEffect(() => {
@@ -131,11 +133,10 @@ function App() {
         );
       }
 
-          setRun(data.run);
-
-          setGenerationMetrics(
-          data.run?.generationMetrics ?? null,
-        );
+      setRun(data.run);
+      setGenerationMetrics(
+        data.run?.generationMetrics ?? null,
+      );
 
       if (workflow === "automated-refinement") {
         const completedRefinements =
@@ -152,7 +153,6 @@ function App() {
           allIterations[allIterations.length - 1];
 
         setSelectedIteration(finalIteration.iteration);
-
         setApplication(finalIteration.application);
         setGenerationMetrics(
           finalIteration.generationMetrics ?? null,
@@ -181,7 +181,7 @@ function App() {
         );
         setFunctionalReport(data.functionalReport ?? null);
       }
-      
+
       setActiveResultView("preview");
     } catch (generationError) {
       setError(generationError.message);
@@ -193,25 +193,39 @@ function App() {
   return (
     <div className="pipeline-shell">
       <header className="site-header">
-        <div>
-          <p className="eyebrow">7CS077 Dissertation Prototype</p>
-          <h1>AI Software Quality Pipeline</h1>
+        <div className="brand">
+          <div className="brand-copy">
+            <p className="eyebrow">7CS077 Dissertation Prototype</p>
+            <h1>AQuA</h1>
+            <p className="brand-subtitle">
+              AI Quality Assessment Pipeline
+            </p>
+          </div>
         </div>
 
-        <span
-          className={
-            apiStatus === "API connected"
-              ? "status status--connected"
-              : "status status--disconnected"
-          }
-        >
-          {apiStatus}
-        </span>
+        <div className="header-meta">
+          <span className="header-label">System status</span>
+          <span
+            className={
+              apiStatus === "API connected"
+                ? "status status--connected"
+                : "status status--disconnected"
+            }
+          >
+            <span className="status-dot" aria-hidden="true" />
+            {apiStatus}
+          </span>
+        </div>
       </header>
 
       <main className="main-layout">
         <section className="panel generation-panel">
-          <h2>Generate application</h2>
+          <div className="panel-heading">
+            <div>
+              <p className="section-label">Configuration</p>
+              <h2>Generate application</h2>
+            </div>
+          </div>
 
           <form onSubmit={handleGenerate}>
             <div className="form-group">
@@ -264,7 +278,7 @@ function App() {
                       }
                     />
 
-                    <span>
+                    <span className="workflow-copy">
                       <strong>{workflowOption.name}</strong>
                       <small>
                         {workflowOption.description}
@@ -278,20 +292,21 @@ function App() {
             <button
               className="primary-button"
               type="submit"
-              disabled={
-                isGenerating ||
-                !specificationId
-              }
+              disabled={isGenerating || !specificationId}
             >
-              {isGenerating
-                ? "Generating application…"
-                : "Generate application"}
+              <span>
+                {isGenerating
+                  ? "Running pipeline"
+                  : "Run AQuA pipeline"}
+              </span>
+              <span aria-hidden="true">↗</span>
             </button>
           </form>
 
           {isGenerating && (
             <p className="information-message" role="status">
-              The AI is generating the application. This may take several minutes.
+              AQuA is generating and evaluating the application.
+              This may take several minutes.
             </p>
           )}
 
@@ -305,114 +320,104 @@ function App() {
 
         <section className="panel result-panel">
           <div className="result-header">
-            <div>
-              <h2>Generated application</h2>
+            <div className="result-title">
+              <div>
+                <p className="section-label">Run workspace</p>
+                <h2>Generated application</h2>
 
-              {run && (
-                <p className="run-summary">
-                  {run.specification.name} · {run.workflow} ·{" "}
-                  {run.model}
-                </p>
-              )}
-
-              {refinementIterations.length > 0 && (
-                <div className="iteration-selector">
-                  <label htmlFor="iteration">
-                    Refinement iteration
-                  </label>
-
-                  <select
-                    id="iteration"
-                    value={selectedIteration ?? ""}
-                    onChange={(event) => {
-                      const iterationNumber =
-                        Number(event.target.value);
-
-                      const selected =
-                        refinementIterations.find(
-                          (item) =>
-                            item.iteration === iterationNumber,
-                        );
-
-                      if (!selected) {
-                        return;
-                      }
-
-                      setSelectedIteration(iterationNumber);
-                      setApplication(selected.application);
-                      setGenerationMetrics(
-                        selected.generationMetrics ?? null,
-                      );
-                      setQualityReport(selected.qualityReport);
-                      setRuntimeReport(selected.runtimeReport);
-                      setAccessibilityReport(
-                        selected.accessibilityReport ??
-                          selected.runtimeReport?.accessibility ??
-                          null,
-                      );
-                      setFunctionalReport(
-                        selected.functionalReport ?? null,
-                      );
-                    }}
-                  >
-                    {refinementIterations.map((item) => (
-                      <option
-                        key={item.iteration}
-                        value={item.iteration}
-                      >
-                        {item.iteration === 0
-                          ? "Iteration 0 — Initial generation"
-                          : `Iteration ${item.iteration} — Refinement`}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
+                {run ? (
+                  <p className="run-summary">
+                    {run.specification.name} · {run.workflow} ·{" "}
+                    {run.model}
+                  </p>
+                ) : (
+                  <p className="run-summary">
+                    Preview, source and quality evidence will appear
+                    here.
+                  </p>
+                )}
+              </div>
             </div>
 
             <div
               className="result-view-buttons"
               aria-label="Result view"
             >
-              <button
-                type="button"
-                className={
-                  activeResultView === "preview"
-                    ? "view-button view-button--active"
-                    : "view-button"
-                }
-                onClick={() =>
-                  setActiveResultView("preview")
-                }
-              >
-                Preview
-              </button>
-
-              <button
-                type="button"
-                className={
-                  activeResultView === "code"
-                    ? "view-button view-button--active"
-                    : "view-button"
-                }
-                onClick={() => setActiveResultView("code")}
-              >
-                Source code
-              </button>
-
-              <button
-                type="button"
-                className={
-                  activeResultView === "quality"
-                    ? "view-button view-button--active"
-                    : "view-button"
-                }
-                onClick={() => setActiveResultView("quality")}
-              >
-                Quality report
-              </button>
+              {[
+                ["preview", "Preview"],
+                ["code", "Source"],
+                ["quality", "Quality"],
+              ].map(([view, label]) => (
+                <button
+                  key={view}
+                  type="button"
+                  className={
+                    activeResultView === view
+                      ? "view-button view-button--active"
+                      : "view-button"
+                  }
+                  onClick={() => setActiveResultView(view)}
+                >
+                  {label}
+                </button>
+              ))}
             </div>
           </div>
+
+          {refinementIterations.length > 0 && (
+            <div className="iteration-selector">
+              <label htmlFor="iteration">
+                Refinement iteration
+              </label>
+
+              <select
+                id="iteration"
+                value={selectedIteration ?? ""}
+                onChange={(event) => {
+                  const iterationNumber = Number(
+                    event.target.value,
+                  );
+
+                  const selected =
+                    refinementIterations.find(
+                      (item) =>
+                        item.iteration === iterationNumber,
+                    );
+
+                  if (!selected) {
+                    return;
+                  }
+
+                  setSelectedIteration(iterationNumber);
+                  setApplication(selected.application);
+                  setGenerationMetrics(
+                    selected.generationMetrics ?? null,
+                  );
+                  setQualityReport(selected.qualityReport);
+                  setRuntimeReport(selected.runtimeReport);
+                  setAccessibilityReport(
+                    selected.accessibilityReport ??
+                      selected.runtimeReport?.accessibility ??
+                      null,
+                  );
+                  setFunctionalReport(
+                    selected.functionalReport ?? null,
+                  );
+                }}
+              >
+                {refinementIterations.map((item) => (
+                  <option
+                    key={item.iteration}
+                    value={item.iteration}
+                  >
+                    {item.iteration === 0
+                      ? "Iteration 0 — Initial generation"
+                      : `Iteration ${item.iteration} — Refinement`}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {activeResultView === "preview" && (
             <ApplicationPreview application={application} />
@@ -423,35 +428,30 @@ function App() {
           )}
 
           {activeResultView === "quality" && (
-  <>
-            {!application ? (
-              <div className="empty-state">
-                Generate an application to display its quality report.
-              </div>
-            ) : (
-              <>
-                <ExperimentMetrics
-                 metrics={run?.experimentMetrics}
-                 workflow={run?.workflow}
-                />
-
-                <QualityReport report={qualityReport} />
-
-                <RuntimeReport
-                  report={runtimeReport}
-                />
-
-                <AccessibilityReport
-                  report={accessibilityReport}
-                />
-
-                <FunctionalReport
-                  report={functionalReport}
-                />
-              </>
-            )}
-          </>
-        )}
+            <>
+              {!application ? (
+                <div className="empty-state">
+                  Generate an application to display its quality
+                  report.
+                </div>
+              ) : (
+                <>
+                  <ExperimentMetrics
+                    metrics={run?.experimentMetrics}
+                    workflow={run?.workflow}
+                  />
+                  <QualityReport report={qualityReport} />
+                  <RuntimeReport report={runtimeReport} />
+                  <AccessibilityReport
+                    report={accessibilityReport}
+                  />
+                  <FunctionalReport
+                    report={functionalReport}
+                  />
+                </>
+              )}
+            </>
+          )}
         </section>
       </main>
     </div>
