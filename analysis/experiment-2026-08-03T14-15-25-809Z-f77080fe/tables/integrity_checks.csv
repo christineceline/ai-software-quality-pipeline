@@ -1,0 +1,39 @@
+check,passed,detail
+CSV has 90 rows,True,Observed 90 rows.
+CSV has expected 79-column schema,True,Observed 79 columns.
+30 rows per workflow,True,"{""automated-refinement"":30,""one-shot"":30,""quality-focused"":30}"
+30 rows per specification,True,"{""booking"":30,""quiz"":30,""todo"":30}"
+10 rows per specification/workflow cell,True,"{""('booking', 'automated-refinement')"":10,""('booking', 'one-shot')"":10,""('booking', 'quality-focused')"":10,""('quiz', 'automated-refinement')"":10,""('quiz', 'one-shot')"":10,""('quiz', 'quality-focused')"":10,""('todo', 'automated-refinement')"":10,""('todo', 'one-shot')"":10,""('todo', 'quality-focused')"":10}"
+Unique experimentRunId values,True,Unique values: 90.
+Unique runId values,True,Unique values: 90.
+No exact duplicate CSV records,True,Duplicate rows: 0.
+Sequence covers 1 through 90 exactly once,True,"Minimum=1, maximum=90."
+Valid workflow categories,True,"automated-refinement, one-shot, quality-focused"
+Valid specification categories,True,"booking, quiz, todo"
+All runs completed,True,"{""completed"":90}"
+Only valid result classifications present,True,"{""valid-passed"":51,""valid-poor-quality"":39}"
+CSV and dataset JSON agree on every exported field,True,No mismatches across 90 × 79 exported values.
+Dataset JSON and manifest configuration agree,True,Configuration objects compared directly.
+Dataset JSON and manifest summary agree,True,Summary objects compared directly.
+Manifest and dataset JSON agree on run metadata,True,No mismatches across shared run fields.
+"No formal run omitted across CSV, JSON and manifest",True,"CSV=90, JSON=90, manifest=90."
+Response-file references are unique and match run IDs,True,Unique references: 90.
+Timestamps are valid and ordered,True,All completedAt values are on or after startedAt.
+Started timestamps follow sequence order,True,Sequential execution order is monotonic by startedAt.
+Durations are positive,True,Both duration fields checked.
+Workflow duration is at least AI generation duration,True,Checked for all rows.
+Total tokens equal prompt plus output tokens,True,Checked for all rows.
+Initial static issues equal errors plus warnings,True,Checked for all rows.
+Final static issues equal errors plus warnings,True,Checked for all rows.
+Initial functional totals are internally consistent,True,Passed plus failed equals total.
+Final functional totals are internally consistent,True,Passed plus failed equals total.
+Required-control counts are bounded,True,Present does not exceed expected.
+Accessibility impact counts sum to violation count,True,Checked for initial and final reports.
+Recorded change fields are correct,True,All three change fields checked.
+Iteration arrays contain iteration 0 plus refinements,True,Array length equals refinementIterations + 1.
+Iteration numbers are contiguous from zero,True,Checked every iteration array.
+Iteration durations and tokens sum to run totals,True,Duration and token totals checked for every run.
+Non-automated refinement fields are not misread as outcomes,True,Zero refinements are structural for one-shot and quality-focused; converged is null.
+Automated refinement fields are within configured limits,True,Observed range checked against maxRefinementIterations=3.
+Automated zero-refinement runs remain present,True,One automated run stopped at iteration 0 and is retained.
+Result classification matches final all-pass flag,True,Checked for all rows.

@@ -1,0 +1,43 @@
+{
+  "experimentId": "experiment-2026-08-03T14-15-25-809Z-f77080fe",
+  "datasetSchemaVersion": "1.1.0",
+  "manifestSchemaVersion": "1.0.0",
+  "exportedAt": "2026-08-03T15:11:19.359Z",
+  "rawRows": 90,
+  "rawColumns": 79,
+  "processedRows": 90,
+  "processedColumns": 86,
+  "iterationRows": 125,
+  "rawFileSha256": {
+    "dataset.csv": "e1e9e7200543cbacd0c4416f6bed12ca74a3e32d8abf594cf4b82087259044f2",
+    "dataset.json": "abb85bed02581ec63e79a116347911b9261d8336455463b391e30ec77caa4bad",
+    "manifest.json": "c482f9c0cc8cf6295d53a4e7e5069914982b3751c47a74dfb66d329846c0822d"
+  },
+  "blankCounts": {
+    "failureType": 90,
+    "failureStage": 90,
+    "error": 90,
+    "converged": 60
+  },
+  "workflowCounts": {
+    "quality-focused": 30,
+    "automated-refinement": 30,
+    "one-shot": 30
+  },
+  "specificationCounts": {
+    "booking": 30,
+    "todo": 30,
+    "quiz": 30
+  },
+  "resultClassificationCounts": {
+    "valid-passed": 51,
+    "valid-poor-quality": 39
+  },
+  "automatedRefinementIterationCounts": {
+    "0": 1,
+    "1": 23,
+    "2": 6
+  },
+  "integrityChecksPassed": 38,
+  "integrityChecksTotal": 38
+}

@@ -50,5 +50,49 @@ models/
 # Generated experimental runs
 generated-apps/runs/
 # Local experiment outputs
-# experiments/*
-# !experiments/.gitkeep
+experiments/*
+!experiments/.gitkeep
+
+# Python virtual environments
+.venv/
+.venv-*/
+venv/
+env/
+
+# Python cache and tooling
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Jupyter
+.ipynb_checkpoints/
+.jupyter/
+.ipython/
+
+# Analysis temporary files
+analysis/**/outputs/*
+analysis/**/figures/*
+analysis/**/tables/*
+
+# Keep reproducibility metadata and documentation
+!analysis/**/outputs/schema_summary.json
+!analysis/**/tables/data_dictionary.csv
+!analysis/**/tables/data_dictionary.md
+!analysis/**/tables/integrity_checks.csv
+!analysis/**/tables/numeric_ranges.csv
+!analysis/**/tables/missing_values.csv
+!analysis/**/figures/.gitkeep
+!analysis/**/tables/.gitkeep
+!analysis/**/outputs/.gitkeep
+
+# Local analysis exports
+*.parquet
+*.feather
+*.pkl
+*.pickle
