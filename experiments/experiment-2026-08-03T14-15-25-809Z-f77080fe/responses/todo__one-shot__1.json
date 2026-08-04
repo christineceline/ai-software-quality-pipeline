@@ -1,0 +1,378 @@
+{
+  "capturedAt": "2026-08-03T14:54:10.504Z",
+  "httpStatus": 201,
+  "ok": true,
+  "body": {
+    "run": {
+      "runId": "2026-08-03T14-54-08-413Z-3a1e439e",
+      "createdAt": "2026-08-03T14:54:08.414Z",
+      "specification": {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      "workflow": "one-shot",
+      "model": "gpt-5.6-luna",
+      "temperature": 0,
+      "promptVersion": "1.0.0",
+      "generationMetrics": {
+        "totalDurationMs": 16929,
+        "promptTokens": 734,
+        "outputTokens": 2794,
+        "totalTokens": 3528,
+        "finishReason": null
+      },
+      "generatedApplication": {
+        "applicationName": "To-do List",
+        "summary": "A focused browser-only task list for adding, completing, and deleting everyday tasks."
+      },
+      "qualitySummary": {
+        "totalIssues": 0,
+        "totalErrors": 0,
+        "totalWarnings": 0,
+        "passed": true
+      },
+      "experimentMetrics": {
+        "workflowDurationMs": 19045,
+        "aiGenerationDurationMs": 16929,
+        "refinementIterations": 0,
+        "converged": null,
+        "stopReason": "not-applicable",
+        "totalPromptTokens": 734,
+        "totalOutputTokens": 2794,
+        "totalTokens": 3528,
+        "iterations": [
+          {
+            "iteration": 0,
+            "generationDurationMs": 16929,
+            "promptTokens": 734,
+            "outputTokens": 2794,
+            "totalTokens": 3528
+          }
+        ]
+      },
+      "completedAt": "2026-08-03T14:54:10.505Z",
+      "runDirectory": "C:\\Users\\Administrator\\Documents\\Development\\ai-software-quality-pipeline\\generated-apps\\runs\\2026-08-03T14-54-08-413Z-3a1e439e"
+    },
+    "application": {
+      "html": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <meta name=\"description\" content=\"A simple, focused to-do list for keeping track of everyday tasks.\">\n  <title>To-do List</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n  <script src=\"script.js\" defer></script>\n</head>\n<body>\n  <main class=\"app-shell\">\n    <section class=\"todo-card\" aria-labelledby=\"page-title\">\n      <header class=\"app-header\">\n        <div>\n          <p class=\"eyebrow\">YOUR DAY, ORGANIZED</p>\n          <h1 id=\"page-title\">To-do List</h1>\n          <p class=\"subtitle\">A clear mind starts with a clear list.</p>\n        </div>\n        <div class=\"header-mark\" aria-hidden=\"true\">✓</div>\n      </header>\n\n      <form class=\"task-form\" id=\"task-form\">\n        <label class=\"sr-only\" for=\"task-input\">Add a new task</label>\n        <input id=\"task-input\" data-testid=\"task-input\" type=\"text\" placeholder=\"What needs to be done?\" autocomplete=\"off\" maxlength=\"200\">\n        <button id=\"task-add\" data-testid=\"task-add\" type=\"submit\">Add task <span aria-hidden=\"true\">+</span></button>\n      </form>\n\n      <div class=\"list-heading\">\n        <h2>My tasks</h2>\n        <span class=\"count-pill\"><span data-testid=\"incomplete-count\">0</span> <span class=\"count-label\">left</span></span>\n      </div>\n\n      <div id=\"task-list\" data-testid=\"task-list\" class=\"task-list\" aria-live=\"polite\"></div>\n      <p id=\"empty-state\" class=\"empty-state\">Nothing here yet. Add your first task above.</p>\n    </section>\n    <p class=\"page-note\">Tasks stay in this browser tab and reset when you refresh.</p>\n  </main>\n</body>\n</html>",
+      "css": "* {\n  box-sizing: border-box;\n}\n\n:root {\n  color-scheme: light;\n  --ink: #18212f;\n  --muted: #738096;\n  --line: #e5e9f0;\n  --accent: #6658d3;\n  --accent-dark: #5144b9;\n  --surface: #ffffff;\n  --background: #f4f6fb;\n}\n\nbody {\n  margin: 0;\n  min-height: 100vh;\n  background: var(--background);\n  color: var(--ink);\n  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif;\n}\n\n.app-shell {\n  width: min(100% - 32px, 680px);\n  margin: 0 auto;\n  padding: 64px 0 28px;\n}\n\n.todo-card {\n  background: var(--surface);\n  border: 1px solid rgba(30, 45, 75, .07);\n  border-radius: 24px;\n  box-shadow: 0 18px 55px rgba(55, 66, 100, .11);\n  padding: 38px;\n}\n\n.app-header {\n  display: flex;\n  align-items: flex-start;\n  justify-content: space-between;\n  gap: 20px;\n  margin-bottom: 32px;\n}\n\n.eyebrow {\n  color: var(--accent);\n  font-size: 11px;\n  font-weight: 800;\n  letter-spacing: .16em;\n  margin: 0 0 10px;\n}\n\nh1, h2, p { margin-top: 0; }\nh1 { font-size: clamp(32px, 6vw, 44px); letter-spacing: -.045em; line-height: 1; margin-bottom: 10px; }\n.subtitle { color: var(--muted); font-size: 15px; margin-bottom: 0; }\n\n.header-mark {\n  align-items: center;\n  background: #eeecff;\n  border-radius: 14px;\n  color: var(--accent);\n  display: flex;\n  font-size: 25px;\n  font-weight: 800;\n  height: 52px;\n  justify-content: center;\n  width: 52px;\n}\n\n.task-form { display: flex; gap: 10px; margin-bottom: 34px; }\n.task-form input {\n  background: #fafbfe;\n  border: 1px solid var(--line);\n  border-radius: 11px;\n  color: var(--ink);\n  flex: 1;\n  font: inherit;\n  min-width: 0;\n  outline: none;\n  padding: 14px 16px;\n  transition: border-color .2s, box-shadow .2s;\n}\n.task-form input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(102, 88, 211, .12); }\n.task-form button {\n  background: var(--accent);\n  border: 0;\n  border-radius: 11px;\n  color: white;\n  cursor: pointer;\n  font: inherit;\n  font-weight: 700;\n  padding: 0 18px;\n  transition: background .2s, transform .2s;\n}\n.task-form button:hover { background: var(--accent-dark); }\n.task-form button:active { transform: scale(.97); }\n.task-form button span { font-size: 20px; line-height: 0; margin-left: 5px; vertical-align: -1px; }\n\n.list-heading { align-items: center; display: flex; justify-content: space-between; margin-bottom: 13px; }\nh2 { font-size: 17px; letter-spacing: -.01em; margin-bottom: 0; }\n.count-pill { background: #f0efff; border-radius: 20px; color: var(--accent-dark); font-size: 12px; font-weight: 750; padding: 7px 11px; }\n.count-label { font-weight: 600; }\n.task-list { display: grid; gap: 9px; }\n.task-item { align-items: center; border: 1px solid var(--line); border-radius: 12px; display: flex; gap: 12px; min-height: 58px; padding: 9px 11px 9px 14px; transition: background .2s, border-color .2s; }\n.task-item:hover { background: #fbfbff; border-color: #d7d3fa; }\n.complete-button { background: transparent; border: 2px solid #cbd1dd; border-radius: 50%; cursor: pointer; flex: 0 0 22px; height: 22px; padding: 0; position: relative; width: 22px; }\n.task-item[data-completed=\"true\"] .complete-button { background: var(--accent); border-color: var(--accent); }\n.task-item[data-completed=\"true\"] .complete-button::after { color: white; content: \"✓\"; font-size: 14px; font-weight: 800; left: 3px; position: absolute; top: -1px; }\n.task-text { flex: 1; font-size: 15px; line-height: 1.4; overflow-wrap: anywhere; }\n.task-item[data-completed=\"true\"] .task-text { color: #9aa3b2; text-decoration: line-through; }\n.delete-button { background: transparent; border: 0; border-radius: 7px; color: #a4adbb; cursor: pointer; font-size: 21px; line-height: 1; padding: 7px; }\n.delete-button:hover { background: #fff0f1; color: #d75e6c; }\n.empty-state { color: var(--muted); font-size: 14px; padding: 23px 0 10px; text-align: center; }\n.page-note { color: #a1aabd; font-size: 12px; text-align: center; }\n.sr-only { height: 1px; margin: -1px; overflow: hidden; position: absolute; width: 1px; clip: rect(0,0,0,0); }\n\n@media (max-width: 520px) {\n  .app-shell { padding-top: 25px; width: min(100% - 20px, 680px); }\n  .todo-card { border-radius: 18px; padding: 25px 18px; }\n  .task-form { align-items: stretch; flex-direction: column; }\n  .task-form button { min-height: 48px; }\n  .app-header { margin-bottom: 25px; }\n}",
+      "javascript": "(() => {\n  const form = document.getElementById('task-form');\n  const input = document.getElementById('task-input');\n  const list = document.querySelector('[data-testid=\"task-list\"]');\n  const count = document.querySelector('[data-testid=\"incomplete-count\"]');\n  const emptyState = document.getElementById('empty-state');\n  let tasks = [];\n\n  function updateCount() {\n    count.textContent = String(tasks.filter(task => !task.completed).length);\n    emptyState.hidden = tasks.length > 0;\n  }\n\n  function render() {\n    list.innerHTML = '';\n    tasks.forEach(task => {\n      const item = document.createElement('article');\n      item.className = 'task-item';\n      item.dataset.testid = 'task';\n      item.dataset.completed = String(task.completed);\n\n      const complete = document.createElement('button');\n      complete.type = 'button';\n      complete.className = 'complete-button';\n      complete.dataset.testid = 'task-complete';\n      complete.setAttribute('aria-label', task.completed ? 'Mark task as incomplete' : 'Mark task as complete');\n      complete.setAttribute('aria-pressed', String(task.completed));\n      complete.addEventListener('click', () => {\n        task.completed = !task.completed;\n        render();\n      });\n\n      const text = document.createElement('span');\n      text.className = 'task-text';\n      text.dataset.testid = 'task-text';\n      text.textContent = task.text;\n\n      const remove = document.createElement('button');\n      remove.type = 'button';\n      remove.className = 'delete-button';\n      remove.dataset.testid = 'task-delete';\n      remove.setAttribute('aria-label', `Delete task: ${task.text}`);\n      remove.textContent = '×';\n      remove.addEventListener('click', () => {\n        tasks = tasks.filter(current => current.id !== task.id);\n        render();\n      });\n\n      item.append(complete, text, remove);\n      list.appendChild(item);\n    });\n    updateCount();\n  }\n\n  form.addEventListener('submit', event => {\n    event.preventDefault();\n    const text = input.value.trim();\n    if (!text) {\n      input.focus();\n      return;\n    }\n    tasks.push({ id: Date.now() + Math.random(), text, completed: false });\n    input.value = '';\n    render();\n    input.focus();\n  });\n\n  render();\n})();",
+      "metadata": {
+        "applicationName": "To-do List",
+        "summary": "A focused browser-only task list for adding, completing, and deleting everyday tasks."
+      }
+    },
+    "qualityReport": {
+      "analysedAt": "2026-08-03T14:54:08.413Z",
+      "analyzers": {
+        "html": {
+          "tool": "HTMLHint",
+          "issueCount": 0,
+          "errorCount": 0,
+          "warningCount": 0,
+          "passed": true,
+          "messages": []
+        },
+        "css": {
+          "tool": "Stylelint",
+          "issueCount": 0,
+          "errorCount": 0,
+          "warningCount": 0,
+          "passed": true,
+          "messages": []
+        },
+        "javascript": {
+          "tool": "ESLint",
+          "issueCount": 0,
+          "errorCount": 0,
+          "warningCount": 0,
+          "passed": true,
+          "messages": []
+        }
+      },
+      "summary": {
+        "totalIssues": 0,
+        "totalErrors": 0,
+        "totalWarnings": 0,
+        "passed": true
+      }
+    },
+    "runtimeReport": {
+      "reportVersion": "1.1",
+      "runId": "2026-08-03T14-54-08-413Z-3a1e439e",
+      "specificationId": "todo",
+      "applicationUrl": "http://localhost:3001/generated-apps/runs/2026-08-03T14-54-08-413Z-3a1e439e/index.html",
+      "browser": {
+        "engine": "chromium",
+        "headless": true,
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        }
+      },
+      "startedAt": "2026-08-03T14:54:08.417Z",
+      "completedAt": "2026-08-03T14:54:09.484Z",
+      "durationMs": 1067,
+      "navigation": {
+        "successful": true,
+        "status": 200,
+        "finalUrl": "http://localhost:3001/generated-apps/runs/2026-08-03T14-54-08-413Z-3a1e439e/index.html",
+        "error": null
+      },
+      "body": {
+        "exists": true,
+        "visible": true,
+        "textLength": 222,
+        "textPreview": "YOUR DAY, ORGANIZED\n\nTo-do List\n\nA clear mind starts with a clear list.\n\n✓\nAdd a new task\nAdd task +\nMy tasks\n0 left\n\nNothing here yet. Add your first task above.\n\nTasks stay in this browser tab and r",
+        "hasVisibleContent": true
+      },
+      "consoleErrors": [],
+      "uncaughtExceptions": [],
+      "requiredControls": {
+        "expected": 2,
+        "present": 2,
+        "allPresent": true,
+        "controls": [
+          {
+            "id": "task-input",
+            "label": "Task input",
+            "present": true,
+            "candidates": [
+              {
+                "type": "css",
+                "selector": "input[type=\"text\"], input:not([type]), textarea",
+                "found": true
+              }
+            ]
+          },
+          {
+            "id": "add-task-control",
+            "label": "Add-task control",
+            "present": true,
+            "candidates": [
+              {
+                "type": "role",
+                "role": "button",
+                "name": "add|create|save|submit",
+                "found": true
+              },
+              {
+                "type": "css",
+                "selector": "button[type=\"submit\"], input[type=\"submit\"]",
+                "found": true
+              }
+            ]
+          }
+        ]
+      },
+      "accessibility": {
+        "successful": true,
+        "standard": "WCAG 2.0 and 2.1 Level A and AA",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa"
+        ],
+        "violationCount": 1,
+        "violatingNodeCount": 3,
+        "violationsByImpact": {
+          "critical": 0,
+          "serious": 1,
+          "moderate": 0,
+          "minor": 0,
+          "unknown": 0
+        },
+        "violations": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "tags": [
+              "cat.color",
+              "wcag2aa",
+              "wcag143",
+              "TTv5",
+              "TT13.c",
+              "EN-301-549",
+              "EN-9.1.4.3",
+              "ACT",
+              "RGAAv4",
+              "RGAA-3.2.1"
+            ],
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.12/color-contrast?application=playwright",
+            "nodeCount": 3,
+            "nodes": [
+              {
+                "html": "<p class=\"subtitle\">A clear mind starts with a clear list.</p>",
+                "target": [
+                  ".subtitle"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.99 (foreground color: #738096, background color: #ffffff, font size: 11.3pt (15px), font weight: normal). Expected contrast ratio of 4.5:1",
+                "impact": "serious"
+              },
+              {
+                "html": "<p id=\"empty-state\" class=\"empty-state\">Nothing here yet. Add your first task above.</p>",
+                "target": [
+                  "#empty-state"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.99 (foreground color: #738096, background color: #ffffff, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1",
+                "impact": "serious"
+              },
+              {
+                "html": "<p class=\"page-note\">Tasks stay in this browser tab and reset when you refresh.</p>",
+                "target": [
+                  ".page-note"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 2.15 (foreground color: #a1aabd, background color: #f4f6fb, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1",
+                "impact": "serious"
+              }
+            ]
+          }
+        ],
+        "incompleteCount": 1,
+        "inapplicableCount": 44,
+        "passCount": 18,
+        "error": null
+      },
+      "summary": {
+        "runtimePassed": true,
+        "accessibilityPassed": false,
+        "navigationSuccessful": true,
+        "hasVisibleBodyContent": true,
+        "consoleErrorCount": 0,
+        "uncaughtExceptionCount": 0,
+        "requiredControlsPresent": 2,
+        "requiredControlsExpected": 2,
+        "accessibilityAnalysisSuccessful": true,
+        "accessibilityViolationCount": 1,
+        "accessibilityViolatingNodeCount": 3
+      }
+    },
+    "accessibilityReport": {
+      "successful": true,
+      "standard": "WCAG 2.0 and 2.1 Level A and AA",
+      "tags": [
+        "wcag2a",
+        "wcag2aa",
+        "wcag21a",
+        "wcag21aa"
+      ],
+      "violationCount": 1,
+      "violatingNodeCount": 3,
+      "violationsByImpact": {
+        "critical": 0,
+        "serious": 1,
+        "moderate": 0,
+        "minor": 0,
+        "unknown": 0
+      },
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "tags": [
+            "cat.color",
+            "wcag2aa",
+            "wcag143",
+            "TTv5",
+            "TT13.c",
+            "EN-301-549",
+            "EN-9.1.4.3",
+            "ACT",
+            "RGAAv4",
+            "RGAA-3.2.1"
+          ],
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.12/color-contrast?application=playwright",
+          "nodeCount": 3,
+          "nodes": [
+            {
+              "html": "<p class=\"subtitle\">A clear mind starts with a clear list.</p>",
+              "target": [
+                ".subtitle"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.99 (foreground color: #738096, background color: #ffffff, font size: 11.3pt (15px), font weight: normal). Expected contrast ratio of 4.5:1",
+              "impact": "serious"
+            },
+            {
+              "html": "<p id=\"empty-state\" class=\"empty-state\">Nothing here yet. Add your first task above.</p>",
+              "target": [
+                "#empty-state"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.99 (foreground color: #738096, background color: #ffffff, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1",
+              "impact": "serious"
+            },
+            {
+              "html": "<p class=\"page-note\">Tasks stay in this browser tab and reset when you refresh.</p>",
+              "target": [
+                ".page-note"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 2.15 (foreground color: #a1aabd, background color: #f4f6fb, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1",
+              "impact": "serious"
+            }
+          ]
+        }
+      ],
+      "incompleteCount": 1,
+      "inapplicableCount": 44,
+      "passCount": 18,
+      "error": null
+    },
+    "functionalReport": {
+      "reportVersion": "1.0",
+      "runId": "2026-08-03T14-54-08-413Z-3a1e439e",
+      "specificationId": "todo",
+      "applicationUrl": "http://localhost:3001/generated-apps/runs/2026-08-03T14-54-08-413Z-3a1e439e/index.html",
+      "startedAt": "2026-08-03T14:54:09.532Z",
+      "completedAt": "2026-08-03T14:54:10.457Z",
+      "durationMs": 925,
+      "tests": [
+        {
+          "id": "todo-add-task",
+          "requirement": "Allow the user to enter and add a non-empty task, and display the added task in a visible task list.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "todo-reject-empty-task",
+          "requirement": "Whitespace-only or empty input must not create a task.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "todo-complete-task",
+          "requirement": "Allow each task to be marked as completed, with its completed state visibly reflected in the interface.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "todo-delete-task",
+          "requirement": "Allow each task to be deleted. After deletion, the deleted task must no longer be displayed in the task list.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "todo-incomplete-count",
+          "requirement": "Display the current number of incomplete tasks and update the count when tasks are added, completed or deleted.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "todo-session-memory",
+          "requirement": "Keep task data in page memory only. Refreshing or reopening the page must reset the task list.",
+          "passed": true,
+          "error": null
+        }
+      ],
+      "summary": {
+        "passed": true,
+        "passedCount": 6,
+        "failedCount": 0,
+        "totalCount": 6
+      }
+    }
+  }
+}

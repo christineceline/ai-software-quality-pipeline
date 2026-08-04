@@ -1,0 +1,1933 @@
+{
+  "schemaVersion": "1.0.0",
+  "experimentId": "experiment-2026-08-03T14-15-25-809Z-f77080fe",
+  "status": "completed",
+  "createdAt": "2026-08-03T14:15:25.809Z",
+  "startedAt": "2026-08-03T14:15:25.814Z",
+  "completedAt": "2026-08-03T15:11:19.288Z",
+  "updatedAt": "2026-08-03T15:11:19.451Z",
+  "configuration": {
+    "experimentId": "experiment-2026-08-03T14-15-25-809Z-f77080fe",
+    "createdAt": "2026-08-03T14:15:25.809Z",
+    "repetitions": 10,
+    "sequential": true,
+    "runOrder": "seeded-random",
+    "randomSeed": 77077,
+    "baseUrl": "http://localhost:3001",
+    "temperature": 0,
+    "provider": "openai",
+    "model": "gpt-5.6-luna",
+    "promptVersion": "1.0.0",
+    "maxRefinementIterations": 3,
+    "preflightCheckedAt": "2026-08-03T14:15:25.806Z",
+    "reproducibility": {
+      "algorithm": "sha256",
+      "combinedSha256": "df2cd8d1f23affbe69c1728e0e89bbf34c05f15369f675d630274cdac2bfbc34",
+      "fileCount": 16,
+      "files": [
+        {
+          "path": "src/prompts/buildPrompt.js",
+          "sha256": "e659dc44249a0de596b155ae8ae1c7b377bcf32aa2ab33fe63ced42a144ecf90"
+        },
+        {
+          "path": "src/prompts/buildRefinementPrompt.js",
+          "sha256": "21e4c42dc88a15135fce7f45ba3bcf686a0dc7b599ec20e8f4365f2294c11d8c"
+        },
+        {
+          "path": "src/quality/cssAnalyzer.js",
+          "sha256": "03be1a51bd3ee6ef3ffba15b8dc08ee87eb31a864c0b4173751a610dd6d49779"
+        },
+        {
+          "path": "src/quality/htmlAnalyzer.js",
+          "sha256": "ddd23ee8da6a817d033c3e71809c4e1c9c26e698cd91f9290b1d7f4b35c187ae"
+        },
+        {
+          "path": "src/quality/javascriptAnalyzer.js",
+          "sha256": "8c2bbf7b145580e7c472055703fdeece4fed462c12cdb5f6e7969e2d9342779d"
+        },
+        {
+          "path": "src/quality/qualityAnalyzer.js",
+          "sha256": "a5c0b27ee161fb41c05eb6b5ad22091d723c76d2dcc4d493044b6975250ca488"
+        },
+        {
+          "path": "src/routes/generationRoutes.js",
+          "sha256": "86e44b9fe1ebfd149a498018e4ce2b8edff5cd2e38cda83bb6d1f2cf9d5cdfba"
+        },
+        {
+          "path": "src/services/functionalValidationService.js",
+          "sha256": "8e2c1f5ab7201baff035011f6310134c2e1c06331d9b6aaf3efdb20b99414674"
+        },
+        {
+          "path": "src/services/generationService.js",
+          "sha256": "1ccb5ac213506c5dded780abfadd2e8d86d447f1a7cfe07d9790b0942b71a862"
+        },
+        {
+          "path": "src/services/refinementService.js",
+          "sha256": "36913e0d8a9fd655798f0308519d86aa8735e3fc8aac7b07f4fe0b6f10441473"
+        },
+        {
+          "path": "src/services/runtimeValidationService.js",
+          "sha256": "9da65d45a5aa0697b34f12bd276cf97b02a1b87ee56d7d8728c3c7a502a67e51"
+        },
+        {
+          "path": "src/specifications/booking.js",
+          "sha256": "c1f81dc221af8886f416e9b6a829d36e25317b303c7085bb7b4efbb1e6b5e373"
+        },
+        {
+          "path": "src/specifications/index.js",
+          "sha256": "62ebc3854d6d710f63306a3cd7b76d35b8443d5f70e7320dc0b1be8776cd0b1c"
+        },
+        {
+          "path": "src/specifications/quiz.js",
+          "sha256": "8a123ba6d6dd490f78ef6e35efa8cdc8382716a86f4f9bfdf573094872f86628"
+        },
+        {
+          "path": "src/specifications/todo.js",
+          "sha256": "fda15878cae702b03e5ca307bb865af0b912203b84c7a0536f27a3eebc25d6b0"
+        },
+        {
+          "path": "src/utils/responseParser.js",
+          "sha256": "78d7ca5d2df79cc1fac6a292695015fc9d8c20944ef7693c4c4b3c3c88f657c9"
+        }
+      ]
+    },
+    "specifications": [
+      {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      {
+        "id": "quiz",
+        "name": "Multiple-choice Quiz"
+      },
+      {
+        "id": "booking",
+        "name": "Appointment Booking Form"
+      }
+    ],
+    "workflows": [
+      "one-shot",
+      "quality-focused",
+      "automated-refinement"
+    ]
+  },
+  "summary": {
+    "totalRuns": 90,
+    "pending": 0,
+    "running": 0,
+    "completed": 90,
+    "failed": 0,
+    "validPassed": 51,
+    "validPoorQuality": 39,
+    "generationApiFailures": 0,
+    "pipelineFailures": 0
+  },
+  "runs": [
+    {
+      "experimentRunId": "booking__quality-focused__10",
+      "sequence": 1,
+      "specification": {
+        "id": "booking",
+        "name": "Appointment Booking Form"
+      },
+      "workflow": "quality-focused",
+      "repetition": 10,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:15:25.816Z",
+      "completedAt": "2026-08-03T14:16:02.639Z",
+      "runId": "2026-08-03T14-15-58-876Z-fe654b06",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/booking__quality-focused__10.json"
+    },
+    {
+      "experimentRunId": "booking__quality-focused__4",
+      "sequence": 2,
+      "specification": {
+        "id": "booking",
+        "name": "Appointment Booking Form"
+      },
+      "workflow": "quality-focused",
+      "repetition": 4,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:16:02.653Z",
+      "completedAt": "2026-08-03T14:16:24.320Z",
+      "runId": "2026-08-03T14-16-21-899Z-c8bdabc6",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/booking__quality-focused__4.json"
+    },
+    {
+      "experimentRunId": "booking__automated-refinement__6",
+      "sequence": 3,
+      "specification": {
+        "id": "booking",
+        "name": "Appointment Booking Form"
+      },
+      "workflow": "automated-refinement",
+      "repetition": 6,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:16:24.328Z",
+      "completedAt": "2026-08-03T14:17:18.791Z",
+      "runId": "2026-08-03T14-16-49-761Z-550bd579",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/booking__automated-refinement__6.json"
+    },
+    {
+      "experimentRunId": "todo__quality-focused__10",
+      "sequence": 4,
+      "specification": {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      "workflow": "quality-focused",
+      "repetition": 10,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:17:18.802Z",
+      "completedAt": "2026-08-03T14:17:40.795Z",
+      "runId": "2026-08-03T14-17-38-880Z-feabbef8",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/todo__quality-focused__10.json"
+    },
+    {
+      "experimentRunId": "todo__automated-refinement__7",
+      "sequence": 5,
+      "specification": {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      "workflow": "automated-refinement",
+      "repetition": 7,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:17:40.809Z",
+      "completedAt": "2026-08-03T14:18:13.161Z",
+      "runId": "2026-08-03T14-18-08-791Z-f9fe75ba",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/todo__automated-refinement__7.json"
+    },
+    {
+      "experimentRunId": "quiz__automated-refinement__8",
+      "sequence": 6,
+      "specification": {
+        "id": "quiz",
+        "name": "Multiple-choice Quiz"
+      },
+      "workflow": "automated-refinement",
+      "repetition": 8,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:18:13.174Z",
+      "completedAt": "2026-08-03T14:19:11.071Z",
+      "runId": "2026-08-03T14-18-30-728Z-eb659227",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/quiz__automated-refinement__8.json"
+    },
+    {
+      "experimentRunId": "booking__one-shot__5",
+      "sequence": 7,
+      "specification": {
+        "id": "booking",
+        "name": "Appointment Booking Form"
+      },
+      "workflow": "one-shot",
+      "repetition": 5,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:19:11.085Z",
+      "completedAt": "2026-08-03T14:19:38.261Z",
+      "runId": "2026-08-03T14-19-35-020Z-58f44c9a",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/booking__one-shot__5.json"
+    },
+    {
+      "experimentRunId": "quiz__one-shot__3",
+      "sequence": 8,
+      "specification": {
+        "id": "quiz",
+        "name": "Multiple-choice Quiz"
+      },
+      "workflow": "one-shot",
+      "repetition": 3,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:19:38.277Z",
+      "completedAt": "2026-08-03T14:19:57.653Z",
+      "runId": "2026-08-03T14-19-54-773Z-d5356877",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/quiz__one-shot__3.json"
+    },
+    {
+      "experimentRunId": "booking__quality-focused__9",
+      "sequence": 9,
+      "specification": {
+        "id": "booking",
+        "name": "Appointment Booking Form"
+      },
+      "workflow": "quality-focused",
+      "repetition": 9,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:19:57.668Z",
+      "completedAt": "2026-08-03T14:20:39.897Z",
+      "runId": "2026-08-03T14-20-37-544Z-9ed6206b",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/booking__quality-focused__9.json"
+    },
+    {
+      "experimentRunId": "todo__automated-refinement__9",
+      "sequence": 10,
+      "specification": {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      "workflow": "automated-refinement",
+      "repetition": 9,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:20:39.916Z",
+      "completedAt": "2026-08-03T14:21:22.307Z",
+      "runId": "2026-08-03T14-20-57-162Z-d95506e6",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/todo__automated-refinement__9.json"
+    },
+    {
+      "experimentRunId": "quiz__quality-focused__6",
+      "sequence": 11,
+      "specification": {
+        "id": "quiz",
+        "name": "Multiple-choice Quiz"
+      },
+      "workflow": "quality-focused",
+      "repetition": 6,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:21:22.325Z",
+      "completedAt": "2026-08-03T14:21:40.267Z",
+      "runId": "2026-08-03T14-21-38-116Z-664df035",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/quiz__quality-focused__6.json"
+    },
+    {
+      "experimentRunId": "todo__one-shot__10",
+      "sequence": 12,
+      "specification": {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      "workflow": "one-shot",
+      "repetition": 10,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:21:40.287Z",
+      "completedAt": "2026-08-03T14:22:07.765Z",
+      "runId": "2026-08-03T14-22-03-867Z-e5ddb149",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/todo__one-shot__10.json"
+    },
+    {
+      "experimentRunId": "todo__quality-focused__2",
+      "sequence": 13,
+      "specification": {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      "workflow": "quality-focused",
+      "repetition": 2,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:22:07.786Z",
+      "completedAt": "2026-08-03T14:22:27.652Z",
+      "runId": "2026-08-03T14-22-25-661Z-dd6a58fa",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/todo__quality-focused__2.json"
+    },
+    {
+      "experimentRunId": "booking__quality-focused__3",
+      "sequence": 14,
+      "specification": {
+        "id": "booking",
+        "name": "Appointment Booking Form"
+      },
+      "workflow": "quality-focused",
+      "repetition": 3,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:22:27.672Z",
+      "completedAt": "2026-08-03T14:22:51.146Z",
+      "runId": "2026-08-03T14-22-48-740Z-de42f655",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/booking__quality-focused__3.json"
+    },
+    {
+      "experimentRunId": "todo__quality-focused__1",
+      "sequence": 15,
+      "specification": {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      "workflow": "quality-focused",
+      "repetition": 1,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:22:51.167Z",
+      "completedAt": "2026-08-03T14:23:45.948Z",
+      "runId": "2026-08-03T14-23-43-921Z-c585c771",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/todo__quality-focused__1.json"
+    },
+    {
+      "experimentRunId": "booking__automated-refinement__10",
+      "sequence": 16,
+      "specification": {
+        "id": "booking",
+        "name": "Appointment Booking Form"
+      },
+      "workflow": "automated-refinement",
+      "repetition": 10,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:23:45.972Z",
+      "completedAt": "2026-08-03T14:25:28.660Z",
+      "runId": "2026-08-03T14-24-32-447Z-e1b0b2c9",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/booking__automated-refinement__10.json"
+    },
+    {
+      "experimentRunId": "todo__one-shot__2",
+      "sequence": 17,
+      "specification": {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      "workflow": "one-shot",
+      "repetition": 2,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:25:28.685Z",
+      "completedAt": "2026-08-03T14:26:02.038Z",
+      "runId": "2026-08-03T14-25-58-425Z-1cd2a767",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/todo__one-shot__2.json"
+    },
+    {
+      "experimentRunId": "todo__one-shot__7",
+      "sequence": 18,
+      "specification": {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      "workflow": "one-shot",
+      "repetition": 7,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:26:02.065Z",
+      "completedAt": "2026-08-03T14:26:23.004Z",
+      "runId": "2026-08-03T14-26-19-043Z-398426ea",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/todo__one-shot__7.json"
+    },
+    {
+      "experimentRunId": "booking__automated-refinement__2",
+      "sequence": 19,
+      "specification": {
+        "id": "booking",
+        "name": "Appointment Booking Form"
+      },
+      "workflow": "automated-refinement",
+      "repetition": 2,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:26:23.031Z",
+      "completedAt": "2026-08-03T14:27:14.923Z",
+      "runId": "2026-08-03T14-26-47-602Z-b2af4010",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/booking__automated-refinement__2.json"
+    },
+    {
+      "experimentRunId": "booking__quality-focused__8",
+      "sequence": 20,
+      "specification": {
+        "id": "booking",
+        "name": "Appointment Booking Form"
+      },
+      "workflow": "quality-focused",
+      "repetition": 8,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:27:14.952Z",
+      "completedAt": "2026-08-03T14:27:42.997Z",
+      "runId": "2026-08-03T14-27-40-531Z-9b248d35",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/booking__quality-focused__8.json"
+    },
+    {
+      "experimentRunId": "booking__automated-refinement__9",
+      "sequence": 21,
+      "specification": {
+        "id": "booking",
+        "name": "Appointment Booking Form"
+      },
+      "workflow": "automated-refinement",
+      "repetition": 9,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:27:43.028Z",
+      "completedAt": "2026-08-03T14:28:37.294Z",
+      "runId": "2026-08-03T14-28-08-745Z-cfc323bd",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/booking__automated-refinement__9.json"
+    },
+    {
+      "experimentRunId": "quiz__automated-refinement__5",
+      "sequence": 22,
+      "specification": {
+        "id": "quiz",
+        "name": "Multiple-choice Quiz"
+      },
+      "workflow": "automated-refinement",
+      "repetition": 5,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:28:37.326Z",
+      "completedAt": "2026-08-03T14:29:15.062Z",
+      "runId": "2026-08-03T14-28-53-231Z-d631675b",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/quiz__automated-refinement__5.json"
+    },
+    {
+      "experimentRunId": "quiz__quality-focused__5",
+      "sequence": 23,
+      "specification": {
+        "id": "quiz",
+        "name": "Multiple-choice Quiz"
+      },
+      "workflow": "quality-focused",
+      "repetition": 5,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:29:15.095Z",
+      "completedAt": "2026-08-03T14:29:36.651Z",
+      "runId": "2026-08-03T14-29-34-417Z-ecdd894e",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/quiz__quality-focused__5.json"
+    },
+    {
+      "experimentRunId": "quiz__automated-refinement__4",
+      "sequence": 24,
+      "specification": {
+        "id": "quiz",
+        "name": "Multiple-choice Quiz"
+      },
+      "workflow": "automated-refinement",
+      "repetition": 4,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:29:36.685Z",
+      "completedAt": "2026-08-03T14:30:18.986Z",
+      "runId": "2026-08-03T14-29-54-510Z-6cf509eb",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/quiz__automated-refinement__4.json"
+    },
+    {
+      "experimentRunId": "quiz__automated-refinement__2",
+      "sequence": 25,
+      "specification": {
+        "id": "quiz",
+        "name": "Multiple-choice Quiz"
+      },
+      "workflow": "automated-refinement",
+      "repetition": 2,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:30:19.016Z",
+      "completedAt": "2026-08-03T14:31:18.088Z",
+      "runId": "2026-08-03T14-30-38-864Z-54719093",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/quiz__automated-refinement__2.json"
+    },
+    {
+      "experimentRunId": "booking__automated-refinement__1",
+      "sequence": 26,
+      "specification": {
+        "id": "booking",
+        "name": "Appointment Booking Form"
+      },
+      "workflow": "automated-refinement",
+      "repetition": 1,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:31:18.124Z",
+      "completedAt": "2026-08-03T14:32:33.160Z",
+      "runId": "2026-08-03T14-31-45-391Z-37dd36f3",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/booking__automated-refinement__1.json"
+    },
+    {
+      "experimentRunId": "quiz__one-shot__10",
+      "sequence": 27,
+      "specification": {
+        "id": "quiz",
+        "name": "Multiple-choice Quiz"
+      },
+      "workflow": "one-shot",
+      "repetition": 10,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:32:33.200Z",
+      "completedAt": "2026-08-03T14:32:51.990Z",
+      "runId": "2026-08-03T14-32-49-459Z-32eadc42",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/quiz__one-shot__10.json"
+    },
+    {
+      "experimentRunId": "booking__quality-focused__2",
+      "sequence": 28,
+      "specification": {
+        "id": "booking",
+        "name": "Appointment Booking Form"
+      },
+      "workflow": "quality-focused",
+      "repetition": 2,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:32:52.061Z",
+      "completedAt": "2026-08-03T14:33:15.617Z",
+      "runId": "2026-08-03T14-33-13-231Z-e4c3fde6",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/booking__quality-focused__2.json"
+    },
+    {
+      "experimentRunId": "todo__automated-refinement__8",
+      "sequence": 29,
+      "specification": {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      "workflow": "automated-refinement",
+      "repetition": 8,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:33:15.658Z",
+      "completedAt": "2026-08-03T14:34:27.247Z",
+      "runId": "2026-08-03T14-33-45-193Z-d10c7f93",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/todo__automated-refinement__8.json"
+    },
+    {
+      "experimentRunId": "booking__one-shot__2",
+      "sequence": 30,
+      "specification": {
+        "id": "booking",
+        "name": "Appointment Booking Form"
+      },
+      "workflow": "one-shot",
+      "repetition": 2,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:34:27.293Z",
+      "completedAt": "2026-08-03T14:34:58.833Z",
+      "runId": "2026-08-03T14-34-56-274Z-ced1f604",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/booking__one-shot__2.json"
+    },
+    {
+      "experimentRunId": "todo__quality-focused__6",
+      "sequence": 31,
+      "specification": {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      "workflow": "quality-focused",
+      "repetition": 6,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:34:58.876Z",
+      "completedAt": "2026-08-03T14:35:20.907Z",
+      "runId": "2026-08-03T14-35-18-860Z-c2fef161",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/todo__quality-focused__6.json"
+    },
+    {
+      "experimentRunId": "booking__automated-refinement__5",
+      "sequence": 32,
+      "specification": {
+        "id": "booking",
+        "name": "Appointment Booking Form"
+      },
+      "workflow": "automated-refinement",
+      "repetition": 5,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:35:20.951Z",
+      "completedAt": "2026-08-03T14:36:12.958Z",
+      "runId": "2026-08-03T14-35-47-013Z-74b0bf9f",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/booking__automated-refinement__5.json"
+    },
+    {
+      "experimentRunId": "todo__automated-refinement__10",
+      "sequence": 33,
+      "specification": {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      "workflow": "automated-refinement",
+      "repetition": 10,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:36:13.004Z",
+      "completedAt": "2026-08-03T14:37:15.835Z",
+      "runId": "2026-08-03T14-36-50-627Z-2f9c2d1d",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/todo__automated-refinement__10.json"
+    },
+    {
+      "experimentRunId": "todo__one-shot__8",
+      "sequence": 34,
+      "specification": {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      "workflow": "one-shot",
+      "repetition": 8,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:37:15.882Z",
+      "completedAt": "2026-08-03T14:37:41.985Z",
+      "runId": "2026-08-03T14-37-38-403Z-4b3a25aa",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/todo__one-shot__8.json"
+    },
+    {
+      "experimentRunId": "quiz__quality-focused__4",
+      "sequence": 35,
+      "specification": {
+        "id": "quiz",
+        "name": "Multiple-choice Quiz"
+      },
+      "workflow": "quality-focused",
+      "repetition": 4,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:37:42.034Z",
+      "completedAt": "2026-08-03T14:38:00.296Z",
+      "runId": "2026-08-03T14-37-58-077Z-0ecc9360",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/quiz__quality-focused__4.json"
+    },
+    {
+      "experimentRunId": "todo__quality-focused__9",
+      "sequence": 36,
+      "specification": {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      "workflow": "quality-focused",
+      "repetition": 9,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:38:00.348Z",
+      "completedAt": "2026-08-03T14:38:21.412Z",
+      "runId": "2026-08-03T14-38-19-495Z-76436b94",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/todo__quality-focused__9.json"
+    },
+    {
+      "experimentRunId": "todo__one-shot__5",
+      "sequence": 37,
+      "specification": {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      "workflow": "one-shot",
+      "repetition": 5,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:38:21.465Z",
+      "completedAt": "2026-08-03T14:38:51.408Z",
+      "runId": "2026-08-03T14-38-47-026Z-2bb80d9d",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/todo__one-shot__5.json"
+    },
+    {
+      "experimentRunId": "quiz__automated-refinement__6",
+      "sequence": 38,
+      "specification": {
+        "id": "quiz",
+        "name": "Multiple-choice Quiz"
+      },
+      "workflow": "automated-refinement",
+      "repetition": 6,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:38:51.459Z",
+      "completedAt": "2026-08-03T14:39:35.612Z",
+      "runId": "2026-08-03T14-39-10-339Z-16d177a5",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/quiz__automated-refinement__6.json"
+    },
+    {
+      "experimentRunId": "quiz__quality-focused__2",
+      "sequence": 39,
+      "specification": {
+        "id": "quiz",
+        "name": "Multiple-choice Quiz"
+      },
+      "workflow": "quality-focused",
+      "repetition": 2,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:39:35.675Z",
+      "completedAt": "2026-08-03T14:39:57.757Z",
+      "runId": "2026-08-03T14-39-55-642Z-49da0515",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/quiz__quality-focused__2.json"
+    },
+    {
+      "experimentRunId": "todo__automated-refinement__3",
+      "sequence": 40,
+      "specification": {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      "workflow": "automated-refinement",
+      "repetition": 3,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:39:57.809Z",
+      "completedAt": "2026-08-03T14:40:43.568Z",
+      "runId": "2026-08-03T14-40-14-424Z-bf25a289",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/todo__automated-refinement__3.json"
+    },
+    {
+      "experimentRunId": "todo__automated-refinement__4",
+      "sequence": 41,
+      "specification": {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      "workflow": "automated-refinement",
+      "repetition": 4,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:40:43.624Z",
+      "completedAt": "2026-08-03T14:41:26.060Z",
+      "runId": "2026-08-03T14-41-01-578Z-672a45ef",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/todo__automated-refinement__4.json"
+    },
+    {
+      "experimentRunId": "booking__automated-refinement__7",
+      "sequence": 42,
+      "specification": {
+        "id": "booking",
+        "name": "Appointment Booking Form"
+      },
+      "workflow": "automated-refinement",
+      "repetition": 7,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:41:26.115Z",
+      "completedAt": "2026-08-03T14:42:27.305Z",
+      "runId": "2026-08-03T14-41-58-266Z-a645d381",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/booking__automated-refinement__7.json"
+    },
+    {
+      "experimentRunId": "quiz__quality-focused__8",
+      "sequence": 43,
+      "specification": {
+        "id": "quiz",
+        "name": "Multiple-choice Quiz"
+      },
+      "workflow": "quality-focused",
+      "repetition": 8,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:42:27.366Z",
+      "completedAt": "2026-08-03T14:42:46.411Z",
+      "runId": "2026-08-03T14-42-44-249Z-fc0b6aa0",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/quiz__quality-focused__8.json"
+    },
+    {
+      "experimentRunId": "todo__quality-focused__5",
+      "sequence": 44,
+      "specification": {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      "workflow": "quality-focused",
+      "repetition": 5,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:42:46.469Z",
+      "completedAt": "2026-08-03T14:43:22.724Z",
+      "runId": "2026-08-03T14-43-05-812Z-bfe26281",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/todo__quality-focused__5.json"
+    },
+    {
+      "experimentRunId": "todo__quality-focused__8",
+      "sequence": 45,
+      "specification": {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      "workflow": "quality-focused",
+      "repetition": 8,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:43:22.788Z",
+      "completedAt": "2026-08-03T14:43:43.641Z",
+      "runId": "2026-08-03T14-43-41-664Z-840e5a53",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/todo__quality-focused__8.json"
+    },
+    {
+      "experimentRunId": "todo__quality-focused__3",
+      "sequence": 46,
+      "specification": {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      "workflow": "quality-focused",
+      "repetition": 3,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:43:43.711Z",
+      "completedAt": "2026-08-03T14:44:04.647Z",
+      "runId": "2026-08-03T14-44-02-640Z-8e55e3d2",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/todo__quality-focused__3.json"
+    },
+    {
+      "experimentRunId": "todo__automated-refinement__6",
+      "sequence": 47,
+      "specification": {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      "workflow": "automated-refinement",
+      "repetition": 6,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:44:04.716Z",
+      "completedAt": "2026-08-03T14:44:49.292Z",
+      "runId": "2026-08-03T14-44-23-258Z-062ffe5e",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/todo__automated-refinement__6.json"
+    },
+    {
+      "experimentRunId": "quiz__quality-focused__9",
+      "sequence": 48,
+      "specification": {
+        "id": "quiz",
+        "name": "Multiple-choice Quiz"
+      },
+      "workflow": "quality-focused",
+      "repetition": 9,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:44:49.372Z",
+      "completedAt": "2026-08-03T14:45:13.174Z",
+      "runId": "2026-08-03T14-45-11-045Z-31d0747d",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/quiz__quality-focused__9.json"
+    },
+    {
+      "experimentRunId": "todo__one-shot__6",
+      "sequence": 49,
+      "specification": {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      "workflow": "one-shot",
+      "repetition": 6,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:45:13.236Z",
+      "completedAt": "2026-08-03T14:45:31.450Z",
+      "runId": "2026-08-03T14-45-28-863Z-83f22cb4",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/todo__one-shot__6.json"
+    },
+    {
+      "experimentRunId": "booking__one-shot__4",
+      "sequence": 50,
+      "specification": {
+        "id": "booking",
+        "name": "Appointment Booking Form"
+      },
+      "workflow": "one-shot",
+      "repetition": 4,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:45:31.525Z",
+      "completedAt": "2026-08-03T14:46:28.150Z",
+      "runId": "2026-08-03T14-46-24-703Z-955e123e",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/booking__one-shot__4.json"
+    },
+    {
+      "experimentRunId": "todo__automated-refinement__5",
+      "sequence": 51,
+      "specification": {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      "workflow": "automated-refinement",
+      "repetition": 5,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:46:28.216Z",
+      "completedAt": "2026-08-03T14:47:29.670Z",
+      "runId": "2026-08-03T14-46-43-037Z-109d3362",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/todo__automated-refinement__5.json"
+    },
+    {
+      "experimentRunId": "todo__one-shot__3",
+      "sequence": 52,
+      "specification": {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      "workflow": "one-shot",
+      "repetition": 3,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:47:29.751Z",
+      "completedAt": "2026-08-03T14:48:01.081Z",
+      "runId": "2026-08-03T14-47-56-903Z-be989aa0",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/todo__one-shot__3.json"
+    },
+    {
+      "experimentRunId": "quiz__automated-refinement__1",
+      "sequence": 53,
+      "specification": {
+        "id": "quiz",
+        "name": "Multiple-choice Quiz"
+      },
+      "workflow": "automated-refinement",
+      "repetition": 1,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:48:01.167Z",
+      "completedAt": "2026-08-03T14:48:51.818Z",
+      "runId": "2026-08-03T14-48-25-207Z-9170b306",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/quiz__automated-refinement__1.json"
+    },
+    {
+      "experimentRunId": "quiz__automated-refinement__7",
+      "sequence": 54,
+      "specification": {
+        "id": "quiz",
+        "name": "Multiple-choice Quiz"
+      },
+      "workflow": "automated-refinement",
+      "repetition": 7,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:48:51.889Z",
+      "completedAt": "2026-08-03T14:49:30.018Z",
+      "runId": "2026-08-03T14-49-09-687Z-25b07654",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/quiz__automated-refinement__7.json"
+    },
+    {
+      "experimentRunId": "todo__quality-focused__7",
+      "sequence": 55,
+      "specification": {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      "workflow": "quality-focused",
+      "repetition": 7,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:49:30.090Z",
+      "completedAt": "2026-08-03T14:49:56.433Z",
+      "runId": "2026-08-03T14-49-54-405Z-6f567906",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/todo__quality-focused__7.json"
+    },
+    {
+      "experimentRunId": "booking__one-shot__7",
+      "sequence": 56,
+      "specification": {
+        "id": "booking",
+        "name": "Appointment Booking Form"
+      },
+      "workflow": "one-shot",
+      "repetition": 7,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:49:56.504Z",
+      "completedAt": "2026-08-03T14:50:24.647Z",
+      "runId": "2026-08-03T14-50-22-221Z-99375d65",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/booking__one-shot__7.json"
+    },
+    {
+      "experimentRunId": "quiz__one-shot__2",
+      "sequence": 57,
+      "specification": {
+        "id": "quiz",
+        "name": "Multiple-choice Quiz"
+      },
+      "workflow": "one-shot",
+      "repetition": 2,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:50:24.724Z",
+      "completedAt": "2026-08-03T14:50:44.889Z",
+      "runId": "2026-08-03T14-50-42-016Z-2c4c4296",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/quiz__one-shot__2.json"
+    },
+    {
+      "experimentRunId": "todo__one-shot__9",
+      "sequence": 58,
+      "specification": {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      "workflow": "one-shot",
+      "repetition": 9,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:50:44.992Z",
+      "completedAt": "2026-08-03T14:51:45.459Z",
+      "runId": "2026-08-03T14-51-41-014Z-f2bb0e6c",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/todo__one-shot__9.json"
+    },
+    {
+      "experimentRunId": "booking__quality-focused__5",
+      "sequence": 59,
+      "specification": {
+        "id": "booking",
+        "name": "Appointment Booking Form"
+      },
+      "workflow": "quality-focused",
+      "repetition": 5,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:51:45.539Z",
+      "completedAt": "2026-08-03T14:53:23.364Z",
+      "runId": "2026-08-03T14-53-20-877Z-e7da1fef",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/booking__quality-focused__5.json"
+    },
+    {
+      "experimentRunId": "booking__quality-focused__6",
+      "sequence": 60,
+      "specification": {
+        "id": "booking",
+        "name": "Appointment Booking Form"
+      },
+      "workflow": "quality-focused",
+      "repetition": 6,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:53:23.439Z",
+      "completedAt": "2026-08-03T14:53:51.375Z",
+      "runId": "2026-08-03T14-53-49-047Z-856dcd8c",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/booking__quality-focused__6.json"
+    },
+    {
+      "experimentRunId": "todo__one-shot__1",
+      "sequence": 61,
+      "specification": {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      "workflow": "one-shot",
+      "repetition": 1,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:53:51.453Z",
+      "completedAt": "2026-08-03T14:54:10.507Z",
+      "runId": "2026-08-03T14-54-08-413Z-3a1e439e",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/todo__one-shot__1.json"
+    },
+    {
+      "experimentRunId": "booking__automated-refinement__4",
+      "sequence": 62,
+      "specification": {
+        "id": "booking",
+        "name": "Appointment Booking Form"
+      },
+      "workflow": "automated-refinement",
+      "repetition": 4,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:54:10.625Z",
+      "completedAt": "2026-08-03T14:55:04.636Z",
+      "runId": "2026-08-03T14-54-34-688Z-066bff61",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/booking__automated-refinement__4.json"
+    },
+    {
+      "experimentRunId": "quiz__one-shot__9",
+      "sequence": 63,
+      "specification": {
+        "id": "quiz",
+        "name": "Multiple-choice Quiz"
+      },
+      "workflow": "one-shot",
+      "repetition": 9,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:55:04.728Z",
+      "completedAt": "2026-08-03T14:55:27.360Z",
+      "runId": "2026-08-03T14-55-24-340Z-148e36ad",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/quiz__one-shot__9.json"
+    },
+    {
+      "experimentRunId": "quiz__one-shot__6",
+      "sequence": 64,
+      "specification": {
+        "id": "quiz",
+        "name": "Multiple-choice Quiz"
+      },
+      "workflow": "one-shot",
+      "repetition": 6,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:55:27.444Z",
+      "completedAt": "2026-08-03T14:55:50.920Z",
+      "runId": "2026-08-03T14-55-48-098Z-51795f8a",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/quiz__one-shot__6.json"
+    },
+    {
+      "experimentRunId": "quiz__one-shot__1",
+      "sequence": 65,
+      "specification": {
+        "id": "quiz",
+        "name": "Multiple-choice Quiz"
+      },
+      "workflow": "one-shot",
+      "repetition": 1,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:55:51.011Z",
+      "completedAt": "2026-08-03T14:56:14.068Z",
+      "runId": "2026-08-03T14-56-11-671Z-83fe360f",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/quiz__one-shot__1.json"
+    },
+    {
+      "experimentRunId": "quiz__automated-refinement__10",
+      "sequence": 66,
+      "specification": {
+        "id": "quiz",
+        "name": "Multiple-choice Quiz"
+      },
+      "workflow": "automated-refinement",
+      "repetition": 10,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:56:14.157Z",
+      "completedAt": "2026-08-03T14:56:53.602Z",
+      "runId": "2026-08-03T14-56-32-564Z-bbfbf863",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/quiz__automated-refinement__10.json"
+    },
+    {
+      "experimentRunId": "booking__one-shot__10",
+      "sequence": 67,
+      "specification": {
+        "id": "booking",
+        "name": "Appointment Booking Form"
+      },
+      "workflow": "one-shot",
+      "repetition": 10,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:56:53.695Z",
+      "completedAt": "2026-08-03T14:57:21.600Z",
+      "runId": "2026-08-03T14-57-18-012Z-ccd00cfb",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/booking__one-shot__10.json"
+    },
+    {
+      "experimentRunId": "quiz__one-shot__5",
+      "sequence": 68,
+      "specification": {
+        "id": "quiz",
+        "name": "Multiple-choice Quiz"
+      },
+      "workflow": "one-shot",
+      "repetition": 5,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:57:21.716Z",
+      "completedAt": "2026-08-03T14:57:45.971Z",
+      "runId": "2026-08-03T14-57-43-495Z-fffe6529",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/quiz__one-shot__5.json"
+    },
+    {
+      "experimentRunId": "booking__one-shot__8",
+      "sequence": 69,
+      "specification": {
+        "id": "booking",
+        "name": "Appointment Booking Form"
+      },
+      "workflow": "one-shot",
+      "repetition": 8,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:57:46.064Z",
+      "completedAt": "2026-08-03T14:58:18.882Z",
+      "runId": "2026-08-03T14-58-16-065Z-ca98a6a5",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/booking__one-shot__8.json"
+    },
+    {
+      "experimentRunId": "quiz__quality-focused__7",
+      "sequence": 70,
+      "specification": {
+        "id": "quiz",
+        "name": "Multiple-choice Quiz"
+      },
+      "workflow": "quality-focused",
+      "repetition": 7,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:58:18.969Z",
+      "completedAt": "2026-08-03T14:58:39.445Z",
+      "runId": "2026-08-03T14-58-37-331Z-5580a76a",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/quiz__quality-focused__7.json"
+    },
+    {
+      "experimentRunId": "quiz__quality-focused__10",
+      "sequence": 71,
+      "specification": {
+        "id": "quiz",
+        "name": "Multiple-choice Quiz"
+      },
+      "workflow": "quality-focused",
+      "repetition": 10,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:58:39.533Z",
+      "completedAt": "2026-08-03T14:59:05.945Z",
+      "runId": "2026-08-03T14-59-03-848Z-4a27d1fa",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/quiz__quality-focused__10.json"
+    },
+    {
+      "experimentRunId": "todo__automated-refinement__1",
+      "sequence": 72,
+      "specification": {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      "workflow": "automated-refinement",
+      "repetition": 1,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T14:59:06.034Z",
+      "completedAt": "2026-08-03T15:00:01.180Z",
+      "runId": "2026-08-03T14-59-39-228Z-072c9804",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/todo__automated-refinement__1.json"
+    },
+    {
+      "experimentRunId": "booking__automated-refinement__8",
+      "sequence": 73,
+      "specification": {
+        "id": "booking",
+        "name": "Appointment Booking Form"
+      },
+      "workflow": "automated-refinement",
+      "repetition": 8,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T15:00:01.275Z",
+      "completedAt": "2026-08-03T15:01:03.048Z",
+      "runId": "2026-08-03T15-00-30-689Z-e18e8b66",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/booking__automated-refinement__8.json"
+    },
+    {
+      "experimentRunId": "todo__automated-refinement__2",
+      "sequence": 74,
+      "specification": {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      "workflow": "automated-refinement",
+      "repetition": 2,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T15:01:03.145Z",
+      "completedAt": "2026-08-03T15:01:46.772Z",
+      "runId": "2026-08-03T15-01-20-011Z-bbf32377",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/todo__automated-refinement__2.json"
+    },
+    {
+      "experimentRunId": "quiz__automated-refinement__3",
+      "sequence": 75,
+      "specification": {
+        "id": "quiz",
+        "name": "Multiple-choice Quiz"
+      },
+      "workflow": "automated-refinement",
+      "repetition": 3,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T15:01:46.871Z",
+      "completedAt": "2026-08-03T15:02:41.063Z",
+      "runId": "2026-08-03T15-02-06-276Z-e0cccc2c",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/quiz__automated-refinement__3.json"
+    },
+    {
+      "experimentRunId": "todo__quality-focused__4",
+      "sequence": 76,
+      "specification": {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      "workflow": "quality-focused",
+      "repetition": 4,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T15:02:41.170Z",
+      "completedAt": "2026-08-03T15:03:02.351Z",
+      "runId": "2026-08-03T15-03-00-372Z-2f4f9e8c",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/todo__quality-focused__4.json"
+    },
+    {
+      "experimentRunId": "todo__one-shot__4",
+      "sequence": 77,
+      "specification": {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      "workflow": "one-shot",
+      "repetition": 4,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T15:03:02.448Z",
+      "completedAt": "2026-08-03T15:03:23.527Z",
+      "runId": "2026-08-03T15-03-19-540Z-e22e2ed7",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/todo__one-shot__4.json"
+    },
+    {
+      "experimentRunId": "booking__quality-focused__7",
+      "sequence": 78,
+      "specification": {
+        "id": "booking",
+        "name": "Appointment Booking Form"
+      },
+      "workflow": "quality-focused",
+      "repetition": 7,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T15:03:23.621Z",
+      "completedAt": "2026-08-03T15:03:51.451Z",
+      "runId": "2026-08-03T15-03-49-132Z-43baf6b5",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/booking__quality-focused__7.json"
+    },
+    {
+      "experimentRunId": "quiz__quality-focused__3",
+      "sequence": 79,
+      "specification": {
+        "id": "quiz",
+        "name": "Multiple-choice Quiz"
+      },
+      "workflow": "quality-focused",
+      "repetition": 3,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T15:03:51.546Z",
+      "completedAt": "2026-08-03T15:04:09.435Z",
+      "runId": "2026-08-03T15-04-07-220Z-cc4fc56b",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/quiz__quality-focused__3.json"
+    },
+    {
+      "experimentRunId": "booking__one-shot__9",
+      "sequence": 80,
+      "specification": {
+        "id": "booking",
+        "name": "Appointment Booking Form"
+      },
+      "workflow": "one-shot",
+      "repetition": 9,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T15:04:09.535Z",
+      "completedAt": "2026-08-03T15:04:56.200Z",
+      "runId": "2026-08-03T15-04-52-692Z-995c5f2b",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/booking__one-shot__9.json"
+    },
+    {
+      "experimentRunId": "booking__automated-refinement__3",
+      "sequence": 81,
+      "specification": {
+        "id": "booking",
+        "name": "Appointment Booking Form"
+      },
+      "workflow": "automated-refinement",
+      "repetition": 3,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T15:04:56.302Z",
+      "completedAt": "2026-08-03T15:06:13.884Z",
+      "runId": "2026-08-03T15-05-32-537Z-4c20466f",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/booking__automated-refinement__3.json"
+    },
+    {
+      "experimentRunId": "booking__one-shot__1",
+      "sequence": 82,
+      "specification": {
+        "id": "booking",
+        "name": "Appointment Booking Form"
+      },
+      "workflow": "one-shot",
+      "repetition": 1,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T15:06:13.986Z",
+      "completedAt": "2026-08-03T15:06:52.871Z",
+      "runId": "2026-08-03T15-06-37-962Z-1ad64977",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/booking__one-shot__1.json"
+    },
+    {
+      "experimentRunId": "booking__one-shot__3",
+      "sequence": 83,
+      "specification": {
+        "id": "booking",
+        "name": "Appointment Booking Form"
+      },
+      "workflow": "one-shot",
+      "repetition": 3,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T15:06:52.982Z",
+      "completedAt": "2026-08-03T15:07:24.535Z",
+      "runId": "2026-08-03T15-07-21-028Z-64d732b4",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/booking__one-shot__3.json"
+    },
+    {
+      "experimentRunId": "booking__one-shot__6",
+      "sequence": 84,
+      "specification": {
+        "id": "booking",
+        "name": "Appointment Booking Form"
+      },
+      "workflow": "one-shot",
+      "repetition": 6,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T15:07:24.640Z",
+      "completedAt": "2026-08-03T15:07:54.904Z",
+      "runId": "2026-08-03T15-07-51-883Z-79f0e4ef",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/booking__one-shot__6.json"
+    },
+    {
+      "experimentRunId": "quiz__one-shot__7",
+      "sequence": 85,
+      "specification": {
+        "id": "quiz",
+        "name": "Multiple-choice Quiz"
+      },
+      "workflow": "one-shot",
+      "repetition": 7,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T15:07:55.009Z",
+      "completedAt": "2026-08-03T15:08:16.702Z",
+      "runId": "2026-08-03T15-08-13-520Z-9c3d0a87",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/quiz__one-shot__7.json"
+    },
+    {
+      "experimentRunId": "quiz__one-shot__4",
+      "sequence": 86,
+      "specification": {
+        "id": "quiz",
+        "name": "Multiple-choice Quiz"
+      },
+      "workflow": "one-shot",
+      "repetition": 4,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T15:08:16.800Z",
+      "completedAt": "2026-08-03T15:08:38.048Z",
+      "runId": "2026-08-03T15-08-35-340Z-da00b85b",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/quiz__one-shot__4.json"
+    },
+    {
+      "experimentRunId": "booking__quality-focused__1",
+      "sequence": 87,
+      "specification": {
+        "id": "booking",
+        "name": "Appointment Booking Form"
+      },
+      "workflow": "quality-focused",
+      "repetition": 1,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T15:08:38.198Z",
+      "completedAt": "2026-08-03T15:09:05.416Z",
+      "runId": "2026-08-03T15-09-02-946Z-abb8a53f",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/booking__quality-focused__1.json"
+    },
+    {
+      "experimentRunId": "quiz__one-shot__8",
+      "sequence": 88,
+      "specification": {
+        "id": "quiz",
+        "name": "Multiple-choice Quiz"
+      },
+      "workflow": "one-shot",
+      "repetition": 8,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T15:09:05.525Z",
+      "completedAt": "2026-08-03T15:09:36.469Z",
+      "runId": "2026-08-03T15-09-33-917Z-3418bb62",
+      "resultClassification": "valid-poor-quality",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/quiz__one-shot__8.json"
+    },
+    {
+      "experimentRunId": "quiz__quality-focused__1",
+      "sequence": 89,
+      "specification": {
+        "id": "quiz",
+        "name": "Multiple-choice Quiz"
+      },
+      "workflow": "quality-focused",
+      "repetition": 1,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T15:09:36.581Z",
+      "completedAt": "2026-08-03T15:09:57.855Z",
+      "runId": "2026-08-03T15-09-55-733Z-f2b4d3fe",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/quiz__quality-focused__1.json"
+    },
+    {
+      "experimentRunId": "quiz__automated-refinement__9",
+      "sequence": 90,
+      "specification": {
+        "id": "quiz",
+        "name": "Multiple-choice Quiz"
+      },
+      "workflow": "automated-refinement",
+      "repetition": 9,
+      "status": "completed",
+      "attemptCount": 1,
+      "startedAt": "2026-08-03T15:09:57.956Z",
+      "completedAt": "2026-08-03T15:11:19.176Z",
+      "runId": "2026-08-03T15-10-15-645Z-48d201a7",
+      "resultClassification": "valid-passed",
+      "failureType": null,
+      "failureStage": null,
+      "error": null,
+      "responseFile": "responses/quiz__automated-refinement__9.json"
+    }
+  ],
+  "exports": {
+    "generatedAt": "2026-08-03T15:11:19.451Z",
+    "schemaVersion": "1.1.0",
+    "json": "dataset.json",
+    "csv": "dataset.csv"
+  }
+}

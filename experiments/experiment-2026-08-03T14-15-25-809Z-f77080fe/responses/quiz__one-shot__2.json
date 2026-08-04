@@ -1,0 +1,474 @@
+{
+  "capturedAt": "2026-08-03T14:50:44.888Z",
+  "httpStatus": 201,
+  "ok": true,
+  "body": {
+    "run": {
+      "runId": "2026-08-03T14-50-42-016Z-2c4c4296",
+      "createdAt": "2026-08-03T14:50:42.017Z",
+      "specification": {
+        "id": "quiz",
+        "name": "Multiple-choice Quiz"
+      },
+      "workflow": "one-shot",
+      "model": "gpt-5.6-luna",
+      "temperature": 0,
+      "promptVersion": "1.0.0",
+      "generationMetrics": {
+        "totalDurationMs": 17267,
+        "promptTokens": 743,
+        "outputTokens": 2714,
+        "totalTokens": 3457,
+        "finishReason": null
+      },
+      "generatedApplication": {
+        "applicationName": "Multiple-choice Quiz",
+        "summary": "A polished three-question browser quiz that calculates and displays a score entirely in page memory."
+      },
+      "qualitySummary": {
+        "totalIssues": 1,
+        "totalErrors": 1,
+        "totalWarnings": 0,
+        "passed": false
+      },
+      "experimentMetrics": {
+        "workflowDurationMs": 20159,
+        "aiGenerationDurationMs": 17267,
+        "refinementIterations": 0,
+        "converged": null,
+        "stopReason": "not-applicable",
+        "totalPromptTokens": 743,
+        "totalOutputTokens": 2714,
+        "totalTokens": 3457,
+        "iterations": [
+          {
+            "iteration": 0,
+            "generationDurationMs": 17267,
+            "promptTokens": 743,
+            "outputTokens": 2714,
+            "totalTokens": 3457
+          }
+        ]
+      },
+      "completedAt": "2026-08-03T14:50:44.891Z",
+      "runDirectory": "C:\\Users\\Administrator\\Documents\\Development\\ai-software-quality-pipeline\\generated-apps\\runs\\2026-08-03T14-50-42-016Z-2c4c4296"
+    },
+    "application": {
+      "html": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Multiple-choice Quiz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n  <script src=\"script.js\" defer></script>\n</head>\n<body>\n  <main class=\"app-shell\">\n    <header class=\"hero\">\n      <div class=\"eyebrow\">QUICK KNOWLEDGE CHECK</div>\n      <h1>Multiple-choice Quiz</h1>\n      <p>Test yourself with three questions and discover your score.</p>\n    </header>\n\n    <form id=\"quiz-form\" class=\"quiz-card\">\n      <section class=\"question\" data-testid=\"quiz-question\">\n        <div class=\"question-heading\"><span class=\"question-number\">01</span><h2>Which planet is known as the Red Planet?</h2></div>\n        <div class=\"options\">\n          <label class=\"option\" data-testid=\"quiz-option\"><input type=\"radio\" name=\"q1\" value=\"mars\"><span class=\"radio-mark\"></span><span>Mars</span></label>\n          <label class=\"option\" data-testid=\"quiz-option\"><input type=\"radio\" name=\"q1\" value=\"venus\"><span class=\"radio-mark\"></span><span>Venus</span></label>\n          <label class=\"option\" data-testid=\"quiz-option\"><input type=\"radio\" name=\"q1\" value=\"jupiter\"><span class=\"radio-mark\"></span><span>Jupiter</span></label>\n        </div>\n      </section>\n\n      <section class=\"question\" data-testid=\"quiz-question\">\n        <div class=\"question-heading\"><span class=\"question-number\">02</span><h2>What is the largest ocean on Earth?</h2></div>\n        <div class=\"options\">\n          <label class=\"option\" data-testid=\"quiz-option\"><input type=\"radio\" name=\"q2\" value=\"atlantic\"><span class=\"radio-mark\"></span><span>Atlantic Ocean</span></label>\n          <label class=\"option\" data-testid=\"quiz-option\"><input type=\"radio\" name=\"q2\" value=\"indian\"><span class=\"radio-mark\"></span><span>Indian Ocean</span></label>\n          <label class=\"option\" data-testid=\"quiz-option\"><input type=\"radio\" name=\"q2\" value=\"pacific\"><span class=\"radio-mark\"></span><span>Pacific Ocean</span></label>\n        </div>\n      </section>\n\n      <section class=\"question\" data-testid=\"quiz-question\">\n        <div class=\"question-heading\"><span class=\"question-number\">03</span><h2>Which instrument has keys, pedals, and strings?</h2></div>\n        <div class=\"options\">\n          <label class=\"option\" data-testid=\"quiz-option\"><input type=\"radio\" name=\"q3\" value=\"flute\"><span class=\"radio-mark\"></span><span>Flute</span></label>\n          <label class=\"option\" data-testid=\"quiz-option\"><input type=\"radio\" name=\"q3\" value=\"piano\"><span class=\"radio-mark\"></span><span>Piano</span></label>\n          <label class=\"option\" data-testid=\"quiz-option\"><input type=\"radio\" name=\"q3\" value=\"trumpet\"><span class=\"radio-mark\"></span><span>Trumpet</span></label>\n        </div>\n      </section>\n\n      <div class=\"quiz-footer\">\n        <p id=\"status\" class=\"status\" role=\"status\">Choose one answer for each question.</p>\n        <button type=\"submit\" data-testid=\"quiz-submit\">Submit quiz <span aria-hidden=\"true\">→</span></button>\n      </div>\n    </form>\n\n    <section class=\"result\" aria-live=\"polite\">\n      <div class=\"result-label\">YOUR FINAL SCORE</div>\n      <div class=\"score\" data-testid=\"quiz-score\">—</div>\n      <p>out of 3 questions</p>\n    </section>\n  </main>\n</body>\n</html>",
+      "css": "@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap');\n\n:root { --ink: #172033; --muted: #718096; --line: #e5eaf2; --blue: #3867f0; --soft: #f5f7ff; --mint: #dff8ed; }\n* { box-sizing: border-box; }\nbody { margin: 0; min-height: 100vh; color: var(--ink); background: #f2f5fa; font-family: 'DM Sans', sans-serif; }\nbody:before { content: ''; position: fixed; inset: 0 0 auto; height: 330px; z-index: -1; background: linear-gradient(120deg, #dce8ff, #f3eaff 65%, #fff4df); }\n.app-shell { width: min(760px, calc(100% - 32px)); margin: 0 auto; padding: 70px 0 55px; }\n.hero { text-align: center; margin-bottom: 34px; }\n.eyebrow, .result-label { color: var(--blue); font-size: 11px; font-weight: 700; letter-spacing: .18em; }\nh1 { margin: 12px 0 10px; font: 700 clamp(34px, 6vw, 52px)/1.05 'Space Grotesk', sans-serif; letter-spacing: -.045em; }\n.hero p { margin: 0; color: var(--muted); font-size: 16px; }\n.quiz-card { padding: 10px 34px 28px; background: rgba(255,255,255,.94); border: 1px solid rgba(255,255,255,.8); border-radius: 24px; box-shadow: 0 20px 55px rgba(48,68,110,.12); }\n.question { padding: 27px 0 29px; border-bottom: 1px solid var(--line); }\n.question-heading { display: flex; gap: 16px; align-items: flex-start; }\n.question-number { flex: 0 0 auto; display: grid; place-items: center; width: 34px; height: 34px; color: var(--blue); background: var(--soft); border-radius: 10px; font-size: 12px; font-weight: 700; }\nh2 { margin: 3px 0 20px; font: 600 19px/1.35 'Space Grotesk', sans-serif; }\n.options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-left: 50px; }\n.option { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 11px; color: #45536b; cursor: pointer; font-size: 14px; transition: .2s ease; }\n.option:hover { border-color: #aebff7; background: #fafbff; transform: translateY(-1px); }\n.option input { position: absolute; opacity: 0; pointer-events: none; }\n.radio-mark { width: 17px; height: 17px; flex: 0 0 17px; border: 2px solid #cbd3e1; border-radius: 50%; position: relative; }\n.option:has(input:checked) { color: var(--blue); border-color: var(--blue); background: var(--soft); font-weight: 700; }\n.option:has(input:checked) .radio-mark { border-color: var(--blue); }\n.option:has(input:checked) .radio-mark:after { content: ''; position: absolute; inset: 3px; border-radius: 50%; background: var(--blue); }\n.quiz-footer { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding-top: 25px; }\n.status { margin: 0; color: var(--muted); font-size: 13px; }\n.status.error { color: #d45d5d; }\nbutton { border: 0; border-radius: 12px; padding: 14px 20px; color: white; background: var(--blue); font: 700 14px 'DM Sans', sans-serif; cursor: pointer; box-shadow: 0 8px 18px rgba(56,103,240,.25); transition: .2s; }\nbutton:hover { background: #2854d6; transform: translateY(-2px); }\nbutton span { margin-left: 9px; font-size: 18px; vertical-align: -1px; }\n.result { margin: 25px auto 0; text-align: center; }\n.score { margin: 5px 0 1px; font: 700 44px 'Space Grotesk', sans-serif; color: var(--ink); }\n.result p { margin: 0; color: var(--muted); font-size: 13px; }\n@media (max-width: 620px) { .app-shell { padding-top: 42px; } .quiz-card { padding: 4px 20px 22px; } .options { grid-template-columns: 1fr; margin-left: 0; } .quiz-footer { align-items: stretch; flex-direction: column; } button { width: 100%; } }",
+      "javascript": "const form = document.getElementById('quiz-form');\nconst scoreElement = document.querySelector('[data-testid=\"quiz-score\"]');\nconst statusElement = document.getElementById('status');\nconst answers = { q1: 'mars', q2: 'pacific', q3: 'piano' };\n\nform.addEventListener('submit', (event) => {\n  event.preventDefault();\n  const formData = new FormData(form);\n  const unanswered = ['q1', 'q2', 'q3'].filter((question) => !formData.get(question));\n\n  if (unanswered.length) {\n    statusElement.textContent = 'Please answer all three questions before submitting.';\n    statusElement.classList.add('error');\n    return;\n  }\n\n  let score = 0;\n  Object.keys(answers).forEach((question) => {\n    if (formData.get(question) === answers[question]) score += 1;\n  });\n\n  scoreElement.textContent = String(score);\n  scoreElement.setAttribute('data-score', String(score));\n  statusElement.textContent = score === 3 ? 'Perfect score — excellent work!' : 'Your result is ready. Try again to improve it.';\n  statusElement.classList.remove('error');\n});\n\nform.addEventListener('change', () => {\n  statusElement.textContent = 'Choose one answer for each question.';\n  statusElement.classList.remove('error');\n});",
+      "metadata": {
+        "applicationName": "Multiple-choice Quiz",
+        "summary": "A polished three-question browser quiz that calculates and displays a score entirely in page memory."
+      }
+    },
+    "qualityReport": {
+      "analysedAt": "2026-08-03T14:50:42.016Z",
+      "analyzers": {
+        "html": {
+          "tool": "HTMLHint",
+          "issueCount": 0,
+          "errorCount": 0,
+          "warningCount": 0,
+          "passed": true,
+          "messages": []
+        },
+        "css": {
+          "tool": "Stylelint",
+          "issueCount": 0,
+          "errorCount": 0,
+          "warningCount": 0,
+          "passed": true,
+          "messages": []
+        },
+        "javascript": {
+          "tool": "ESLint",
+          "issueCount": 1,
+          "errorCount": 1,
+          "warningCount": 0,
+          "passed": false,
+          "messages": [
+            {
+              "line": 8,
+              "column": 24,
+              "endLine": 8,
+              "endColumn": 32,
+              "severity": "error",
+              "message": "'FormData' is not defined.",
+              "ruleId": "no-undef"
+            }
+          ]
+        }
+      },
+      "summary": {
+        "totalIssues": 1,
+        "totalErrors": 1,
+        "totalWarnings": 0,
+        "passed": false
+      }
+    },
+    "runtimeReport": {
+      "reportVersion": "1.1",
+      "runId": "2026-08-03T14-50-42-016Z-2c4c4296",
+      "specificationId": "quiz",
+      "applicationUrl": "http://localhost:3001/generated-apps/runs/2026-08-03T14-50-42-016Z-2c4c4296/index.html",
+      "browser": {
+        "engine": "chromium",
+        "headless": true,
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        }
+      },
+      "startedAt": "2026-08-03T14:50:42.020Z",
+      "completedAt": "2026-08-03T14:50:43.289Z",
+      "durationMs": 1269,
+      "navigation": {
+        "successful": true,
+        "status": 200,
+        "finalUrl": "http://localhost:3001/generated-apps/runs/2026-08-03T14-50-42-016Z-2c4c4296/index.html",
+        "error": null
+      },
+      "body": {
+        "exists": true,
+        "visible": true,
+        "textLength": 411,
+        "textPreview": "QUICK KNOWLEDGE CHECK\nMultiple-choice Quiz\n\nTest yourself with three questions and discover your score.\n\n01\nWhich planet is known as the Red Planet?\nMars\nVenus\nJupiter\n02\nWhat is the largest ocean on ",
+        "hasVisibleContent": true
+      },
+      "consoleErrors": [],
+      "uncaughtExceptions": [],
+      "requiredControls": {
+        "expected": 2,
+        "present": 2,
+        "allPresent": true,
+        "controls": [
+          {
+            "id": "answer-control",
+            "label": "Answer control",
+            "present": true,
+            "candidates": [
+              {
+                "type": "css",
+                "selector": "input[type=\"radio\"], input[type=\"checkbox\"], select, button",
+                "found": true
+              }
+            ]
+          },
+          {
+            "id": "quiz-action-control",
+            "label": "Submit or next control",
+            "present": true,
+            "candidates": [
+              {
+                "type": "role",
+                "role": "button",
+                "name": "submit|next|check|answer|finish|start",
+                "found": true
+              },
+              {
+                "type": "css",
+                "selector": "button[type=\"submit\"], input[type=\"submit\"]",
+                "found": true
+              }
+            ]
+          }
+        ]
+      },
+      "accessibility": {
+        "successful": true,
+        "standard": "WCAG 2.0 and 2.1 Level A and AA",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa"
+        ],
+        "violationCount": 1,
+        "violatingNodeCount": 8,
+        "violationsByImpact": {
+          "critical": 0,
+          "serious": 1,
+          "moderate": 0,
+          "minor": 0,
+          "unknown": 0
+        },
+        "violations": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "tags": [
+              "cat.color",
+              "wcag2aa",
+              "wcag143",
+              "TTv5",
+              "TT13.c",
+              "EN-301-549",
+              "EN-9.1.4.3",
+              "ACT",
+              "RGAAv4",
+              "RGAA-3.2.1"
+            ],
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.12/color-contrast?application=playwright",
+            "nodeCount": 8,
+            "nodes": [
+              {
+                "html": "<div class=\"eyebrow\">QUICK KNOWLEDGE CHECK</div>",
+                "target": [
+                  ".eyebrow"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.4 (foreground color: #3867f0, background color: #f2f5fa, font size: 8.3pt (11px), font weight: bold). Expected contrast ratio of 4.5:1",
+                "impact": "serious"
+              },
+              {
+                "html": "<p>Test yourself with three questions and discover your score.</p>",
+                "target": [
+                  "header > p"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.67 (foreground color: #718096, background color: #f2f5fa, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1",
+                "impact": "serious"
+              },
+              {
+                "html": "<span class=\"question-number\">01</span>",
+                "target": [
+                  ".question[data-testid=\"quiz-question\"]:nth-child(1) > .question-heading > .question-number"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.49 (foreground color: #3867f0, background color: #f5f7ff, font size: 9.0pt (12px), font weight: bold). Expected contrast ratio of 4.5:1",
+                "impact": "serious"
+              },
+              {
+                "html": "<span class=\"question-number\">02</span>",
+                "target": [
+                  ".question[data-testid=\"quiz-question\"]:nth-child(2) > .question-heading > .question-number"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.49 (foreground color: #3867f0, background color: #f5f7ff, font size: 9.0pt (12px), font weight: bold). Expected contrast ratio of 4.5:1",
+                "impact": "serious"
+              },
+              {
+                "html": "<span class=\"question-number\">03</span>",
+                "target": [
+                  ".question[data-testid=\"quiz-question\"]:nth-child(3) > .question-heading > .question-number"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.49 (foreground color: #3867f0, background color: #f5f7ff, font size: 9.0pt (12px), font weight: bold). Expected contrast ratio of 4.5:1",
+                "impact": "serious"
+              },
+              {
+                "html": "<p id=\"status\" class=\"status\" role=\"status\">Choose one answer for each question.</p>",
+                "target": [
+                  "#status"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.98 (foreground color: #718096, background color: #fefeff, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1",
+                "impact": "serious"
+              },
+              {
+                "html": "<div class=\"result-label\">YOUR FINAL SCORE</div>",
+                "target": [
+                  ".result-label"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.4 (foreground color: #3867f0, background color: #f2f5fa, font size: 8.3pt (11px), font weight: bold). Expected contrast ratio of 4.5:1",
+                "impact": "serious"
+              },
+              {
+                "html": "<p>out of 3 questions</p>",
+                "target": [
+                  ".result > p"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.67 (foreground color: #718096, background color: #f2f5fa, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1",
+                "impact": "serious"
+              }
+            ]
+          }
+        ],
+        "incompleteCount": 1,
+        "inapplicableCount": 43,
+        "passCount": 19,
+        "error": null
+      },
+      "summary": {
+        "runtimePassed": true,
+        "accessibilityPassed": false,
+        "navigationSuccessful": true,
+        "hasVisibleBodyContent": true,
+        "consoleErrorCount": 0,
+        "uncaughtExceptionCount": 0,
+        "requiredControlsPresent": 2,
+        "requiredControlsExpected": 2,
+        "accessibilityAnalysisSuccessful": true,
+        "accessibilityViolationCount": 1,
+        "accessibilityViolatingNodeCount": 8
+      }
+    },
+    "accessibilityReport": {
+      "successful": true,
+      "standard": "WCAG 2.0 and 2.1 Level A and AA",
+      "tags": [
+        "wcag2a",
+        "wcag2aa",
+        "wcag21a",
+        "wcag21aa"
+      ],
+      "violationCount": 1,
+      "violatingNodeCount": 8,
+      "violationsByImpact": {
+        "critical": 0,
+        "serious": 1,
+        "moderate": 0,
+        "minor": 0,
+        "unknown": 0
+      },
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "tags": [
+            "cat.color",
+            "wcag2aa",
+            "wcag143",
+            "TTv5",
+            "TT13.c",
+            "EN-301-549",
+            "EN-9.1.4.3",
+            "ACT",
+            "RGAAv4",
+            "RGAA-3.2.1"
+          ],
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.12/color-contrast?application=playwright",
+          "nodeCount": 8,
+          "nodes": [
+            {
+              "html": "<div class=\"eyebrow\">QUICK KNOWLEDGE CHECK</div>",
+              "target": [
+                ".eyebrow"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.4 (foreground color: #3867f0, background color: #f2f5fa, font size: 8.3pt (11px), font weight: bold). Expected contrast ratio of 4.5:1",
+              "impact": "serious"
+            },
+            {
+              "html": "<p>Test yourself with three questions and discover your score.</p>",
+              "target": [
+                "header > p"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.67 (foreground color: #718096, background color: #f2f5fa, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1",
+              "impact": "serious"
+            },
+            {
+              "html": "<span class=\"question-number\">01</span>",
+              "target": [
+                ".question[data-testid=\"quiz-question\"]:nth-child(1) > .question-heading > .question-number"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.49 (foreground color: #3867f0, background color: #f5f7ff, font size: 9.0pt (12px), font weight: bold). Expected contrast ratio of 4.5:1",
+              "impact": "serious"
+            },
+            {
+              "html": "<span class=\"question-number\">02</span>",
+              "target": [
+                ".question[data-testid=\"quiz-question\"]:nth-child(2) > .question-heading > .question-number"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.49 (foreground color: #3867f0, background color: #f5f7ff, font size: 9.0pt (12px), font weight: bold). Expected contrast ratio of 4.5:1",
+              "impact": "serious"
+            },
+            {
+              "html": "<span class=\"question-number\">03</span>",
+              "target": [
+                ".question[data-testid=\"quiz-question\"]:nth-child(3) > .question-heading > .question-number"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.49 (foreground color: #3867f0, background color: #f5f7ff, font size: 9.0pt (12px), font weight: bold). Expected contrast ratio of 4.5:1",
+              "impact": "serious"
+            },
+            {
+              "html": "<p id=\"status\" class=\"status\" role=\"status\">Choose one answer for each question.</p>",
+              "target": [
+                "#status"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.98 (foreground color: #718096, background color: #fefeff, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1",
+              "impact": "serious"
+            },
+            {
+              "html": "<div class=\"result-label\">YOUR FINAL SCORE</div>",
+              "target": [
+                ".result-label"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.4 (foreground color: #3867f0, background color: #f2f5fa, font size: 8.3pt (11px), font weight: bold). Expected contrast ratio of 4.5:1",
+              "impact": "serious"
+            },
+            {
+              "html": "<p>out of 3 questions</p>",
+              "target": [
+                ".result > p"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.67 (foreground color: #718096, background color: #f2f5fa, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1",
+              "impact": "serious"
+            }
+          ]
+        }
+      ],
+      "incompleteCount": 1,
+      "inapplicableCount": 43,
+      "passCount": 19,
+      "error": null
+    },
+    "functionalReport": {
+      "reportVersion": "1.0",
+      "runId": "2026-08-03T14-50-42-016Z-2c4c4296",
+      "specificationId": "quiz",
+      "applicationUrl": "http://localhost:3001/generated-apps/runs/2026-08-03T14-50-42-016Z-2c4c4296/index.html",
+      "startedAt": "2026-08-03T14:50:43.349Z",
+      "completedAt": "2026-08-03T14:50:44.853Z",
+      "durationMs": 1504,
+      "tests": [
+        {
+          "id": "quiz-question-count",
+          "requirement": "Include exactly three multiple-choice questions, with at least two answer options for each question.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "quiz-single-page",
+          "requirement": "Display all three questions and their answer options on a single page without requiring navigation between questions.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "quiz-select-answers",
+          "requirement": "Allow the user to select exactly one answer for each question.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "quiz-submit",
+          "requirement": "Provide a visible control for submitting the completed quiz.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "quiz-final-score",
+          "requirement": "After the quiz is submitted, display a final numeric score between 0 and 3.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "quiz-score-stability",
+          "requirement": "Repeated submission, if the application still permits it, must not accumulate or otherwise change the score unless the selected answers change.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "quiz-session-memory",
+          "requirement": "Keep quiz selections and results in page memory only. Refreshing or reopening the page must reset the quiz state.",
+          "passed": true,
+          "error": null
+        }
+      ],
+      "summary": {
+        "passed": true,
+        "passedCount": 7,
+        "failedCount": 0,
+        "totalCount": 7
+      }
+    }
+  }
+}

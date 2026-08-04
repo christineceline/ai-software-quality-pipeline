@@ -1,0 +1,907 @@
+{
+  "capturedAt": "2026-08-03T14:17:18.789Z",
+  "httpStatus": 201,
+  "ok": true,
+  "body": {
+    "run": {
+      "runId": "2026-08-03T14-16-49-761Z-550bd579",
+      "createdAt": "2026-08-03T14:16:49.769Z",
+      "specification": {
+        "id": "booking",
+        "name": "Appointment Booking Form"
+      },
+      "workflow": "automated-refinement",
+      "model": "gpt-5.6-luna",
+      "temperature": 0,
+      "promptVersion": "1.0.0",
+      "maxRefinementIterations": 3,
+      "generatedApplication": {
+        "applicationName": "Appointment Booking Form",
+        "summary": "A polished browser-only appointment scheduler for creating, viewing, and cancelling mock bookings."
+      },
+      "iterations": [
+        {
+          "iteration": 0,
+          "type": "initial-generation",
+          "createdAt": "2026-08-03T14:16:49.769Z",
+          "generationMetrics": {
+            "totalDurationMs": 25416,
+            "promptTokens": 796,
+            "outputTokens": 3204,
+            "totalTokens": 4000,
+            "finishReason": null
+          },
+          "qualitySummary": {
+            "totalIssues": 3,
+            "totalErrors": 3,
+            "totalWarnings": 0,
+            "passed": false
+          }
+        },
+        {
+          "iteration": 1,
+          "type": "refinement",
+          "completedAt": "2026-08-03T14:17:18.790Z",
+          "generationMetrics": {
+            "totalDurationMs": 18830,
+            "promptTokens": 5274,
+            "outputTokens": 3307,
+            "totalTokens": 8581,
+            "finishReason": null
+          },
+          "qualitySummary": {
+            "totalIssues": 0,
+            "totalErrors": 0,
+            "totalWarnings": 0,
+            "passed": true
+          },
+          "runtimePassed": true,
+          "accessibilityPassed": true,
+          "functionalPassed": true
+        }
+      ],
+      "refinement": {
+        "refinementIterations": 1,
+        "stoppedEarly": true,
+        "converged": true,
+        "stopReason": "no-actionable-feedback",
+        "completedAt": "2026-08-03T14:17:18.790Z"
+      },
+      "experimentMetrics": {
+        "workflowDurationMs": 54469,
+        "aiGenerationDurationMs": 44246,
+        "refinementIterations": 1,
+        "converged": true,
+        "stopReason": "no-actionable-feedback",
+        "totalPromptTokens": 6070,
+        "totalOutputTokens": 6511,
+        "totalTokens": 12581,
+        "iterations": [
+          {
+            "iteration": 0,
+            "generationDurationMs": 25416,
+            "promptTokens": 796,
+            "outputTokens": 3204,
+            "totalTokens": 4000
+          },
+          {
+            "iteration": 1,
+            "generationDurationMs": 18830,
+            "promptTokens": 5274,
+            "outputTokens": 3307,
+            "totalTokens": 8581
+          }
+        ]
+      },
+      "completedAt": "2026-08-03T14:17:18.790Z",
+      "runDirectory": "C:\\Users\\Administrator\\Documents\\Development\\ai-software-quality-pipeline\\generated-apps\\runs\\2026-08-03T14-16-49-761Z-550bd579"
+    },
+    "initial": {
+      "iteration": 0,
+      "application": {
+        "html": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Appointment Booking Form</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n  <script src=\"script.js\" defer></script>\n</head>\n<body>\n  <main class=\"shell\">\n    <section class=\"intro\">\n      <div class=\"brand-mark\" aria-hidden=\"true\">✦</div>\n      <p class=\"eyebrow\">SCHEDULE WITH EASE</p>\n      <h1>Book your next<br><em>appointment.</em></h1>\n      <p class=\"lead\">Choose a time that works for you. Your appointment details will appear here once confirmed.</p>\n      <div class=\"intro-note\"><span>●</span> No account required · Simple and secure</div>\n    </section>\n\n    <section class=\"panel\" aria-labelledby=\"form-title\">\n      <div class=\"panel-header\">\n        <div>\n          <p class=\"section-label\">NEW BOOKING</p>\n          <h2 id=\"form-title\">Appointment details</h2>\n        </div>\n        <div class=\"step\">01 <span>/</span> 01</div>\n      </div>\n      <form id=\"booking-form\" novalidate>\n        <div class=\"field\">\n          <label for=\"booking-name\">Your name <span>*</span></label>\n          <input data-testid=\"booking-name\" id=\"booking-name\" name=\"name\" type=\"text\" placeholder=\"e.g. Jordan Lee\" autocomplete=\"name\" required>\n        </div>\n        <div class=\"field\">\n          <label for=\"booking-email\">Email address <span>*</span></label>\n          <input data-testid=\"booking-email\" id=\"booking-email\" name=\"email\" type=\"email\" placeholder=\"you@example.com\" autocomplete=\"email\" required>\n        </div>\n        <div class=\"field-row\">\n          <div class=\"field\">\n            <label for=\"booking-date\">Date <span>*</span></label>\n            <input data-testid=\"booking-date\" id=\"booking-date\" name=\"date\" type=\"date\" required>\n          </div>\n          <div class=\"field\">\n            <label for=\"booking-time\">Time <span>*</span></label>\n            <input data-testid=\"booking-time\" id=\"booking-time\" name=\"time\" type=\"time\" required>\n          </div>\n        </div>\n        <div class=\"field\">\n          <label for=\"booking-type\">Appointment type <span>*</span></label>\n          <select data-testid=\"booking-type\" id=\"booking-type\" name=\"type\" required>\n            <option value=\"\" selected disabled>Select an appointment type</option>\n            <option value=\"Consultation\">Consultation</option>\n            <option value=\"Follow-up\">Follow-up</option>\n            <option value=\"Wellness check\">Wellness check</option>\n            <option value=\"Project review\">Project review</option>\n          </select>\n        </div>\n        <button data-testid=\"booking-submit\" class=\"submit\" type=\"submit\">Confirm appointment <span>→</span></button>\n        <p class=\"form-footnote\">By confirming, you are creating a mock booking for this page only.</p>\n      </form>\n    </section>\n\n    <section class=\"bookings-section\" aria-labelledby=\"bookings-title\">\n      <div class=\"list-heading\">\n        <div><p class=\"section-label\">YOUR SCHEDULE</p><h2 id=\"bookings-title\">Bookings</h2></div>\n        <span class=\"count\" id=\"booking-count\">0 appointments</span>\n      </div>\n      <div id=\"booking-confirmation\" class=\"confirmation\" role=\"status\" aria-live=\"polite\" hidden></div>\n      <div data-testid=\"booking-list\" id=\"booking-list\" class=\"booking-list\">\n        <div class=\"empty-state\" id=\"empty-state\"><div class=\"calendar-icon\">□</div><p>No appointments yet</p><span>Your confirmed bookings will show up here.</span></div>\n      </div>\n    </section>\n  </main>\n</body>\n</html>",
+        "css": "@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap');\n:root{--ink:#172a2b;--muted:#718080;--cream:#f7f6f1;--paper:#fff;--mint:#cde9dc;--teal:#1e6962;--line:#dce5e0;--coral:#e07d68}*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif} .shell{max-width:1100px;margin:auto;padding:62px 34px 80px;display:grid;grid-template-columns:.82fr 1.18fr;gap:70px}.intro{padding:26px 0}.brand-mark{width:45px;height:45px;background:var(--teal);color:white;border-radius:13px;display:grid;place-items:center;font-size:25px;margin-bottom:62px}.eyebrow,.section-label{font-size:11px;letter-spacing:2px;font-weight:700;color:var(--teal);margin:0 0 16px}.intro h1{font-size:54px;line-height:1.08;letter-spacing:-2px;margin:0 0 24px}.intro h1 em{font-family:'Playfair Display',serif;font-weight:600;color:var(--teal)}.lead{color:var(--muted);font-size:16px;line-height:1.7;max-width:360px}.intro-note{margin-top:62px;color:var(--muted);font-size:12px}.intro-note span{color:var(--coral);margin-right:8px}.panel{background:var(--paper);border:1px solid #e9ede8;border-radius:22px;padding:36px 40px;box-shadow:0 15px 45px #173d3510}.panel-header,.list-heading{display:flex;justify-content:space-between;align-items:flex-start}.panel h2,.list-heading h2{font-size:25px;margin:0 0 28px;letter-spacing:-.6px}.step{font-size:12px;color:var(--teal);font-weight:700}.step span{color:#bbc8c3;font-weight:400}.field{margin-bottom:20px}.field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}.field label{display:block;font-size:12px;font-weight:700;margin:0 0 8px}.field label span{color:var(--coral)}input,select{font:inherit;width:100%;height:48px;border:1px solid var(--line);border-radius:9px;padding:0 14px;color:var(--ink);background:#fff;outline:none}input:focus,select:focus{border-color:var(--teal);box-shadow:0 0 0 3px #1e696215}input:user-invalid:not(:placeholder-shown){border-color:var(--coral)}.submit{width:100%;height:52px;border:0;border-radius:9px;background:var(--teal);color:#fff;font:600 14px 'DM Sans';cursor:pointer;margin-top:5px;transition:.2s}.submit:hover{background:#15534e;transform:translateY(-1px)}.submit span{font-size:20px;margin-left:12px}.form-footnote{text-align:center;color:#94a19d;font-size:11px;margin:15px 0 0}.bookings-section{grid-column:2}.list-heading h2{margin-bottom:18px}.count{font-size:12px;color:var(--muted);padding-top:5px}.confirmation{background:#e1f3e9;color:#28624e;padding:13px 16px;border-radius:9px;font-size:13px;margin-bottom:15px}.booking-list{display:flex;flex-direction:column;gap:12px}.empty-state{text-align:center;border:1px dashed #cfdcd5;border-radius:14px;padding:35px 20px;color:var(--muted)}.calendar-icon{font-size:24px;color:var(--teal);margin-bottom:8px}.empty-state p{margin:0 0 5px;color:var(--ink);font-weight:600}.empty-state span{font-size:12px}.booking{background:#fff;border:1px solid var(--line);border-radius:13px;padding:18px 20px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}.booking.cancelled{opacity:.62;background:#f1f3f0}.booking-name{font-size:16px;font-weight:700;margin:0 0 7px}.booking-meta{font-size:12px;color:var(--muted);margin:0}.booking-type{font-size:11px;color:var(--teal);font-weight:700;text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px}.cancel{border:1px solid #e6c1b8;background:#fff;color:#bd6756;border-radius:7px;padding:8px 11px;font:600 11px 'DM Sans';cursor:pointer}.cancelled-label{font-size:11px;color:#9b655b;font-weight:700}.booking.cancelled .booking-name{text-decoration:line-through}.booking:focus-within{outline:2px solid var(--mint)}@media(max-width:800px){.shell{grid-template-columns:1fr;gap:40px;padding:35px 20px}.intro{padding:0}.brand-mark{margin-bottom:35px}.intro h1{font-size:43px}.intro-note{margin-top:30px}.bookings-section{grid-column:1}.panel{padding:28px 22px}}@media(max-width:450px){.field-row{grid-template-columns:1fr;gap:0}}",
+        "javascript": "const form = document.getElementById('booking-form');\nconst dateInput = document.getElementById('booking-date');\nconst list = document.getElementById('booking-list');\nconst empty = document.getElementById('empty-state');\nconst confirmation = document.getElementById('booking-confirmation');\nconst count = document.getElementById('booking-count');\nconst bookings = [];\n\nfunction localDateString() {\n  const now = new Date();\n  const offset = now.getTimezoneOffset() * 60000;\n  return new Date(now.getTime() - offset).toISOString().split('T')[0];\n}\nfunction formatDate(value) {\n  return new Date(value + 'T00:00:00').toLocaleDateString(undefined, {weekday:'short', month:'short', day:'numeric', year:'numeric'});\n}\nfunction updateCount() {\n  const active = bookings.filter(item => !item.cancelled).length;\n  count.textContent = `${active} ${active === 1 ? 'appointment' : 'appointments'}`;\n}\nfunction render() {\n  list.querySelectorAll('[data-testid=\"booking\"]').forEach(node => node.remove());\n  empty.hidden = bookings.length > 0;\n  bookings.forEach((item, index) => {\n    const card = document.createElement('article');\n    card.className = 'booking' + (item.cancelled ? ' cancelled' : '');\n    card.dataset.testid = 'booking';\n    card.dataset.status = item.cancelled ? 'cancelled' : 'active';\n    card.innerHTML = `<div><div class=\"booking-type\">${item.type}</div><p class=\"booking-name\" data-testid=\"booking-name-display\"></p><p class=\"booking-meta\">${formatDate(item.date)} · ${item.time} · ${item.email}</p></div>`;\n    card.querySelector('[data-testid=\"booking-name-display\"]').textContent = item.name;\n    const action = document.createElement('div');\n    if (item.cancelled) { action.className = 'cancelled-label'; action.textContent = 'Cancelled'; }\n    else { const button = document.createElement('button'); button.className='cancel'; button.type='button'; button.dataset.testid='booking-cancel'; button.textContent='Cancel'; button.addEventListener('click', () => { item.cancelled=true; render(); }); action.appendChild(button); }\n    card.appendChild(action); list.appendChild(card);\n  });\n  updateCount();\n}\ndateInput.min = localDateString();\nform.addEventListener('submit', event => {\n  event.preventDefault();\n  if (!form.checkValidity()) { form.reportValidity(); return; }\n  const data = new FormData(form);\n  const date = data.get('date');\n  if (date < localDateString()) { dateInput.setCustomValidity('Please choose today or a future date.'); dateInput.reportValidity(); dateInput.setCustomValidity(''); return; }\n  bookings.push({name:data.get('name'), email:data.get('email'), date, time:data.get('time'), type:data.get('type'), cancelled:false});\n  render();\n  confirmation.textContent = `Appointment confirmed for ${data.get('name')} — ${formatDate(date)} at ${data.get('time')}.`;\n  confirmation.hidden = false;\n  form.reset(); dateInput.min = localDateString();\n  window.setTimeout(() => { confirmation.hidden = true; }, 6000);\n});",
+        "metadata": {
+          "applicationName": "Appointment Booking Form",
+          "summary": "A polished browser-only appointment scheduler for creating, viewing, and cancelling mock bookings."
+        }
+      },
+      "qualityReport": {
+        "analysedAt": "2026-08-03T14:16:49.760Z",
+        "analyzers": {
+          "html": {
+            "tool": "HTMLHint",
+            "issueCount": 0,
+            "errorCount": 0,
+            "warningCount": 0,
+            "passed": true,
+            "messages": []
+          },
+          "css": {
+            "tool": "Stylelint",
+            "issueCount": 2,
+            "errorCount": 2,
+            "warningCount": 0,
+            "passed": false,
+            "messages": [
+              {
+                "line": 2,
+                "column": 1997,
+                "endLine": 2,
+                "endColumn": 2006,
+                "severity": "error",
+                "message": "Missing generic font family (font-family-no-missing-generic-family-keyword)",
+                "ruleId": "font-family-no-missing-generic-family-keyword"
+              },
+              {
+                "line": 2,
+                "column": 3378,
+                "endLine": 2,
+                "endColumn": 3387,
+                "severity": "error",
+                "message": "Missing generic font family (font-family-no-missing-generic-family-keyword)",
+                "ruleId": "font-family-no-missing-generic-family-keyword"
+              }
+            ]
+          },
+          "javascript": {
+            "tool": "ESLint",
+            "issueCount": 1,
+            "errorCount": 1,
+            "warningCount": 0,
+            "passed": false,
+            "messages": [
+              {
+                "line": 42,
+                "column": 20,
+                "endLine": 42,
+                "endColumn": 28,
+                "severity": "error",
+                "message": "'FormData' is not defined.",
+                "ruleId": "no-undef"
+              }
+            ]
+          }
+        },
+        "summary": {
+          "totalIssues": 3,
+          "totalErrors": 3,
+          "totalWarnings": 0,
+          "passed": false
+        }
+      },
+      "runtimeReport": {
+        "reportVersion": "1.1",
+        "runId": "2026-08-03T14-16-49-761Z-550bd579",
+        "specificationId": "booking",
+        "applicationUrl": "http://localhost:3001/generated-apps/runs/2026-08-03T14-16-49-761Z-550bd579/iterations/0/index.html",
+        "browser": {
+          "engine": "chromium",
+          "headless": true,
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          }
+        },
+        "startedAt": "2026-08-03T14:16:49.773Z",
+        "completedAt": "2026-08-03T14:16:53.816Z",
+        "durationMs": 4043,
+        "navigation": {
+          "successful": true,
+          "status": 200,
+          "finalUrl": "http://localhost:3001/generated-apps/runs/2026-08-03T14-16-49-761Z-550bd579/iterations/0/index.html",
+          "error": null
+        },
+        "body": {
+          "exists": true,
+          "visible": true,
+          "textLength": 566,
+          "textPreview": "✦\n\nSCHEDULE WITH EASE\n\nBook your next\nappointment.\n\nChoose a time that works for you. Your appointment details will appear here once confirmed.\n\n● No account required · Simple and secure\n\nNEW BOOKING\n",
+          "hasVisibleContent": true
+        },
+        "consoleErrors": [],
+        "uncaughtExceptions": [],
+        "requiredControls": {
+          "expected": 2,
+          "present": 2,
+          "allPresent": true,
+          "controls": [
+            {
+              "id": "booking-date-control",
+              "label": "Booking date control",
+              "present": true,
+              "candidates": [
+                {
+                  "type": "css",
+                  "selector": "input[type=\"date\"], input[type=\"datetime-local\"], input[name*=\"date\" i]",
+                  "found": true
+                }
+              ]
+            },
+            {
+              "id": "booking-action-control",
+              "label": "Booking submission control",
+              "present": true,
+              "candidates": [
+                {
+                  "type": "role",
+                  "role": "button",
+                  "name": "book|reserve|confirm|submit|save",
+                  "found": true
+                },
+                {
+                  "type": "css",
+                  "selector": "button[type=\"submit\"], input[type=\"submit\"]",
+                  "found": true
+                }
+              ]
+            }
+          ]
+        },
+        "accessibility": {
+          "successful": true,
+          "standard": "WCAG 2.0 and 2.1 Level A and AA",
+          "tags": [
+            "wcag2a",
+            "wcag2aa",
+            "wcag21a",
+            "wcag21aa"
+          ],
+          "violationCount": 1,
+          "violatingNodeCount": 5,
+          "violationsByImpact": {
+            "critical": 0,
+            "serious": 1,
+            "moderate": 0,
+            "minor": 0,
+            "unknown": 0
+          },
+          "violations": [
+            {
+              "id": "color-contrast",
+              "impact": "serious",
+              "tags": [
+                "cat.color",
+                "wcag2aa",
+                "wcag143",
+                "TTv5",
+                "TT13.c",
+                "EN-301-549",
+                "EN-9.1.4.3",
+                "ACT",
+                "RGAAv4",
+                "RGAA-3.2.1"
+              ],
+              "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+              "help": "Elements must meet minimum color contrast ratio thresholds",
+              "helpUrl": "https://dequeuniversity.com/rules/axe/4.12/color-contrast?application=playwright",
+              "nodeCount": 5,
+              "nodes": [
+                {
+                  "html": "<p class=\"lead\">Choose a time that works for you. Your appointment details will appear here once confirmed.</p>",
+                  "target": [
+                    ".lead"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.8 (foreground color: #718080, background color: #f7f6f1, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1",
+                  "impact": "serious"
+                },
+                {
+                  "html": "<div class=\"intro-note\"><span>●</span> No account required · Simple and secure</div>",
+                  "target": [
+                    ".intro-note"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.8 (foreground color: #718080, background color: #f7f6f1, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1",
+                  "impact": "serious"
+                },
+                {
+                  "html": "<p class=\"form-footnote\">By confirming, you are creating a mock booking for this page only.</p>",
+                  "target": [
+                    ".form-footnote"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 2.67 (foreground color: #94a19d, background color: #ffffff, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1",
+                  "impact": "serious"
+                },
+                {
+                  "html": "<span class=\"count\" id=\"booking-count\">0 appointments</span>",
+                  "target": [
+                    "#booking-count"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.8 (foreground color: #718080, background color: #f7f6f1, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1",
+                  "impact": "serious"
+                },
+                {
+                  "html": "<span>Your confirmed bookings will show up here.</span>",
+                  "target": [
+                    "#empty-state > span"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.8 (foreground color: #718080, background color: #f7f6f1, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1",
+                  "impact": "serious"
+                }
+              ]
+            }
+          ],
+          "incompleteCount": 1,
+          "inapplicableCount": 43,
+          "passCount": 19,
+          "error": null
+        },
+        "summary": {
+          "runtimePassed": true,
+          "accessibilityPassed": false,
+          "navigationSuccessful": true,
+          "hasVisibleBodyContent": true,
+          "consoleErrorCount": 0,
+          "uncaughtExceptionCount": 0,
+          "requiredControlsPresent": 2,
+          "requiredControlsExpected": 2,
+          "accessibilityAnalysisSuccessful": true,
+          "accessibilityViolationCount": 1,
+          "accessibilityViolatingNodeCount": 5
+        }
+      },
+      "accessibilityReport": {
+        "successful": true,
+        "standard": "WCAG 2.0 and 2.1 Level A and AA",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa"
+        ],
+        "violationCount": 1,
+        "violatingNodeCount": 5,
+        "violationsByImpact": {
+          "critical": 0,
+          "serious": 1,
+          "moderate": 0,
+          "minor": 0,
+          "unknown": 0
+        },
+        "violations": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "tags": [
+              "cat.color",
+              "wcag2aa",
+              "wcag143",
+              "TTv5",
+              "TT13.c",
+              "EN-301-549",
+              "EN-9.1.4.3",
+              "ACT",
+              "RGAAv4",
+              "RGAA-3.2.1"
+            ],
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.12/color-contrast?application=playwright",
+            "nodeCount": 5,
+            "nodes": [
+              {
+                "html": "<p class=\"lead\">Choose a time that works for you. Your appointment details will appear here once confirmed.</p>",
+                "target": [
+                  ".lead"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.8 (foreground color: #718080, background color: #f7f6f1, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1",
+                "impact": "serious"
+              },
+              {
+                "html": "<div class=\"intro-note\"><span>●</span> No account required · Simple and secure</div>",
+                "target": [
+                  ".intro-note"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.8 (foreground color: #718080, background color: #f7f6f1, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1",
+                "impact": "serious"
+              },
+              {
+                "html": "<p class=\"form-footnote\">By confirming, you are creating a mock booking for this page only.</p>",
+                "target": [
+                  ".form-footnote"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 2.67 (foreground color: #94a19d, background color: #ffffff, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1",
+                "impact": "serious"
+              },
+              {
+                "html": "<span class=\"count\" id=\"booking-count\">0 appointments</span>",
+                "target": [
+                  "#booking-count"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.8 (foreground color: #718080, background color: #f7f6f1, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1",
+                "impact": "serious"
+              },
+              {
+                "html": "<span>Your confirmed bookings will show up here.</span>",
+                "target": [
+                  "#empty-state > span"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.8 (foreground color: #718080, background color: #f7f6f1, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1",
+                "impact": "serious"
+              }
+            ]
+          }
+        ],
+        "incompleteCount": 1,
+        "inapplicableCount": 43,
+        "passCount": 19,
+        "error": null
+      },
+      "functionalReport": {
+        "reportVersion": "1.0",
+        "runId": "2026-08-03T14-16-49-761Z-550bd579",
+        "specificationId": "booking",
+        "applicationUrl": "http://localhost:3001/generated-apps/runs/2026-08-03T14-16-49-761Z-550bd579/iterations/0/index.html",
+        "startedAt": "2026-08-03T14:16:53.867Z",
+        "completedAt": "2026-08-03T14:16:56.184Z",
+        "durationMs": 2317,
+        "tests": [
+          {
+            "id": "booking-fields",
+            "requirement": "Include fields for customer name, email address, appointment date and appointment time.",
+            "passed": true,
+            "error": null
+          },
+          {
+            "id": "booking-type",
+            "requirement": "Include a selectable appointment type.",
+            "passed": true,
+            "error": null
+          },
+          {
+            "id": "booking-required-fields",
+            "requirement": "Prevent a booking from being created when required information is missing.",
+            "passed": true,
+            "error": null
+          },
+          {
+            "id": "booking-email-validation",
+            "requirement": "Reject an email address that is not in a valid email format using browser-side validation.",
+            "passed": true,
+            "error": null
+          },
+          {
+            "id": "booking-past-date",
+            "requirement": "Prevent a booking from being created for a date in the past.",
+            "passed": true,
+            "error": null
+          },
+          {
+            "id": "booking-create",
+            "requirement": "After a valid booking is submitted, display the booking in a visible list or booking area.",
+            "passed": true,
+            "error": null
+          },
+          {
+            "id": "booking-confirmation",
+            "requirement": "Display a visible confirmation after a valid booking is successfully created.",
+            "passed": false,
+            "error": {
+              "name": "Error",
+              "message": "No visible booking confirmation was displayed after successful creation."
+            }
+          },
+          {
+            "id": "booking-cancel",
+            "requirement": "Allow each booking to be cancelled. Cancellation may either remove the booking from the active list or clearly mark it as cancelled.",
+            "passed": true,
+            "error": null
+          },
+          {
+            "id": "booking-session-memory",
+            "requirement": "Keep booking data in page memory only. Refreshing or reopening the page must reset the booking data.",
+            "passed": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "passed": false,
+          "passedCount": 8,
+          "failedCount": 1,
+          "totalCount": 9
+        }
+      },
+      "generationMetrics": {
+        "totalDurationMs": 25416,
+        "promptTokens": 796,
+        "outputTokens": 3204,
+        "totalTokens": 4000,
+        "finishReason": null
+      }
+    },
+    "refinement": {
+      "iterations": [
+        {
+          "refined": true,
+          "reason": null,
+          "iteration": 1,
+          "application": {
+            "html": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Appointment Booking Form</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n  <script src=\"script.js\" defer></script>\n</head>\n<body>\n  <main class=\"shell\">\n    <section class=\"intro\">\n      <div class=\"brand-mark\" aria-hidden=\"true\">✦</div>\n      <p class=\"eyebrow\">SCHEDULE WITH EASE</p>\n      <h1>Book your next<br><em>appointment.</em></h1>\n      <p class=\"lead\">Choose a time that works for you. Your appointment details will appear here once confirmed.</p>\n      <div class=\"intro-note\"><span>●</span> No account required · Simple and secure</div>\n    </section>\n\n    <section class=\"panel\" aria-labelledby=\"form-title\">\n      <div class=\"panel-header\">\n        <div>\n          <p class=\"section-label\">NEW BOOKING</p>\n          <h2 id=\"form-title\">Appointment details</h2>\n        </div>\n        <div class=\"step\">01 <span>/</span> 01</div>\n      </div>\n      <form id=\"booking-form\" novalidate>\n        <div class=\"field\">\n          <label for=\"booking-name\">Your name <span>*</span></label>\n          <input data-testid=\"booking-name\" id=\"booking-name\" name=\"name\" type=\"text\" placeholder=\"e.g. Jordan Lee\" autocomplete=\"name\" required>\n        </div>\n        <div class=\"field\">\n          <label for=\"booking-email\">Email address <span>*</span></label>\n          <input data-testid=\"booking-email\" id=\"booking-email\" name=\"email\" type=\"email\" placeholder=\"you@example.com\" autocomplete=\"email\" required>\n        </div>\n        <div class=\"field-row\">\n          <div class=\"field\">\n            <label for=\"booking-date\">Date <span>*</span></label>\n            <input data-testid=\"booking-date\" id=\"booking-date\" name=\"date\" type=\"date\" required>\n          </div>\n          <div class=\"field\">\n            <label for=\"booking-time\">Time <span>*</span></label>\n            <input data-testid=\"booking-time\" id=\"booking-time\" name=\"time\" type=\"time\" required>\n          </div>\n        </div>\n        <div class=\"field\">\n          <label for=\"booking-type\">Appointment type <span>*</span></label>\n          <select data-testid=\"booking-type\" id=\"booking-type\" name=\"type\" required>\n            <option value=\"\" selected disabled>Select an appointment type</option>\n            <option value=\"Consultation\">Consultation</option>\n            <option value=\"Follow-up\">Follow-up</option>\n            <option value=\"Wellness check\">Wellness check</option>\n            <option value=\"Project review\">Project review</option>\n          </select>\n        </div>\n        <button data-testid=\"booking-submit\" class=\"submit\" type=\"submit\">Confirm appointment <span>→</span></button>\n        <p class=\"form-footnote\">By confirming, you are creating a mock booking for this page only.</p>\n      </form>\n    </section>\n\n    <section class=\"bookings-section\" aria-labelledby=\"bookings-title\">\n      <div class=\"list-heading\">\n        <div><p class=\"section-label\">YOUR SCHEDULE</p><h2 id=\"bookings-title\">Bookings</h2></div>\n        <span class=\"count\" id=\"booking-count\">0 appointments</span>\n      </div>\n      <div data-testid=\"booking-confirmation\" id=\"booking-confirmation\" class=\"confirmation\" role=\"status\" aria-live=\"polite\" hidden></div>\n      <div data-testid=\"booking-list\" id=\"booking-list\" class=\"booking-list\">\n        <div class=\"empty-state\" id=\"empty-state\"><div class=\"calendar-icon\">□</div><p>No appointments yet</p><span>Your confirmed bookings will show up here.</span></div>\n      </div>\n    </section>\n  </main>\n</body>\n</html>",
+            "css": "@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap');\n:root{--ink:#172a2b;--muted:#536665;--cream:#f7f6f1;--paper:#fff;--mint:#cde9dc;--teal:#1e6962;--line:#dce5e0;--coral:#e07d68}*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif}.shell{max-width:1100px;margin:auto;padding:62px 34px 80px;display:grid;grid-template-columns:.82fr 1.18fr;gap:70px}.intro{padding:26px 0}.brand-mark{width:45px;height:45px;background:var(--teal);color:white;border-radius:13px;display:grid;place-items:center;font-size:25px;margin-bottom:62px}.eyebrow,.section-label{font-size:11px;letter-spacing:2px;font-weight:700;color:var(--teal);margin:0 0 16px}.intro h1{font-size:54px;line-height:1.08;letter-spacing:-2px;margin:0 0 24px}.intro h1 em{font-family:'Playfair Display',serif;font-weight:600;color:var(--teal)}.lead{color:var(--muted);font-size:16px;line-height:1.7;max-width:360px}.intro-note{margin-top:62px;color:var(--muted);font-size:12px}.intro-note span{color:var(--coral);margin-right:8px}.panel{background:var(--paper);border:1px solid #e9ede8;border-radius:22px;padding:36px 40px;box-shadow:0 15px 45px #173d3510}.panel-header,.list-heading{display:flex;justify-content:space-between;align-items:flex-start}.panel h2,.list-heading h2{font-size:25px;margin:0 0 28px;letter-spacing:-.6px}.step{font-size:12px;color:var(--teal);font-weight:700}.step span{color:#bbc8c3;font-weight:400}.field{margin-bottom:20px}.field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}.field label{display:block;font-size:12px;font-weight:700;margin:0 0 8px}.field label span{color:var(--coral)}input,select{font:inherit;width:100%;height:48px;border:1px solid var(--line);border-radius:9px;padding:0 14px;color:var(--ink);background:#fff;outline:none}input:focus,select:focus{border-color:var(--teal);box-shadow:0 0 0 3px #1e696215}input:user-invalid:not(:placeholder-shown){border-color:var(--coral)}.submit{width:100%;height:52px;border:0;border-radius:9px;background:var(--teal);color:#fff;font:600 14px 'DM Sans',sans-serif;cursor:pointer;margin-top:5px;transition:.2s}.submit:hover{background:#15534e;transform:translateY(-1px)}.submit span{font-size:20px;margin-left:12px}.form-footnote{text-align:center;color:#536665;font-size:11px;margin:15px 0 0}.bookings-section{grid-column:2}.list-heading h2{margin-bottom:18px}.count{font-size:12px;color:var(--muted);padding-top:5px}.confirmation{background:#e1f3e9;color:#28624e;padding:13px 16px;border-radius:9px;font-size:13px;margin-bottom:15px}.booking-list{display:flex;flex-direction:column;gap:12px}.empty-state{text-align:center;border:1px dashed #cfdcd5;border-radius:14px;padding:35px 20px;color:var(--muted)}.calendar-icon{font-size:24px;color:var(--teal);margin-bottom:8px}.empty-state p{margin:0 0 5px;color:var(--ink);font-weight:600}.empty-state span{font-size:12px}.booking{background:#fff;border:1px solid var(--line);border-radius:13px;padding:18px 20px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}.booking.cancelled{opacity:.62;background:#f1f3f0}.booking-name{font-size:16px;font-weight:700;margin:0 0 7px}.booking-meta{font-size:12px;color:var(--muted);margin:0}.booking-type{font-size:11px;color:var(--teal);font-weight:700;text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px}.cancel{border:1px solid #e6c1b8;background:#fff;color:#bd6756;border-radius:7px;padding:8px 11px;font:600 11px 'DM Sans',sans-serif;cursor:pointer}.cancelled-label{font-size:11px;color:#9b655b;font-weight:700}.booking.cancelled .booking-name{text-decoration:line-through}.booking:focus-within{outline:2px solid var(--mint)}@media(max-width:800px){.shell{grid-template-columns:1fr;gap:40px;padding:35px 20px}.intro{padding:0}.brand-mark{margin-bottom:35px}.intro h1{font-size:43px}.intro-note{margin-top:30px}.bookings-section{grid-column:1}.panel{padding:28px 22px}}@media(max-width:450px){.field-row{grid-template-columns:1fr;gap:0}}",
+            "javascript": "const form = document.getElementById('booking-form');\nconst dateInput = document.getElementById('booking-date');\nconst list = document.getElementById('booking-list');\nconst empty = document.getElementById('empty-state');\nconst confirmation = document.getElementById('booking-confirmation');\nconst count = document.getElementById('booking-count');\nconst bookings = [];\n\nfunction localDateString() {\n  const now = new Date();\n  const offset = now.getTimezoneOffset() * 60000;\n  return new Date(now.getTime() - offset).toISOString().split('T')[0];\n}\nfunction formatDate(value) {\n  return new Date(value + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });\n}\nfunction updateCount() {\n  const active = bookings.filter(item => !item.cancelled).length;\n  count.textContent = `${active} ${active === 1 ? 'appointment' : 'appointments'}`;\n}\nfunction render() {\n  list.querySelectorAll('[data-testid=\"booking\"]').forEach(node => node.remove());\n  empty.hidden = bookings.length > 0;\n  bookings.forEach(item => {\n    const card = document.createElement('article');\n    card.className = 'booking' + (item.cancelled ? ' cancelled' : '');\n    card.dataset.testid = 'booking';\n    card.dataset.status = item.cancelled ? 'cancelled' : 'active';\n    card.innerHTML = `<div><div class=\"booking-type\">${item.type}</div><p class=\"booking-name\" data-testid=\"booking-name-display\"></p><p class=\"booking-meta\">${formatDate(item.date)} · ${item.time} · ${item.email}</p></div>`;\n    card.querySelector('[data-testid=\"booking-name-display\"]').textContent = item.name;\n    const action = document.createElement('div');\n    if (item.cancelled) {\n      action.className = 'cancelled-label';\n      action.textContent = 'Cancelled';\n    } else {\n      const button = document.createElement('button');\n      button.className = 'cancel';\n      button.type = 'button';\n      button.dataset.testid = 'booking-cancel';\n      button.textContent = 'Cancel';\n      button.addEventListener('click', () => { item.cancelled = true; render(); });\n      action.appendChild(button);\n    }\n    card.appendChild(action);\n    list.appendChild(card);\n  });\n  updateCount();\n}\ndateInput.min = localDateString();\nform.addEventListener('submit', event => {\n  event.preventDefault();\n  if (!form.checkValidity()) { form.reportValidity(); return; }\n  const name = document.getElementById('booking-name').value;\n  const email = document.getElementById('booking-email').value;\n  const date = dateInput.value;\n  const time = document.getElementById('booking-time').value;\n  const type = document.getElementById('booking-type').value;\n  if (date < localDateString()) {\n    dateInput.setCustomValidity('Please choose today or a future date.');\n    dateInput.reportValidity();\n    dateInput.setCustomValidity('');\n    return;\n  }\n  bookings.push({ name, email, date, time, type, cancelled: false });\n  render();\n  confirmation.textContent = `Appointment confirmed for ${name} — ${formatDate(date)} at ${time}.`;\n  confirmation.hidden = false;\n  form.reset();\n  dateInput.min = localDateString();\n});",
+            "metadata": {
+              "applicationName": "Appointment Booking Form",
+              "summary": "A frontend-only appointment booking form that validates details, displays confirmations and manages cancellable in-memory bookings."
+            }
+          },
+          "qualityReport": {
+            "analysedAt": "2026-08-03T14:17:15.088Z",
+            "analyzers": {
+              "html": {
+                "tool": "HTMLHint",
+                "issueCount": 0,
+                "errorCount": 0,
+                "warningCount": 0,
+                "passed": true,
+                "messages": []
+              },
+              "css": {
+                "tool": "Stylelint",
+                "issueCount": 0,
+                "errorCount": 0,
+                "warningCount": 0,
+                "passed": true,
+                "messages": []
+              },
+              "javascript": {
+                "tool": "ESLint",
+                "issueCount": 0,
+                "errorCount": 0,
+                "warningCount": 0,
+                "passed": true,
+                "messages": []
+              }
+            },
+            "summary": {
+              "totalIssues": 0,
+              "totalErrors": 0,
+              "totalWarnings": 0,
+              "passed": true
+            }
+          },
+          "runtimeReport": {
+            "reportVersion": "1.1",
+            "runId": "2026-08-03T14-16-49-761Z-550bd579",
+            "specificationId": "booking",
+            "applicationUrl": "http://localhost:3001/generated-apps/runs/2026-08-03T14-16-49-761Z-550bd579/iterations/1/index.html",
+            "browser": {
+              "engine": "chromium",
+              "headless": true,
+              "viewport": {
+                "width": 1280,
+                "height": 720
+              }
+            },
+            "startedAt": "2026-08-03T14:17:15.093Z",
+            "completedAt": "2026-08-03T14:17:16.387Z",
+            "durationMs": 1294,
+            "navigation": {
+              "successful": true,
+              "status": 200,
+              "finalUrl": "http://localhost:3001/generated-apps/runs/2026-08-03T14-16-49-761Z-550bd579/iterations/1/index.html",
+              "error": null
+            },
+            "body": {
+              "exists": true,
+              "visible": true,
+              "textLength": 566,
+              "textPreview": "✦\n\nSCHEDULE WITH EASE\n\nBook your next\nappointment.\n\nChoose a time that works for you. Your appointment details will appear here once confirmed.\n\n● No account required · Simple and secure\n\nNEW BOOKING\n",
+              "hasVisibleContent": true
+            },
+            "consoleErrors": [],
+            "uncaughtExceptions": [],
+            "requiredControls": {
+              "expected": 2,
+              "present": 2,
+              "allPresent": true,
+              "controls": [
+                {
+                  "id": "booking-date-control",
+                  "label": "Booking date control",
+                  "present": true,
+                  "candidates": [
+                    {
+                      "type": "css",
+                      "selector": "input[type=\"date\"], input[type=\"datetime-local\"], input[name*=\"date\" i]",
+                      "found": true
+                    }
+                  ]
+                },
+                {
+                  "id": "booking-action-control",
+                  "label": "Booking submission control",
+                  "present": true,
+                  "candidates": [
+                    {
+                      "type": "role",
+                      "role": "button",
+                      "name": "book|reserve|confirm|submit|save",
+                      "found": true
+                    },
+                    {
+                      "type": "css",
+                      "selector": "button[type=\"submit\"], input[type=\"submit\"]",
+                      "found": true
+                    }
+                  ]
+                }
+              ]
+            },
+            "accessibility": {
+              "successful": true,
+              "standard": "WCAG 2.0 and 2.1 Level A and AA",
+              "tags": [
+                "wcag2a",
+                "wcag2aa",
+                "wcag21a",
+                "wcag21aa"
+              ],
+              "violationCount": 0,
+              "violatingNodeCount": 0,
+              "violationsByImpact": {
+                "critical": 0,
+                "serious": 0,
+                "moderate": 0,
+                "minor": 0,
+                "unknown": 0
+              },
+              "violations": [],
+              "incompleteCount": 1,
+              "inapplicableCount": 43,
+              "passCount": 19,
+              "error": null
+            },
+            "summary": {
+              "runtimePassed": true,
+              "accessibilityPassed": true,
+              "navigationSuccessful": true,
+              "hasVisibleBodyContent": true,
+              "consoleErrorCount": 0,
+              "uncaughtExceptionCount": 0,
+              "requiredControlsPresent": 2,
+              "requiredControlsExpected": 2,
+              "accessibilityAnalysisSuccessful": true,
+              "accessibilityViolationCount": 0,
+              "accessibilityViolatingNodeCount": 0
+            }
+          },
+          "accessibilityReport": {
+            "successful": true,
+            "standard": "WCAG 2.0 and 2.1 Level A and AA",
+            "tags": [
+              "wcag2a",
+              "wcag2aa",
+              "wcag21a",
+              "wcag21aa"
+            ],
+            "violationCount": 0,
+            "violatingNodeCount": 0,
+            "violationsByImpact": {
+              "critical": 0,
+              "serious": 0,
+              "moderate": 0,
+              "minor": 0,
+              "unknown": 0
+            },
+            "violations": [],
+            "incompleteCount": 1,
+            "inapplicableCount": 43,
+            "passCount": 19,
+            "error": null
+          },
+          "functionalReport": {
+            "reportVersion": "1.0",
+            "runId": "2026-08-03T14-16-49-761Z-550bd579",
+            "specificationId": "booking",
+            "applicationUrl": "http://localhost:3001/generated-apps/runs/2026-08-03T14-16-49-761Z-550bd579/iterations/1/index.html",
+            "startedAt": "2026-08-03T14:17:16.433Z",
+            "completedAt": "2026-08-03T14:17:18.750Z",
+            "durationMs": 2317,
+            "tests": [
+              {
+                "id": "booking-fields",
+                "requirement": "Include fields for customer name, email address, appointment date and appointment time.",
+                "passed": true,
+                "error": null
+              },
+              {
+                "id": "booking-type",
+                "requirement": "Include a selectable appointment type.",
+                "passed": true,
+                "error": null
+              },
+              {
+                "id": "booking-required-fields",
+                "requirement": "Prevent a booking from being created when required information is missing.",
+                "passed": true,
+                "error": null
+              },
+              {
+                "id": "booking-email-validation",
+                "requirement": "Reject an email address that is not in a valid email format using browser-side validation.",
+                "passed": true,
+                "error": null
+              },
+              {
+                "id": "booking-past-date",
+                "requirement": "Prevent a booking from being created for a date in the past.",
+                "passed": true,
+                "error": null
+              },
+              {
+                "id": "booking-create",
+                "requirement": "After a valid booking is submitted, display the booking in a visible list or booking area.",
+                "passed": true,
+                "error": null
+              },
+              {
+                "id": "booking-confirmation",
+                "requirement": "Display a visible confirmation after a valid booking is successfully created.",
+                "passed": true,
+                "error": null
+              },
+              {
+                "id": "booking-cancel",
+                "requirement": "Allow each booking to be cancelled. Cancellation may either remove the booking from the active list or clearly mark it as cancelled.",
+                "passed": true,
+                "error": null
+              },
+              {
+                "id": "booking-session-memory",
+                "requirement": "Keep booking data in page memory only. Refreshing or reopening the page must reset the booking data.",
+                "passed": true,
+                "error": null
+              }
+            ],
+            "summary": {
+              "passed": true,
+              "passedCount": 9,
+              "failedCount": 0,
+              "totalCount": 9
+            }
+          },
+          "feedback": {
+            "staticAnalysis": {
+              "passed": false,
+              "totalIssues": 3,
+              "totalErrors": 3,
+              "totalWarnings": 0,
+              "html": {
+                "tool": "HTMLHint",
+                "passed": true,
+                "issueCount": 0,
+                "errorCount": 0,
+                "warningCount": 0,
+                "messages": []
+              },
+              "css": {
+                "tool": "Stylelint",
+                "passed": false,
+                "issueCount": 2,
+                "errorCount": 2,
+                "warningCount": 0,
+                "messages": [
+                  {
+                    "line": 2,
+                    "column": 1997,
+                    "endLine": 2,
+                    "endColumn": 2006,
+                    "severity": "error",
+                    "message": "Missing generic font family (font-family-no-missing-generic-family-keyword)",
+                    "ruleId": "font-family-no-missing-generic-family-keyword"
+                  },
+                  {
+                    "line": 2,
+                    "column": 3378,
+                    "endLine": 2,
+                    "endColumn": 3387,
+                    "severity": "error",
+                    "message": "Missing generic font family (font-family-no-missing-generic-family-keyword)",
+                    "ruleId": "font-family-no-missing-generic-family-keyword"
+                  }
+                ]
+              },
+              "javascript": {
+                "tool": "ESLint",
+                "passed": false,
+                "issueCount": 1,
+                "errorCount": 1,
+                "warningCount": 0,
+                "messages": [
+                  {
+                    "line": 42,
+                    "column": 20,
+                    "endLine": 42,
+                    "endColumn": 28,
+                    "severity": "error",
+                    "message": "'FormData' is not defined.",
+                    "ruleId": "no-undef"
+                  }
+                ]
+              }
+            },
+            "runtimeValidation": {
+              "passed": true,
+              "navigationSuccessful": true,
+              "hasVisibleBodyContent": true,
+              "consoleErrors": [],
+              "uncaughtExceptions": [],
+              "requiredControls": {
+                "expected": 2,
+                "present": 2,
+                "allPresent": true,
+                "missing": []
+              }
+            },
+            "accessibility": {
+              "successful": true,
+              "violationCount": 1,
+              "violatingNodeCount": 5,
+              "violationsByImpact": {
+                "critical": 0,
+                "serious": 1,
+                "moderate": 0,
+                "minor": 0,
+                "unknown": 0
+              },
+              "violations": [
+                {
+                  "id": "color-contrast",
+                  "impact": "serious",
+                  "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+                  "help": "Elements must meet minimum color contrast ratio thresholds",
+                  "affectedNodeCount": 5,
+                  "nodes": [
+                    {
+                      "target": [
+                        ".lead"
+                      ],
+                      "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.8 (foreground color: #718080, background color: #f7f6f1, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+                    },
+                    {
+                      "target": [
+                        ".intro-note"
+                      ],
+                      "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.8 (foreground color: #718080, background color: #f7f6f1, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+                    },
+                    {
+                      "target": [
+                        ".form-footnote"
+                      ],
+                      "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 2.67 (foreground color: #94a19d, background color: #ffffff, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+                    }
+                  ]
+                }
+              ]
+            },
+            "functionalValidation": {
+              "passed": false,
+              "passedCount": 8,
+              "failedCount": 1,
+              "totalCount": 9,
+              "failedTests": [
+                {
+                  "id": "booking-confirmation",
+                  "requirement": "Display a visible confirmation after a valid booking is successfully created.",
+                  "error": "No visible booking confirmation was displayed after successful creation."
+                }
+              ]
+            }
+          },
+          "prompt": "You are refining an existing frontend web application.\n\nRefinement iteration: 1\n\nYour task is to REPAIR the existing application based on the automated validation failures below.\n\nYou MUST modify the application to address every reported issue that can be repaired.\n\nThe automated feedback represents observed defects in the current application. Do not simply reproduce the current application.\n\nRepair priorities:\n\n1. FUNCTIONAL FAILURES\n- Every failed functional test represents required behaviour that is currently broken.\n- Modify the HTML and/or JavaScript so each failed requirement works.\n- Check that HTML element IDs and JavaScript selectors match.\n- Check that event listeners are attached to elements that actually exist.\n- Add any controls required by the original specification, including controls for completing or deleting items where applicable.\n\n2. RUNTIME FAILURES\n- Every uncaught exception must be investigated and repaired.\n- If JavaScript attempts to access an element that does not exist, correct either the HTML or the JavaScript so they match.\n- Do not leave code that can throw the reported exception.\n\n3. ACCESSIBILITY VIOLATIONS\n- Repair every reported accessibility violation where possible.\n- Use each node's target and failureSummary to identify the affected element.\n- For contrast violations, change the relevant CSS colours so the reported WCAG minimum contrast ratio is met.\n\n4. STATIC ANALYSIS\n- Repair reported HTMLHint, Stylelint and ESLint issues.\n- Apply straightforward lint fixes such as changing let to const when a variable is never reassigned.\n\nBefore returning the application, verify your replacement files against:\n- the original specification;\n- every functional failure;\n- every runtime exception;\n- every accessibility violation;\n- every static-analysis issue.\n\nIMPORTANT:\n- The replacement application MUST contain concrete code changes addressing the reported feedback.\n- Do NOT return the current application unchanged when actionable feedback exists.\n- Preserve functionality that already works.\n- Do not add unrelated features.\n- Do not redesign the application unnecessarily.\n- Keep the application frontend-only.\n- Use only HTML, CSS and vanilla JavaScript.\n- Do not use external frameworks, libraries or APIs.\n- Do not use cookies or collect personal data.\n- Return complete replacement files, not patches.\n- Reference styles.css from the HTML.\n- Reference script.js using defer.\n- Do not include CSS or JavaScript inline.\n- Preserve every test hook and state attribute defined in the original specification's testabilityContract.\n- Do not remove, rename or repurpose required data-testid attributes during refinement.\n\nReturn valid JSON only.\nDo not use Markdown code fences.\n\nThe JSON must have this exact structure:\n\n{\n  \"html\": \"complete HTML document\",\n  \"css\": \"complete stylesheet\",\n  \"javascript\": \"complete JavaScript source\",\n  \"metadata\": {\n    \"applicationName\": \"short name\",\n    \"summary\": \"one-sentence summary\"\n  }\n}\n\nORIGINAL APPLICATION SPECIFICATION\n\n{\n  \"id\": \"booking\",\n  \"name\": \"Appointment Booking Form\",\n  \"description\": \"A small browser-based application for creating and managing mock appointment bookings.\",\n  \"functionalRequirements\": [\n    \"Include fields for customer name, email address, appointment date and appointment time.\",\n    \"Include a selectable appointment type.\",\n    \"Prevent a booking from being created when required information is missing.\",\n    \"Reject an email address that is not in a valid email format using browser-side validation.\",\n    \"Prevent a booking from being created for a date in the past.\",\n    \"After a valid booking is submitted, display the booking in a visible list or booking area.\",\n    \"Display a visible confirmation after a valid booking is successfully created.\",\n    \"Allow each booking to be cancelled. Cancellation may either remove the booking from the active list or clearly mark it as cancelled.\",\n    \"Keep booking data in page memory only. Refreshing or reopening the page must reset the booking data.\",\n    \"Do not send booking data to an external service.\"\n  ],\n  \"testabilityContract\": {\n    \"description\": \"The following data-testid attributes are required only to support consistent automated experimental evaluation. They must not affect application behaviour or visual presentation.\",\n    \"hooks\": [\n      {\n        \"testId\": \"booking-name\",\n        \"requirement\": \"Apply to the customer name input.\"\n      },\n      {\n        \"testId\": \"booking-email\",\n        \"requirement\": \"Apply to the email address input.\"\n      },\n      {\n        \"testId\": \"booking-date\",\n        \"requirement\": \"Apply to the appointment date input.\"\n      },\n      {\n        \"testId\": \"booking-time\",\n        \"requirement\": \"Apply to the appointment time input.\"\n      },\n      {\n        \"testId\": \"booking-type\",\n        \"requirement\": \"Apply to the control used to select the appointment type.\"\n      },\n      {\n        \"testId\": \"booking-submit\",\n        \"requirement\": \"Apply to the control used to submit the booking.\"\n      },\n      {\n        \"testId\": \"booking-list\",\n        \"requirement\": \"Apply to the container displaying created bookings.\"\n      },\n      {\n        \"testId\": \"booking\",\n        \"requirement\": \"Apply to each individual booking container. This test ID may appear multiple times.\"\n      },\n      {\n        \"testId\": \"booking-name-display\",\n        \"requirement\": \"Apply to the element displaying the customer name within each created booking.\"\n      },\n      {\n        \"testId\": \"booking-cancel\",\n        \"requirement\": \"Apply to the control used to cancel each booking.\"\n      },\n      {\n        \"testId\": \"booking-confirmation\",\n        \"requirement\": \"Apply to the confirmation displayed after a booking is successfully created.\"\n      }\n    ],\n    \"stateAttributes\": [\n      {\n        \"attribute\": \"data-status\",\n        \"appliesTo\": \"booking\",\n        \"requirement\": \"If a cancelled booking remains displayed, its data-testid=\\\"booking\\\" container must expose data-status=\\\"cancelled\\\". Active bookings may use data-status=\\\"active\\\".\"\n      }\n    ]\n  },\n  \"qualityRequirements\": [\n    \"Apply CSS to provide a clear, consistent and usable visual presentation.\"\n  ]\n}\n\nCURRENT APPLICATION\n\nHTML:\n<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Appointment Booking Form</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n  <script src=\"script.js\" defer></script>\n</head>\n<body>\n  <main class=\"shell\">\n    <section class=\"intro\">\n      <div class=\"brand-mark\" aria-hidden=\"true\">✦</div>\n      <p class=\"eyebrow\">SCHEDULE WITH EASE</p>\n      <h1>Book your next<br><em>appointment.</em></h1>\n      <p class=\"lead\">Choose a time that works for you. Your appointment details will appear here once confirmed.</p>\n      <div class=\"intro-note\"><span>●</span> No account required · Simple and secure</div>\n    </section>\n\n    <section class=\"panel\" aria-labelledby=\"form-title\">\n      <div class=\"panel-header\">\n        <div>\n          <p class=\"section-label\">NEW BOOKING</p>\n          <h2 id=\"form-title\">Appointment details</h2>\n        </div>\n        <div class=\"step\">01 <span>/</span> 01</div>\n      </div>\n      <form id=\"booking-form\" novalidate>\n        <div class=\"field\">\n          <label for=\"booking-name\">Your name <span>*</span></label>\n          <input data-testid=\"booking-name\" id=\"booking-name\" name=\"name\" type=\"text\" placeholder=\"e.g. Jordan Lee\" autocomplete=\"name\" required>\n        </div>\n        <div class=\"field\">\n          <label for=\"booking-email\">Email address <span>*</span></label>\n          <input data-testid=\"booking-email\" id=\"booking-email\" name=\"email\" type=\"email\" placeholder=\"you@example.com\" autocomplete=\"email\" required>\n        </div>\n        <div class=\"field-row\">\n          <div class=\"field\">\n            <label for=\"booking-date\">Date <span>*</span></label>\n            <input data-testid=\"booking-date\" id=\"booking-date\" name=\"date\" type=\"date\" required>\n          </div>\n          <div class=\"field\">\n            <label for=\"booking-time\">Time <span>*</span></label>\n            <input data-testid=\"booking-time\" id=\"booking-time\" name=\"time\" type=\"time\" required>\n          </div>\n        </div>\n        <div class=\"field\">\n          <label for=\"booking-type\">Appointment type <span>*</span></label>\n          <select data-testid=\"booking-type\" id=\"booking-type\" name=\"type\" required>\n            <option value=\"\" selected disabled>Select an appointment type</option>\n            <option value=\"Consultation\">Consultation</option>\n            <option value=\"Follow-up\">Follow-up</option>\n            <option value=\"Wellness check\">Wellness check</option>\n            <option value=\"Project review\">Project review</option>\n          </select>\n        </div>\n        <button data-testid=\"booking-submit\" class=\"submit\" type=\"submit\">Confirm appointment <span>→</span></button>\n        <p class=\"form-footnote\">By confirming, you are creating a mock booking for this page only.</p>\n      </form>\n    </section>\n\n    <section class=\"bookings-section\" aria-labelledby=\"bookings-title\">\n      <div class=\"list-heading\">\n        <div><p class=\"section-label\">YOUR SCHEDULE</p><h2 id=\"bookings-title\">Bookings</h2></div>\n        <span class=\"count\" id=\"booking-count\">0 appointments</span>\n      </div>\n      <div id=\"booking-confirmation\" class=\"confirmation\" role=\"status\" aria-live=\"polite\" hidden></div>\n      <div data-testid=\"booking-list\" id=\"booking-list\" class=\"booking-list\">\n        <div class=\"empty-state\" id=\"empty-state\"><div class=\"calendar-icon\">□</div><p>No appointments yet</p><span>Your confirmed bookings will show up here.</span></div>\n      </div>\n    </section>\n  </main>\n</body>\n</html>\n\nCSS:\n@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap');\n:root{--ink:#172a2b;--muted:#718080;--cream:#f7f6f1;--paper:#fff;--mint:#cde9dc;--teal:#1e6962;--line:#dce5e0;--coral:#e07d68}*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif} .shell{max-width:1100px;margin:auto;padding:62px 34px 80px;display:grid;grid-template-columns:.82fr 1.18fr;gap:70px}.intro{padding:26px 0}.brand-mark{width:45px;height:45px;background:var(--teal);color:white;border-radius:13px;display:grid;place-items:center;font-size:25px;margin-bottom:62px}.eyebrow,.section-label{font-size:11px;letter-spacing:2px;font-weight:700;color:var(--teal);margin:0 0 16px}.intro h1{font-size:54px;line-height:1.08;letter-spacing:-2px;margin:0 0 24px}.intro h1 em{font-family:'Playfair Display',serif;font-weight:600;color:var(--teal)}.lead{color:var(--muted);font-size:16px;line-height:1.7;max-width:360px}.intro-note{margin-top:62px;color:var(--muted);font-size:12px}.intro-note span{color:var(--coral);margin-right:8px}.panel{background:var(--paper);border:1px solid #e9ede8;border-radius:22px;padding:36px 40px;box-shadow:0 15px 45px #173d3510}.panel-header,.list-heading{display:flex;justify-content:space-between;align-items:flex-start}.panel h2,.list-heading h2{font-size:25px;margin:0 0 28px;letter-spacing:-.6px}.step{font-size:12px;color:var(--teal);font-weight:700}.step span{color:#bbc8c3;font-weight:400}.field{margin-bottom:20px}.field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}.field label{display:block;font-size:12px;font-weight:700;margin:0 0 8px}.field label span{color:var(--coral)}input,select{font:inherit;width:100%;height:48px;border:1px solid var(--line);border-radius:9px;padding:0 14px;color:var(--ink);background:#fff;outline:none}input:focus,select:focus{border-color:var(--teal);box-shadow:0 0 0 3px #1e696215}input:user-invalid:not(:placeholder-shown){border-color:var(--coral)}.submit{width:100%;height:52px;border:0;border-radius:9px;background:var(--teal);color:#fff;font:600 14px 'DM Sans';cursor:pointer;margin-top:5px;transition:.2s}.submit:hover{background:#15534e;transform:translateY(-1px)}.submit span{font-size:20px;margin-left:12px}.form-footnote{text-align:center;color:#94a19d;font-size:11px;margin:15px 0 0}.bookings-section{grid-column:2}.list-heading h2{margin-bottom:18px}.count{font-size:12px;color:var(--muted);padding-top:5px}.confirmation{background:#e1f3e9;color:#28624e;padding:13px 16px;border-radius:9px;font-size:13px;margin-bottom:15px}.booking-list{display:flex;flex-direction:column;gap:12px}.empty-state{text-align:center;border:1px dashed #cfdcd5;border-radius:14px;padding:35px 20px;color:var(--muted)}.calendar-icon{font-size:24px;color:var(--teal);margin-bottom:8px}.empty-state p{margin:0 0 5px;color:var(--ink);font-weight:600}.empty-state span{font-size:12px}.booking{background:#fff;border:1px solid var(--line);border-radius:13px;padding:18px 20px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}.booking.cancelled{opacity:.62;background:#f1f3f0}.booking-name{font-size:16px;font-weight:700;margin:0 0 7px}.booking-meta{font-size:12px;color:var(--muted);margin:0}.booking-type{font-size:11px;color:var(--teal);font-weight:700;text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px}.cancel{border:1px solid #e6c1b8;background:#fff;color:#bd6756;border-radius:7px;padding:8px 11px;font:600 11px 'DM Sans';cursor:pointer}.cancelled-label{font-size:11px;color:#9b655b;font-weight:700}.booking.cancelled .booking-name{text-decoration:line-through}.booking:focus-within{outline:2px solid var(--mint)}@media(max-width:800px){.shell{grid-template-columns:1fr;gap:40px;padding:35px 20px}.intro{padding:0}.brand-mark{margin-bottom:35px}.intro h1{font-size:43px}.intro-note{margin-top:30px}.bookings-section{grid-column:1}.panel{padding:28px 22px}}@media(max-width:450px){.field-row{grid-template-columns:1fr;gap:0}}\n\nJAVASCRIPT:\nconst form = document.getElementById('booking-form');\nconst dateInput = document.getElementById('booking-date');\nconst list = document.getElementById('booking-list');\nconst empty = document.getElementById('empty-state');\nconst confirmation = document.getElementById('booking-confirmation');\nconst count = document.getElementById('booking-count');\nconst bookings = [];\n\nfunction localDateString() {\n  const now = new Date();\n  const offset = now.getTimezoneOffset() * 60000;\n  return new Date(now.getTime() - offset).toISOString().split('T')[0];\n}\nfunction formatDate(value) {\n  return new Date(value + 'T00:00:00').toLocaleDateString(undefined, {weekday:'short', month:'short', day:'numeric', year:'numeric'});\n}\nfunction updateCount() {\n  const active = bookings.filter(item => !item.cancelled).length;\n  count.textContent = `${active} ${active === 1 ? 'appointment' : 'appointments'}`;\n}\nfunction render() {\n  list.querySelectorAll('[data-testid=\"booking\"]').forEach(node => node.remove());\n  empty.hidden = bookings.length > 0;\n  bookings.forEach((item, index) => {\n    const card = document.createElement('article');\n    card.className = 'booking' + (item.cancelled ? ' cancelled' : '');\n    card.dataset.testid = 'booking';\n    card.dataset.status = item.cancelled ? 'cancelled' : 'active';\n    card.innerHTML = `<div><div class=\"booking-type\">${item.type}</div><p class=\"booking-name\" data-testid=\"booking-name-display\"></p><p class=\"booking-meta\">${formatDate(item.date)} · ${item.time} · ${item.email}</p></div>`;\n    card.querySelector('[data-testid=\"booking-name-display\"]').textContent = item.name;\n    const action = document.createElement('div');\n    if (item.cancelled) { action.className = 'cancelled-label'; action.textContent = 'Cancelled'; }\n    else { const button = document.createElement('button'); button.className='cancel'; button.type='button'; button.dataset.testid='booking-cancel'; button.textContent='Cancel'; button.addEventListener('click', () => { item.cancelled=true; render(); }); action.appendChild(button); }\n    card.appendChild(action); list.appendChild(card);\n  });\n  updateCount();\n}\ndateInput.min = localDateString();\nform.addEventListener('submit', event => {\n  event.preventDefault();\n  if (!form.checkValidity()) { form.reportValidity(); return; }\n  const data = new FormData(form);\n  const date = data.get('date');\n  if (date < localDateString()) { dateInput.setCustomValidity('Please choose today or a future date.'); dateInput.reportValidity(); dateInput.setCustomValidity(''); return; }\n  bookings.push({name:data.get('name'), email:data.get('email'), date, time:data.get('time'), type:data.get('type'), cancelled:false});\n  render();\n  confirmation.textContent = `Appointment confirmed for ${data.get('name')} — ${formatDate(date)} at ${data.get('time')}.`;\n  confirmation.hidden = false;\n  form.reset(); dateInput.min = localDateString();\n  window.setTimeout(() => { confirmation.hidden = true; }, 6000);\n});\n\nAUTOMATED QUALITY FEEDBACK\n\n{\n  \"staticAnalysis\": {\n    \"passed\": false,\n    \"totalIssues\": 3,\n    \"totalErrors\": 3,\n    \"totalWarnings\": 0,\n    \"html\": {\n      \"tool\": \"HTMLHint\",\n      \"passed\": true,\n      \"issueCount\": 0,\n      \"errorCount\": 0,\n      \"warningCount\": 0,\n      \"messages\": []\n    },\n    \"css\": {\n      \"tool\": \"Stylelint\",\n      \"passed\": false,\n      \"issueCount\": 2,\n      \"errorCount\": 2,\n      \"warningCount\": 0,\n      \"messages\": [\n        {\n          \"line\": 2,\n          \"column\": 1997,\n          \"endLine\": 2,\n          \"endColumn\": 2006,\n          \"severity\": \"error\",\n          \"message\": \"Missing generic font family (font-family-no-missing-generic-family-keyword)\",\n          \"ruleId\": \"font-family-no-missing-generic-family-keyword\"\n        },\n        {\n          \"line\": 2,\n          \"column\": 3378,\n          \"endLine\": 2,\n          \"endColumn\": 3387,\n          \"severity\": \"error\",\n          \"message\": \"Missing generic font family (font-family-no-missing-generic-family-keyword)\",\n          \"ruleId\": \"font-family-no-missing-generic-family-keyword\"\n        }\n      ]\n    },\n    \"javascript\": {\n      \"tool\": \"ESLint\",\n      \"passed\": false,\n      \"issueCount\": 1,\n      \"errorCount\": 1,\n      \"warningCount\": 0,\n      \"messages\": [\n        {\n          \"line\": 42,\n          \"column\": 20,\n          \"endLine\": 42,\n          \"endColumn\": 28,\n          \"severity\": \"error\",\n          \"message\": \"'FormData' is not defined.\",\n          \"ruleId\": \"no-undef\"\n        }\n      ]\n    }\n  },\n  \"runtimeValidation\": {\n    \"passed\": true,\n    \"navigationSuccessful\": true,\n    \"hasVisibleBodyContent\": true,\n    \"consoleErrors\": [],\n    \"uncaughtExceptions\": [],\n    \"requiredControls\": {\n      \"expected\": 2,\n      \"present\": 2,\n      \"allPresent\": true,\n      \"missing\": []\n    }\n  },\n  \"accessibility\": {\n    \"successful\": true,\n    \"violationCount\": 1,\n    \"violatingNodeCount\": 5,\n    \"violationsByImpact\": {\n      \"critical\": 0,\n      \"serious\": 1,\n      \"moderate\": 0,\n      \"minor\": 0,\n      \"unknown\": 0\n    },\n    \"violations\": [\n      {\n        \"id\": \"color-contrast\",\n        \"impact\": \"serious\",\n        \"description\": \"Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds\",\n        \"help\": \"Elements must meet minimum color contrast ratio thresholds\",\n        \"affectedNodeCount\": 5,\n        \"nodes\": [\n          {\n            \"target\": [\n              \".lead\"\n            ],\n            \"failureSummary\": \"Fix any of the following:\\n  Element has insufficient color contrast of 3.8 (foreground color: #718080, background color: #f7f6f1, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1\"\n          },\n          {\n            \"target\": [\n              \".intro-note\"\n            ],\n            \"failureSummary\": \"Fix any of the following:\\n  Element has insufficient color contrast of 3.8 (foreground color: #718080, background color: #f7f6f1, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1\"\n          },\n          {\n            \"target\": [\n              \".form-footnote\"\n            ],\n            \"failureSummary\": \"Fix any of the following:\\n  Element has insufficient color contrast of 2.67 (foreground color: #94a19d, background color: #ffffff, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1\"\n          }\n        ]\n      }\n    ]\n  },\n  \"functionalValidation\": {\n    \"passed\": false,\n    \"passedCount\": 8,\n    \"failedCount\": 1,\n    \"totalCount\": 9,\n    \"failedTests\": [\n      {\n        \"id\": \"booking-confirmation\",\n        \"requirement\": \"Display a visible confirmation after a valid booking is successfully created.\",\n        \"error\": \"No visible booking confirmation was displayed after successful creation.\"\n      }\n    ]\n  }\n}\n\nImprove the existing application while preserving its original specification.",
+          "generationMetrics": {
+            "totalDurationMs": 18830,
+            "promptTokens": 5274,
+            "outputTokens": 3307,
+            "totalTokens": 8581,
+            "finishReason": null
+          },
+          "iterationDirectory": "C:\\Users\\Administrator\\Documents\\Development\\ai-software-quality-pipeline\\generated-apps\\runs\\2026-08-03T14-16-49-761Z-550bd579\\iterations\\1"
+        }
+      ],
+      "stoppedEarly": true,
+      "stopReason": "no-actionable-feedback",
+      "completedIterations": 1
+    }
+  }
+}

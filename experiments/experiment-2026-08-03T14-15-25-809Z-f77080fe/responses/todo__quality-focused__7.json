@@ -1,0 +1,284 @@
+{
+  "capturedAt": "2026-08-03T14:49:56.432Z",
+  "httpStatus": 201,
+  "ok": true,
+  "body": {
+    "run": {
+      "runId": "2026-08-03T14-49-54-405Z-6f567906",
+      "createdAt": "2026-08-03T14:49:54.406Z",
+      "specification": {
+        "id": "todo",
+        "name": "To-do List"
+      },
+      "workflow": "quality-focused",
+      "model": "gpt-5.6-luna",
+      "temperature": 0,
+      "promptVersion": "1.0.0",
+      "generationMetrics": {
+        "totalDurationMs": 24262,
+        "promptTokens": 897,
+        "outputTokens": 2692,
+        "totalTokens": 3589,
+        "finishReason": null
+      },
+      "generatedApplication": {
+        "applicationName": "To-do List",
+        "summary": "A simple in-memory task manager for adding, completing, deleting, and counting to-do items."
+      },
+      "qualitySummary": {
+        "totalIssues": 0,
+        "totalErrors": 0,
+        "totalWarnings": 0,
+        "passed": true
+      },
+      "experimentMetrics": {
+        "workflowDurationMs": 26330,
+        "aiGenerationDurationMs": 24262,
+        "refinementIterations": 0,
+        "converged": null,
+        "stopReason": "not-applicable",
+        "totalPromptTokens": 897,
+        "totalOutputTokens": 2692,
+        "totalTokens": 3589,
+        "iterations": [
+          {
+            "iteration": 0,
+            "generationDurationMs": 24262,
+            "promptTokens": 897,
+            "outputTokens": 2692,
+            "totalTokens": 3589
+          }
+        ]
+      },
+      "completedAt": "2026-08-03T14:49:56.436Z",
+      "runDirectory": "C:\\Users\\Administrator\\Documents\\Development\\ai-software-quality-pipeline\\generated-apps\\runs\\2026-08-03T14-49-54-405Z-6f567906"
+    },
+    "application": {
+      "html": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  <title>To-do List</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n  <script src=\"script.js\" defer></script>\n</head>\n<body>\n  <main class=\"app-shell\">\n    <header class=\"app-header\">\n      <p class=\"eyebrow\">Personal planner</p>\n      <h1>To-do List</h1>\n      <p class=\"intro\">Keep track of the things you want to get done.</p>\n    </header>\n\n    <section class=\"todo-panel\" aria-labelledby=\"add-task-heading\">\n      <h2 id=\"add-task-heading\">Add a task</h2>\n      <form id=\"task-form\" novalidate>\n        <div class=\"input-row\">\n          <div class=\"field-group\">\n            <label for=\"task-input\">Task name</label>\n            <input id=\"task-input\" data-testid=\"task-input\" name=\"task\" type=\"text\" autocomplete=\"off\" maxlength=\"200\" aria-describedby=\"task-error\">\n          </div>\n          <button id=\"task-add\" data-testid=\"task-add\" class=\"primary-button\" type=\"submit\">Add task</button>\n        </div>\n        <p id=\"task-error\" class=\"form-message\" role=\"alert\"></p>\n      </form>\n    </section>\n\n    <section class=\"todo-panel\" aria-labelledby=\"tasks-heading\">\n      <div class=\"list-heading\">\n        <h2 id=\"tasks-heading\">Your tasks</h2>\n        <p class=\"count-summary\"><span data-testid=\"incomplete-count\">0</span> incomplete</p>\n      </div>\n      <ul id=\"task-list\" data-testid=\"task-list\" class=\"task-list\" aria-live=\"polite\"></ul>\n      <p id=\"empty-state\" class=\"empty-state\">No tasks yet. Add one above to get started.</p>\n    </section>\n  </main>\n</body>\n</html>",
+      "css": "* {\n  box-sizing: border-box;\n}\n\n:root {\n  color: #172033;\n  background: #eef2f7;\n  font-family: system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif;\n  line-height: 1.5;\n}\n\nbody {\n  margin: 0;\n  min-width: 280px;\n}\n\n.app-shell {\n  width: min(100% - 2rem, 720px);\n  margin: 0 auto;\n  padding: 3rem 0;\n}\n\n.app-header {\n  margin-bottom: 2rem;\n}\n\n.eyebrow {\n  margin: 0 0 .35rem;\n  color: #315ca8;\n  font-size: .8rem;\n  font-weight: 750;\n  letter-spacing: .12em;\n  text-transform: uppercase;\n}\n\nh1, h2, p {\n  margin-top: 0;\n}\n\nh1 {\n  margin-bottom: .5rem;\n  font-size: clamp(2rem, 6vw, 3rem);\n  line-height: 1.1;\n}\n\nh2 {\n  margin-bottom: 1rem;\n  font-size: 1.2rem;\n}\n\n.intro {\n  max-width: 42rem;\n  margin-bottom: 0;\n  color: #526078;\n}\n\n.todo-panel {\n  margin-bottom: 1.25rem;\n  padding: clamp(1.1rem, 4vw, 1.6rem);\n  border: 1px solid #d6deea;\n  border-radius: 12px;\n  background: #fff;\n  box-shadow: 0 5px 18px rgb(28 49 84 / 7%);\n}\n\n.input-row {\n  display: flex;\n  align-items: end;\n  gap: .75rem;\n}\n\n.field-group {\n  flex: 1 1 auto;\n}\n\nlabel {\n  display: block;\n  margin-bottom: .4rem;\n  font-weight: 650;\n}\n\ninput[type=\"text\"] {\n  width: 100%;\n  min-height: 2.75rem;\n  padding: .6rem .75rem;\n  border: 1px solid #9baac0;\n  border-radius: 7px;\n  color: #172033;\n  background: #fff;\n  font: inherit;\n}\n\nbutton {\n  min-height: 2.75rem;\n  border: 0;\n  border-radius: 7px;\n  padding: .6rem 1rem;\n  font: inherit;\n  font-weight: 700;\n  cursor: pointer;\n}\n\n.primary-button {\n  color: #fff;\n  background: #2457a6;\n}\n\n.primary-button:hover {\n  background: #1b4384;\n}\n\n.form-message {\n  min-height: 1.5em;\n  margin: .5rem 0 0;\n  color: #a32929;\n  font-size: .9rem;\n}\n\n.list-heading {\n  display: flex;\n  align-items: baseline;\n  justify-content: space-between;\n  gap: 1rem;\n}\n\n.list-heading h2 {\n  margin-bottom: 0;\n}\n\n.count-summary {\n  margin-bottom: 0;\n  color: #526078;\n  font-size: .95rem;\n}\n\n.count-summary span {\n  color: #172033;\n  font-weight: 750;\n}\n\n.task-list {\n  display: grid;\n  gap: .7rem;\n  margin: 1.2rem 0 0;\n  padding: 0;\n  list-style: none;\n}\n\n.task-item {\n  display: flex;\n  align-items: center;\n  gap: .75rem;\n  padding: .8rem .9rem;\n  border: 1px solid #d6deea;\n  border-radius: 8px;\n  background: #f9fbfd;\n}\n\n.task-toggle {\n  flex: 0 0 auto;\n  width: 1.15rem;\n  height: 1.15rem;\n  accent-color: #2457a6;\n}\n\n.task-text {\n  flex: 1 1 auto;\n  overflow-wrap: anywhere;\n}\n\n.task-item.completed .task-text {\n  color: #5b687b;\n  text-decoration: line-through;\n}\n\n.delete-button {\n  min-height: 2.25rem;\n  padding: .4rem .7rem;\n  color: #8c2020;\n  background: #fcecec;\n}\n\n.delete-button:hover {\n  background: #f7dada;\n}\n\n.empty-state {\n  margin: 1.2rem 0 0;\n  color: #526078;\n  text-align: center;\n}\n\n:focus-visible {\n  outline: 3px solid #f0a51a;\n  outline-offset: 2px;\n}\n\n@media (max-width: 520px) {\n  .app-shell {\n    padding: 2rem 0;\n  }\n\n  .input-row {\n    align-items: stretch;\n    flex-direction: column;\n  }\n\n  .primary-button {\n    width: 100%;\n  }\n\n  .list-heading {\n    align-items: flex-start;\n    flex-direction: column;\n    gap: .25rem;\n  }\n}",
+      "javascript": "const taskForm = document.querySelector('#task-form');\nconst taskInput = document.querySelector('[data-testid=\"task-input\"]');\nconst taskList = document.querySelector('[data-testid=\"task-list\"]');\nconst incompleteCount = document.querySelector('[data-testid=\"incomplete-count\"]');\nconst emptyState = document.querySelector('#empty-state');\nconst taskError = document.querySelector('#task-error');\n\nlet tasks = [];\nlet nextTaskId = 1;\n\nfunction setError(message) {\n  taskError.textContent = message;\n}\n\nfunction addTask(text) {\n  tasks.push({ id: nextTaskId, text, completed: false });\n  nextTaskId += 1;\n}\n\nfunction createTaskElement(task) {\n  const item = document.createElement('li');\n  item.className = 'task-item';\n  item.dataset.testid = 'task';\n  item.dataset.completed = String(task.completed);\n  if (task.completed) item.classList.add('completed');\n\n  const toggleLabel = document.createElement('label');\n  toggleLabel.className = 'visually-hidden';\n  toggleLabel.htmlFor = `task-toggle-${task.id}`;\n  toggleLabel.textContent = `Mark ${task.text} as complete`;\n\n  const toggle = document.createElement('input');\n  toggle.type = 'checkbox';\n  toggle.id = `task-toggle-${task.id}`;\n  toggle.className = 'task-toggle';\n  toggle.dataset.testid = 'task-complete';\n  toggle.checked = task.completed;\n  toggle.setAttribute('aria-label', `Mark ${task.text} as complete`);\n  toggle.addEventListener('change', () => {\n    task.completed = toggle.checked;\n    renderTasks();\n  });\n\n  const text = document.createElement('span');\n  text.className = 'task-text';\n  text.dataset.testid = 'task-text';\n  text.textContent = task.text;\n\n  const deleteButton = document.createElement('button');\n  deleteButton.type = 'button';\n  deleteButton.className = 'delete-button';\n  deleteButton.dataset.testid = 'task-delete';\n  deleteButton.textContent = 'Delete';\n  deleteButton.setAttribute('aria-label', `Delete ${task.text}`);\n  deleteButton.addEventListener('click', () => {\n    tasks = tasks.filter((currentTask) => currentTask.id !== task.id);\n    renderTasks();\n  });\n\n  item.append(toggle, toggleLabel, text, deleteButton);\n  return item;\n}\n\nfunction renderTasks() {\n  taskList.replaceChildren(...tasks.map(createTaskElement));\n  incompleteCount.textContent = String(tasks.filter((task) => !task.completed).length);\n  emptyState.hidden = tasks.length > 0;\n}\n\nfunction handleTaskSubmit(event) {\n  event.preventDefault();\n  const text = taskInput.value.trim();\n  if (!text) {\n    setError('Enter a task before adding it.');\n    taskInput.focus();\n    return;\n  }\n  addTask(text);\n  taskInput.value = '';\n  setError('');\n  renderTasks();\n  taskInput.focus();\n}\n\ntaskForm.addEventListener('submit', handleTaskSubmit);\nrenderTasks();",
+      "metadata": {
+        "applicationName": "To-do List",
+        "summary": "A simple in-memory task manager for adding, completing, deleting, and counting to-do items."
+      }
+    },
+    "qualityReport": {
+      "analysedAt": "2026-08-03T14:49:54.405Z",
+      "analyzers": {
+        "html": {
+          "tool": "HTMLHint",
+          "issueCount": 0,
+          "errorCount": 0,
+          "warningCount": 0,
+          "passed": true,
+          "messages": []
+        },
+        "css": {
+          "tool": "Stylelint",
+          "issueCount": 0,
+          "errorCount": 0,
+          "warningCount": 0,
+          "passed": true,
+          "messages": []
+        },
+        "javascript": {
+          "tool": "ESLint",
+          "issueCount": 0,
+          "errorCount": 0,
+          "warningCount": 0,
+          "passed": true,
+          "messages": []
+        }
+      },
+      "summary": {
+        "totalIssues": 0,
+        "totalErrors": 0,
+        "totalWarnings": 0,
+        "passed": true
+      }
+    },
+    "runtimeReport": {
+      "reportVersion": "1.1",
+      "runId": "2026-08-03T14-49-54-405Z-6f567906",
+      "specificationId": "todo",
+      "applicationUrl": "http://localhost:3001/generated-apps/runs/2026-08-03T14-49-54-405Z-6f567906/index.html",
+      "browser": {
+        "engine": "chromium",
+        "headless": true,
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        }
+      },
+      "startedAt": "2026-08-03T14:49:54.415Z",
+      "completedAt": "2026-08-03T14:49:55.431Z",
+      "durationMs": 1016,
+      "navigation": {
+        "successful": true,
+        "status": 200,
+        "finalUrl": "http://localhost:3001/generated-apps/runs/2026-08-03T14-49-54-405Z-6f567906/index.html",
+        "error": null
+      },
+      "body": {
+        "exists": true,
+        "visible": true,
+        "textLength": 178,
+        "textPreview": "PERSONAL PLANNER\n\nTo-do List\n\nKeep track of the things you want to get done.\n\nAdd a task\nTask name\nAdd task\n\nYour tasks\n\n0 incomplete\n\nNo tasks yet. Add one above to get started.",
+        "hasVisibleContent": true
+      },
+      "consoleErrors": [],
+      "uncaughtExceptions": [],
+      "requiredControls": {
+        "expected": 2,
+        "present": 2,
+        "allPresent": true,
+        "controls": [
+          {
+            "id": "task-input",
+            "label": "Task input",
+            "present": true,
+            "candidates": [
+              {
+                "type": "css",
+                "selector": "input[type=\"text\"], input:not([type]), textarea",
+                "found": true
+              }
+            ]
+          },
+          {
+            "id": "add-task-control",
+            "label": "Add-task control",
+            "present": true,
+            "candidates": [
+              {
+                "type": "role",
+                "role": "button",
+                "name": "add|create|save|submit",
+                "found": true
+              },
+              {
+                "type": "css",
+                "selector": "button[type=\"submit\"], input[type=\"submit\"]",
+                "found": true
+              }
+            ]
+          }
+        ]
+      },
+      "accessibility": {
+        "successful": true,
+        "standard": "WCAG 2.0 and 2.1 Level A and AA",
+        "tags": [
+          "wcag2a",
+          "wcag2aa",
+          "wcag21a",
+          "wcag21aa"
+        ],
+        "violationCount": 0,
+        "violatingNodeCount": 0,
+        "violationsByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0,
+          "unknown": 0
+        },
+        "violations": [],
+        "incompleteCount": 0,
+        "inapplicableCount": 41,
+        "passCount": 21,
+        "error": null
+      },
+      "summary": {
+        "runtimePassed": true,
+        "accessibilityPassed": true,
+        "navigationSuccessful": true,
+        "hasVisibleBodyContent": true,
+        "consoleErrorCount": 0,
+        "uncaughtExceptionCount": 0,
+        "requiredControlsPresent": 2,
+        "requiredControlsExpected": 2,
+        "accessibilityAnalysisSuccessful": true,
+        "accessibilityViolationCount": 0,
+        "accessibilityViolatingNodeCount": 0
+      }
+    },
+    "accessibilityReport": {
+      "successful": true,
+      "standard": "WCAG 2.0 and 2.1 Level A and AA",
+      "tags": [
+        "wcag2a",
+        "wcag2aa",
+        "wcag21a",
+        "wcag21aa"
+      ],
+      "violationCount": 0,
+      "violatingNodeCount": 0,
+      "violationsByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0,
+        "unknown": 0
+      },
+      "violations": [],
+      "incompleteCount": 0,
+      "inapplicableCount": 41,
+      "passCount": 21,
+      "error": null
+    },
+    "functionalReport": {
+      "reportVersion": "1.0",
+      "runId": "2026-08-03T14-49-54-405Z-6f567906",
+      "specificationId": "todo",
+      "applicationUrl": "http://localhost:3001/generated-apps/runs/2026-08-03T14-49-54-405Z-6f567906/index.html",
+      "startedAt": "2026-08-03T14:49:55.469Z",
+      "completedAt": "2026-08-03T14:49:56.398Z",
+      "durationMs": 929,
+      "tests": [
+        {
+          "id": "todo-add-task",
+          "requirement": "Allow the user to enter and add a non-empty task, and display the added task in a visible task list.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "todo-reject-empty-task",
+          "requirement": "Whitespace-only or empty input must not create a task.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "todo-complete-task",
+          "requirement": "Allow each task to be marked as completed, with its completed state visibly reflected in the interface.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "todo-delete-task",
+          "requirement": "Allow each task to be deleted. After deletion, the deleted task must no longer be displayed in the task list.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "todo-incomplete-count",
+          "requirement": "Display the current number of incomplete tasks and update the count when tasks are added, completed or deleted.",
+          "passed": true,
+          "error": null
+        },
+        {
+          "id": "todo-session-memory",
+          "requirement": "Keep task data in page memory only. Refreshing or reopening the page must reset the task list.",
+          "passed": true,
+          "error": null
+        }
+      ],
+      "summary": {
+        "passed": true,
+        "passedCount": 6,
+        "failedCount": 0,
+        "totalCount": 6
+      }
+    }
+  }
+}
