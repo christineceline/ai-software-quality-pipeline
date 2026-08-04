@@ -1,0 +1,4 @@
+group,outcome,n,missing,mean,standardDeviation,median,q1,q3,iqr,minimum,maximum
+automated-refinement,staticIssueChange,30,0,-1.2333333333333334,1.2228664272317622,-1.0,-2.0,0.0,2.0,-4,0
+automated-refinement,accessibilityViolationChange,30,0,-0.9666666666666667,0.5560534167675355,-1.0,-1.0,-1.0,0.0,-2,0
+automated-refinement,functionalFailedTestChange,30,0,-0.03333333333333333,0.18257418583505533,0.0,0.0,0.0,0.0,-1,0

@@ -96,3 +96,9 @@ analysis/**/tables/*
 *.feather
 *.pkl
 *.pickle
+
+# Keep descriptive analysis outputs
+!analysis/**/tables/descriptive_*.csv
+!analysis/**/tables/table_*.csv
+!analysis/**/tables/automated_initial_final_pass_transitions.csv
+!analysis/**/figures/*.png

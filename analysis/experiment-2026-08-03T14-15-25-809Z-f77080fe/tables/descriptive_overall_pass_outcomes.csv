@@ -1,0 +1,6 @@
+outcome,passed,total,percentage
+Final all checks passed,51,90,56.666666666666664
+Final static analysis passed,64,90,71.11111111111111
+Final runtime validation passed,89,90,98.88888888888889
+Final accessibility validation passed,63,90,70.0
+Final functional validation passed,86,90,95.55555555555556

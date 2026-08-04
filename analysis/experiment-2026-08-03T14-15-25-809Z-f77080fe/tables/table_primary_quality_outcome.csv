@@ -1,0 +1,10 @@
+specificationId,workflow,passed,failed,total,percentagePassed
+booking,automated-refinement,10,0,10,100.0
+booking,one-shot,0,10,10,0.0
+booking,quality-focused,2,8,10,20.0
+quiz,automated-refinement,10,0,10,100.0
+quiz,one-shot,0,10,10,0.0
+quiz,quality-focused,9,1,10,90.0
+todo,automated-refinement,10,0,10,100.0
+todo,one-shot,2,8,10,20.0
+todo,quality-focused,8,2,10,80.0
