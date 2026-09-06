@@ -35,7 +35,7 @@ app.use(
 app.get("/api/health", (request, response) => {
   response.json({
     status: "ok",
-    service: "AI Software Quality Pipeline API",
+    service: "AQuA API",
     timestamp: new Date().toISOString(),
   });
 });
