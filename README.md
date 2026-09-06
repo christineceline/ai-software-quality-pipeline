@@ -93,7 +93,7 @@ generated-apps/  Local generated-run workspace; formal experiment applications a
 ### Prerequisites
 
 - Node.js and npm
-- Python 3 for the analysis workspace
+- Python 3.12 recommended for the analysis workspace; the formal notebooks were executed using Python 3.12.6
 - An OpenAI API key for new generations or experiments
 - Chromium installed through Playwright
 
